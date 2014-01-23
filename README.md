@@ -17,17 +17,29 @@ Incorporating:
   * Custom hardware renderer running on vu1 path
 
 Building
-========
+--------
 
-* Linux: scons
-* Raspberry Pi: scons TARGET=RPI (you'll need scons and liblo-dev installed)
-* Android/OUYA: ndk-build (will need to be part of an APK)
+You'll need scons and liblo-dev installed, the Linux version requires GLUT.
+
+=== Linux
+
+    scons
+
+=== Raspberry Pi
+
+    scons TARGET=RPI
+
+=== Android/OUYA
+
+As part of an APK:
+
+    ndk-build
 
 Jellyfish Lisp Language Reference
-=================================
+---------------------------------
 
-Example programs
-----------------
+=== Example programs
+
 
 Randomly move vertex positions
 
@@ -46,8 +58,7 @@ Randomly move vertex positions
      (pdata-map! (lambda (c) (rndvec)) "c"))
 
 
-Core forms
-----------
+=== Core forms
 
 TDB
 
@@ -90,8 +101,7 @@ TDB
 * synth-play
 * play-now
 
-Low level instruction set
--------------------------
+=== Low level instruction set
 
 TDB
 
