@@ -6,8 +6,8 @@
 (define _touches '())
 (define _fling (vector 0 0))
 
-;(define-macro (every-frame . args)
-;  `(begin (set! frame-thunk (lambda () ,@args))))
+(define-macro (every-frame . args)
+  `(begin (set! frame-thunk (lambda () ,@args))))
 
 (define (frame-hook)
   (set! flx_time (+ flx_time 1))

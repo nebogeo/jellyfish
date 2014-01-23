@@ -274,8 +274,8 @@ void primitive::render(u32 hints)
 
     if (hints&HINT_WIRE)
     {
-        glDisableClientState(GL_COLOR_ARRAY);
-        glColor3f(0,0,0);
+//        glDisableClientState(GL_COLOR_ARRAY);
+//        glColor3f(0,0,0);
         glDrawArrays(GL_LINE_STRIP, 0, m_size);
     }
 

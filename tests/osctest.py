@@ -10,7 +10,6 @@ code = ["""
          (v 0)
          (np 0))
      (forever
-
       (set! vertex (+ positions-start 1))
       (loop (< vertex positions-end)
             (set! v (+ (* (normalise (read vertex)) 0.05)
@@ -22,7 +21,7 @@ code = ["""
       (set! t (+ t 0.01))
       )))
  (hint-unlit)
- (pdata-copy "p" "t")
+ (texture 0)
  (pdata-map! (lambda (p) (vmul (srndvec) 1)) "p")
  (pdata-map! (lambda (c) (rndvec)) "c")
  (pdata-map! (lambda (n) (vector 0 0 0)) "n"))
@@ -32,12 +31,14 @@ code = ["""
 (with-primitive
    (make-jelly 1000 prim-tristrip
     '(let ((vertex positions-start))
+       (write! reg-graphics (vector 512 1 2))
        (forever
         (set! vertex positions-start)
         (loop (< vertex positions-end)
               (write! vertex (+ (read vertex) (rndvec)))
               (++! vertex))
        )))
+   (texture 0)
    (pdata-map! (lambda (p) (srndvec)) "p")
    (pdata-map! (lambda (c) (rndvec)) "c"))
 """,
@@ -85,6 +86,6 @@ code = ["""
 while 1:
 
     print("sending")
-    osc.Message("/eval",[choice(code)]).sendto("192.168.1.192",8000)
-    #osc.Message("/eval",[choice(code)]).sendlocal(8000)
-    time.sleep(60)
+    #osc.Message("/eval",[choice(code)]).sendto("192.168.1.192",8000)
+    osc.Message("/eval",[choice(code)]).sendlocal(8000)
+    time.sleep(6)
