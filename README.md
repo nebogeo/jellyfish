@@ -31,19 +31,19 @@ Example programs
 
 Randomly move vertex positions
 
- (with-primitive
-  (make-jelly-obj 1000
- ;; jellyfish lisp starts here
-   '(let ((vertex positions-start))
-      (forever
-       (set! vertex positions-start)
-       (loop (< vertex positions-end)
-             (write! vertex (+ (read vertex) (rndvec)))
-             (set! vertex (+ vertex 1)))
-      )))
- ;; jellyfish lisp ends here
-  (pdata-map! (lambda (p) (srndvec)) "p")
-  (pdata-map! (lambda (c) (rndvec)) "c"))
+    (with-primitive
+     (make-jelly-obj 1000
+    ;; jellyfish lisp starts here
+      '(let ((vertex positions-start))
+         (forever
+          (set! vertex positions-start)
+          (loop (< vertex positions-end)
+                (write! vertex (+ (read vertex) (rndvec)))
+                (set! vertex (+ vertex 1)))
+         )))
+    ;; jellyfish lisp ends here
+     (pdata-map! (lambda (p) (srndvec)) "p")
+     (pdata-map! (lambda (c) (rndvec)) "c"))
 
 
 Core forms
@@ -51,45 +51,44 @@ Core forms
 
 TDB
 
- let
- define
- cond
- loop
- forever
- do
- lambda
- +
- -
- *
- /
- *v
- cross
- dot
- eq?
- >
- <
- set!
- write!
- write-add!
- swizzle
- rndvec
- trace
- read
- not
- mag
- magsq
- noise
- normalise
- abs
- floor
- sincos
- ignore
- round
- synth-create
- synth-connect
- synth-play
- play-now
-
+* let
+* define
+* cond
+* loop
+* forever
+* do
+* lambda
+* +
+* -
+* *
+* /
+* *v
+* cross
+* dot
+* eq?
+* >
+* <
+* set!
+* write!
+* write-add!
+* swizzle
+* rndvec
+* trace
+* read
+* not
+* mag
+* magsq
+* noise
+* normalise
+* abs
+* floor
+* sincos
+* ignore
+* round
+* synth-create
+* synth-connect
+* synth-play
+* play-now
 
 Low level instruction set
 -------------------------
