@@ -44,10 +44,12 @@
 
 char *starwisp_data = NULL;
 
+#ifndef FLX_RPI
 #include "core/db_container.h"
 db_container the_db_container;
 #include "core/idmap.h"
 idmap the_idmap;
+#endif
 
 #ifdef _EE
 #define USE_STRLWR 0
@@ -4205,6 +4207,8 @@ static pointer opexe_5(scheme *sc, enum scheme_opcodes op) {
      return sc->T;
 }
 
+#ifndef FLX_RPI
+
 // fudge to behave like planet jaymccarthy/sqlite:5:1/sqlite
 static pointer db_data_to_scm(scheme *sc, list *data)
 {
@@ -4274,6 +4278,8 @@ pointer db_exec(scheme* sc, db *d) {
      return ret;
 }
 
+#endif
+
 static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      pointer x, y;
      long v;
@@ -4339,14 +4345,17 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
           }
           s_return(sc,sc->F);
      case OP_OPEN_DB: {
+#ifndef FLX_RPI
           if (is_string(car(sc->args))) {
                the_db_container.add(string_value(car(sc->args)),
                                     new db(string_value(car(sc->args))));
                s_return(sc,sc->T);
           }
+#endif
           s_return(sc,sc->F);
      }
      case OP_EXEC_DB: {
+#ifndef FLX_RPI
           if (is_string(car(sc->args)) &&
               is_string(cadr(sc->args))) {
                db *d=the_db_container.get(string_value(car(sc->args)));
@@ -4355,9 +4364,11 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                     s_return(sc,db_exec(sc,d));
                }
           }
+#endif
           s_return(sc,sc->F);
      }
      case OP_INSERT_DB: {
+#ifndef FLX_RPI
           if (is_string(car(sc->args)) &&
               is_string(cadr(sc->args))) {
                db *d=the_db_container.get(string_value(car(sc->args)));
@@ -4367,12 +4378,15 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                     s_return(sc,mk_integer(sc,d->last_rowid()));
                }
           }
+#endif
           s_return(sc,sc->F);
      }
      case OP_STATUS_DB: {
+#ifndef FLX_RPI
           if (is_string(car(sc->args))) {
                s_return(sc,mk_string(sc,the_db_container.status()));
           }
+#endif
           s_return(sc,sc->F);
      }
      case OP_TIME: {
