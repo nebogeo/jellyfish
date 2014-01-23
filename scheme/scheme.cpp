@@ -47,9 +47,10 @@ char *starwisp_data = NULL;
 #ifndef FLX_RPI
 #include "core/db_container.h"
 db_container the_db_container;
+#endif
+
 #include "core/idmap.h"
 idmap the_idmap;
-#endif
 
 #ifdef _EE
 #define USE_STRLWR 0
