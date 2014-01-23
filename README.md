@@ -21,15 +21,15 @@ Building
 
 You'll need scons and liblo-dev installed, the Linux version requires GLUT.
 
-=== Linux
+### Linux ###
 
     scons
 
-=== Raspberry Pi
+### Raspberry Pi ###
 
     scons TARGET=RPI
 
-=== Android/OUYA
+### Android/OUYA ###
 
 As part of an APK:
 
@@ -38,7 +38,7 @@ As part of an APK:
 Jellyfish Lisp Language Reference
 ---------------------------------
 
-=== Example programs
+### Example programs ###
 
 
 Randomly move vertex positions
@@ -58,7 +58,7 @@ Randomly move vertex positions
      (pdata-map! (lambda (c) (rndvec)) "c"))
 
 
-=== Core forms
+### Core forms ###
 
 TDB
 
@@ -101,7 +101,7 @@ TDB
 * synth-play
 * play-now
 
-=== Low level instruction set
+### Low level instruction set ###
 
 TDB
 
