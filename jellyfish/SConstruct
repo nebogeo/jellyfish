@@ -1,0 +1,6 @@
+env = Environment(CCFLAGS='-O3 -ggdb')
+env.Append(CPPPATH = '.')
+
+env.Program( target = 'jellyfishtest', 
+             source = ['main.cpp',
+                       'jellyfish.cpp'] )

@@ -1,0 +1,15 @@
+Jellyfish
+
+Aims to be a fluxus compatible programmable game engine and 3D renderer
+for livecoding small devices.
+
+Incorporating:
+
+* Modified tinyscheme R5RS interpreter
+* Fixed point maths throughout
+* An experimental vector processor for fast procedural rendering
+* OpenGL ES backend for ARM/android/rasperry pi/OUYA
+* Linux target: reference version (also running fixed point)
+
+* Playstation 2 target (legacy)
+  * Custom hardware renderer running on vu1 path
