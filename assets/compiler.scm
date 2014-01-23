@@ -571,6 +571,8 @@
     (else s)))
 
 (define (compile-program cycles prim hints x)
+  (set! variables '())
+  (set! function-code '())
   (let* ((code (emit-expr (pre-process x)))
          (data (variables->data))
          (function-start (+ reg-code-start (length data)))
