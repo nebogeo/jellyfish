@@ -50,21 +50,25 @@ Jellyfish Lisp Language Reference
 
 ### Example programs ###
 
-The purpose of a jellyfish lisp program is to manipulate 3D objects,
-move/rotate/scale or change it's vertex positions, lighting normals,
+The purpose of a Jellyfish Lisp program is to manipulate 3D objects in a
+scene, move/rotate/scale or change vertex positions, lighting normals,
 texture coords. It can also act on input from outside. It can do this
-faster than in Scheme (particually on ARM devices) as it doesn't require
-any memory allocation, and it has access to more data than a GPU shader.
+faster than in interpreted Scheme, particually on ARM devices as the VM
+(written in C++) is very small and doesn't require any memory
+allocation. The VM also has access to more data than a GPU shader,
+although tight coupling to GPU functionality (ie running parts of the VM
+on GPU cores) is planned.
 
-Jellyfish Lisp programs are compiled to bytecode executed by the
-Jellyfish VM - there is one per object running parallel.  The helper
-function (make-jelly-obj) takes a number of cycles to execute per frame,
-an OpenGL primitive type and a program. It returns the primitive id
-which can be operated on like any normal fluxus primitive.
+Jellyfish Lisp programs are compiled to bytecode executed by the VM -
+there is one per object potentially running in parallel threads.  The
+helper function (make-jelly-obj) takes a number of cycles to execute per
+frame, an OpenGL primitive type and a program. It returns the primitive
+id which can be operated on like any normal fluxus primitive.
 
 Inside the jellyfish VM the 3D data exists in the same memory address
-space as the program, starting at "positions-start" address. You can
-(read) data or (write!) to it using a value as an address.
+space as the program itself, starting at "positions-start"
+address. Using (read) or (write!) you can access it using a value as an
+address.
 
 Here is a program that randomly moves vertex positions around:
 
