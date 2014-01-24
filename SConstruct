@@ -1,4 +1,4 @@
-target = 'nomadic'
+target = 'jellyfish'
 platform = ARGUMENTS.get('TARGET','LINUX')
 env = Environment(CCFLAGS='-O3 -std=gnu++0x -ggdb -DUSE_MATH=1 -Wno-write-strings')
 source = ['main.cpp',
@@ -22,8 +22,8 @@ source = ['main.cpp',
           'engine/scenenode.cpp',
           'engine/texture.cpp',
           'engine/nomadic.cpp',
-          'jellyfish/jellyfish_primitive.cpp',
-          'jellyfish/jellyfish.cpp'
+          'engine/jellyfish_primitive.cpp',
+          'engine/jellyfish.cpp'
        ]
 
 if platform=='LINUX':
