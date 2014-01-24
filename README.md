@@ -5,8 +5,6 @@ A minimalistic fluxus compatible programmable game engine and 3D
 renderer for exprimenting with livecoding ARM devices such as Raspberry
 Pi, OUYA and Android as well as legacy support for PlayStation2.
 
-Incorporating:
-
 * Modified tinyscheme R5RS interpreter
 * REPL for livecoding
 * OSC REPL for remote livecoding
