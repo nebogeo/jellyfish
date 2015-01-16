@@ -2,6 +2,7 @@
 ;; vectorlisp: a strange language for procedural rendering
 
 (define debug #f)
+(define prim-size 4096)
 
 (define nop 0) (define jmp 1) (define jmz 2) (define jlt 3) (define jgt 4)
 (define ldl 5) (define lda 6) (define ldi 7) (define sta 8) (define sti 9)
@@ -66,7 +67,7 @@
     addr))
 
 ;; segments are data areas, positions, normals, colours etc
-(define segment-size 512)
+(define segment-size prim-size)
 
 (define (memseg n) (* segment-size n))
 
@@ -142,6 +143,17 @@
                   (emit (vector drp 0 0))
                   (emit-expr-list (cdr l))))))))
 
+
+;; append a bunch of expressions, don't drop
+;; as we want to build the stack (for fn call)
+(define (emit-expr-list-maintain-stack l)
+  (cond
+    ((null? l) '())
+    (else
+     (append (emit-expr (car l))
+             (if (null? (cdr l)) '()
+                 (emit-expr-list-maintain-stack (cdr l)))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; primitive function calls follow
 
@@ -216,7 +228,7 @@
   (_ (cdr x)))
 
 (define (emit-fncall x addr)
-  (let ((args (emit-expr-list (cdr x))))
+  (let ((args (emit-expr-list-maintain-stack (cdr x))))
     (append
      ;; offset from here -> stitch up in second pass
      (emit (list 'add-abs-loc 'this 1
@@ -234,7 +246,7 @@
               ;; for moment use global pile for arguments :O
               (make-variable! arg)
               (vector sta (variable-address arg) 0))
-            (cadr x))
+            (reverse (cadr x)))
            ;; now args are loaded, do body
            (emit-expr-list (cddr x))
            ;; swap ret ptr to top
@@ -462,7 +474,7 @@
 (define (header code-start cycles prim hints)
   (list
    (vector code-start cycles 0) ;; control (pc, cycles, stack)
-   (vector 512 prim hints) ;; graphics
+   (vector prim-size prim hints) ;; graphics
    (vector 0 0 0) ;; translate
    (vector 1 0 0) ;; rota
    (vector 0 1 0) ;; rotb

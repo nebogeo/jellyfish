@@ -413,6 +413,8 @@ int main(int argc, char *argv[])
     appLoadTexture("raspberrypi.png",w,h,(char *)tex);
     tex=LoadPNG(ASSETS_LOCATION+"stripes.png",w,h);
     appLoadTexture("stripes.png",w,h,(char *)tex);
+    tex=LoadPNG(ASSETS_LOCATION+"thread.png",w,h);
+    appLoadTexture("thread.png",w,h,(char *)tex);
 
     appEval((char*)LoadFile(ASSETS_LOCATION+"jellyfish.scm").c_str());
 
