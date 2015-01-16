@@ -123,7 +123,15 @@
    '(let ((vertex positions-start)
           (warp-end 0)
           (warp-position (vector 0 0 0))
-          (shed 0))
+          (shed 0)
+          (weft-t 0)
+          (draft-pos 0)
+          (draft-size 4)
+          (draft    (vector 1 0 1)) (draft-a1 0)
+          (draft-b0 (vector 0 1 0)) (draft-b1 1)
+          (draft-c0 (vector 1 0 1)) (draft-c1 0)
+          (draft-d0 (vector 0 1 0)) (draft-d1 1)
+          (draft-end 0))
 
       (define build-quad
         (lambda (tl size)
@@ -136,6 +144,9 @@
 
       (define animate-shed
         (lambda (i v)
+          (set! v
+                (cond ((< v 0.5) 1)
+                      ((> v 0.5) -1)))
           (set! warp-end 0)
           (loop (< warp-end 10)
                 (write-add! (- i 6) 0 v 0 0 v v)
@@ -156,8 +167,18 @@
             (set! warp-end (+ warp-end 1)))
 
       (forever
+       ;; todo control externally
+       (set! weft-t (+ weft-t 0.05))
+       (cond ((> weft-t 1)
+              (set! draft-pos (+ draft-pos 1))
+              (cond ((> draft-pos draft-size)
+                     (set! draft-pos 0)))
+              (set! weft-t 0)))
+
+       (trace (read (+ (addr draft) (* draft-pos 2))))
+
        (set! vertex (+ positions-start 12))
-       (animate-shed vertex (*v (vector 1 0 0) (* (sincos shed) 1)))
+       (animate-shed vertex weft-t)
        (set! shed (+ shed 5))
 
        ))))

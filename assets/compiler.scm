@@ -212,6 +212,11 @@
    (emit-expr (cadr x)) ;; address
    (emit (vector lds 0 0))))
 
+(define (emit-addr x)
+  (display "ello")(newline)
+  (display (variable-address (cadr x)))(newline)
+  (emit (vector ldl (variable-address (cadr x)) 0)))
+
 (define (emit-cond-part x)
   (let ((block (emit-expr-list (cdr x))))
     (append
@@ -423,6 +428,7 @@
     ((eq? (car x) 'rndvec) (emit (vector rnd 0 0)))
     ((eq? (car x) 'trace) (emit-trace x))
     ((eq? (car x) 'read) (emit-read x))
+    ((eq? (car x) 'addr) (emit-addr x))
     ((eq? (car x) 'not) (emit-not x))
     ((eq? (car x) 'mag) (unary-procedure len x))
     ((eq? (car x) 'magsq) (unary-procedure lensq x))
