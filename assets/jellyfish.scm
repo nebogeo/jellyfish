@@ -119,7 +119,7 @@
 
 (define warp
   (make-jelly
-   500 prim-triangles
+   3000 prim-triangles
    '(let ((vertex positions-start)
           (warp-end 0)
           (warp-position (vector 0 0 0))
@@ -127,11 +127,12 @@
           (weft-t 0)
           (draft-pos 0)
           (draft-size 4)
-          (draft    (vector 1 0 1)) (draft-a1 0)
-          (draft-b0 (vector 0 1 0)) (draft-b1 1)
-          (draft-c0 (vector 1 0 1)) (draft-c1 0)
-          (draft-d0 (vector 0 1 0)) (draft-d1 1)
-          (draft-end 0))
+          (draft 1) (d-b 1) (d-c 0) (d-d 0)
+          (d-e 0) (d-f 1) (d-g 1) (d-h 0)
+          (d-i 0) (d-j 0) (d-k 1) (d-l 1)
+          (d-m 1) (d-n 0) (d-o 0) (d-p 1)
+          (draft-tmp 0)
+          (shed-tmp 0))
 
       (define build-quad
         (lambda (tl size)
@@ -144,22 +145,31 @@
 
       (define animate-shed
         (lambda (i v)
-          (set! v
-                (cond ((< v 0.5) 1)
-                      ((> v 0.5) -1)))
+          (set! shed-tmp (cond ((> v 0.5) (vector 0 0 3))
+                               ((< v 0.5) (vector 0 0 -3))))
+          (set! v (cond ((< v 0.5) (vector 0 0 3))
+                        ((> v 0.5) (vector 0 0 -3))))
           (set! warp-end 0)
-          (loop (< warp-end 10)
-                (write-add! (- i 6) 0 v 0 0 v v)
-                (write-add! i v 0 v v)
+          (loop (< warp-end 20)
+                (set! draft-tmp
+                      (read (+ (addr draft) (+ (* draft-pos draft-size)
+                                               (modulo warp-end (+ draft-size (vector 0 1 1)) )))))
+
+                (cond ((> draft-tmp 0.5)
+                       (write-add! (- i 6) 0 shed-tmp 0 0 shed-tmp shed-tmp
+                                   shed-tmp 0 shed-tmp shed-tmp))
+                       ((< draft-tmp 0.5)
+                       (write-add! (- i 6) 0 v 0 0 v v
+                                   v 0 v v)))
+
                 (set! i (+ i 24))
                 (set! warp-end (+ warp-end 1)))))
 
-
       (set! vertex positions-start)
       ; build 4 segments X warp-ends
-      (loop (< warp-end 10)
+      (loop (< warp-end 20)
             (set! warp-position (+ (vector -25 -35 0)
-                                   (* (vector 5 0 0) warp-end)))
+                                   (* (vector 2.5 0 0) warp-end)))
             (build-quad warp-position (vector 1 35 0))
             (build-quad (+ warp-position (vector 0 35 0)) (vector 1 15 0))
             (build-quad (+ warp-position (vector 0 50 0)) (vector 1 15 0))
@@ -168,14 +178,14 @@
 
       (forever
        ;; todo control externally
+
        (set! weft-t (+ weft-t 0.05))
        (cond ((> weft-t 1)
+              (trace draft-pos)
               (set! draft-pos (+ draft-pos 1))
               (cond ((> draft-pos draft-size)
                      (set! draft-pos 0)))
               (set! weft-t 0)))
-
-       (trace (read (+ (addr draft) (* draft-pos 2))))
 
        (set! vertex (+ positions-start 12))
        (animate-shed vertex weft-t)
@@ -200,7 +210,7 @@
                       ((eqv? (modulo i 6) 4) (vector 1 10 0))
                       ((eqv? (modulo i 6) 5) (vector 0 10 0))
                       )) "t")
- (pdata-map! (lambda (c) (vector 1 1 1)) "c")
+ (pdata-map! (lambda (c) (vector 1 0.5 0.2)) "c")
  (pdata-map! (lambda (n) (vector 0 0 0)) "n"))
 
 
@@ -218,7 +228,7 @@
                       ((eqv? (modulo i 6) 4) (vector 1 1 0))
                       ((eqv? (modulo i 6) 5) (vector 0 1 0))
                       )) "t")
- (pdata-map! (lambda (c) (vector 1 1 1)) "c")
+ (pdata-map! (lambda (c) (vector 0.2 0.8 1)) "c")
  (pdata-map! (lambda (n) (vector 0 0 0)) "n"))
 
 (every-frame

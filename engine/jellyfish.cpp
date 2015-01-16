@@ -260,9 +260,19 @@ void jellyfish::run()
         vec3 v=pop();
         m_audio_graph->Play(v.x, (int)v.y, v.z);
     } break;
-	case FLR: { vec3 t=pop(); push(vec3(floor((float)t.x),
-                                        floor((float)t.y),
-                                        floor((float)t.z))); } break;
+	case FLR:
+          { vec3 t=pop(); push(vec3(floor((float)t.x),
+                                    floor((float)t.y),
+                                    floor((float)t.z)));
+          } break;
+	case MOD:
+          {
+            vec3 m=pop();
+            vec3 t=pop();
+            push(vec3(fmod((float)t.x,(float)m.x),
+                      fmod((float)t.y,(float)m.y),
+                      fmod((float)t.z,(float)m.z)));
+          } break;
 
     default: set_instr(pc,false);
    	};

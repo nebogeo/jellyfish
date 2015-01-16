@@ -14,6 +14,7 @@
 (define swp 32) (define rnd 33) (define mull 34) (define jmr 35) (define ldlv 36)
 (define lensq 37) (define noise 38) (define lds 39) (define sts 40) (define mulv 41)
 (define synth-crt 42) (define synth-con 43) (define synth-ply 44) (define flr 45)
+(define mod 46)
 
 (define instr
   '(nop jmp jmz jlt jgt ldl lda ldi sta sti
@@ -21,7 +22,7 @@
         sqr len dup drp cmp shf bld ret dbg
         nrm add.x add.y add.z swp rnd mull
         jmr ldlv lensq noise lds sts mulv
-        synth-crt synth-con synth-ply flr))
+        synth-crt synth-con synth-ply flr mod))
 
 (define prim-triangles 0)
 (define prim-tristrip 1)
@@ -213,8 +214,6 @@
    (emit (vector lds 0 0))))
 
 (define (emit-addr x)
-  (display "ello")(newline)
-  (display (variable-address (cadr x)))(newline)
   (emit (vector ldl (variable-address (cadr x)) 0)))
 
 (define (emit-cond-part x)
@@ -417,6 +416,7 @@
     ((eq? (car x) '*v) (binary-procedure mulv x))
     ((eq? (car x) 'cross) (binary-procedure crs x))
     ((eq? (car x) 'dot) (binary-procedure dot x))
+    ((eq? (car x) 'modulo) (binary-procedure mod x))
     ((eq? (car x) 'eq?) (emit-eq? x))
     ((eq? (car x) '>) (emit-> x))
     ((eq? (car x) '<) (emit-< x))
