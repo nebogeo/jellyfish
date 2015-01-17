@@ -153,6 +153,6 @@ Soon...
 jmp jmz jlt jgt ldl lda ldi sta sti
 add sub mul div abs scs atn dot crs
 sqr len dup drp cmp shf bld ret dbg
-nrm add.x add.y add.z swp rnd mull
+nrm mst mad msb swp rnd mull
 jmr ldlv lensq noise lds sts mulv
-synth-crt synth-con synth-ply flr
+synth-crt synth-con synth-ply flr 

@@ -54,9 +54,9 @@
 #define RET 26
 #define DBG 27
 #define NRM 28
-#define ADDX 29
-#define ADDY 30
-#define ADDZ 31
+#define MST 29
+#define MAD 30
+#define MSB 31
 #define SWP 32
 #define RND 33
 #define MULL 34

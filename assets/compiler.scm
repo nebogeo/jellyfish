@@ -10,7 +10,7 @@
 (define sincos 15) (define atn 16) (define dot 17) (define crs 18) (define sqr 19)
 (define len 20) (define dup 21) (define drp 22) (define cmp 23) (define shf 24)
 (define bld 25) (define ret 26) (define _dbg 27) (define nrm 28)
-(define add.x 29) (define add.y 30) (define add.z 31) (define end-check 999)
+(define mst 29) (define mad 30) (define msb 31) (define end-check 999)
 (define swp 32) (define rnd 33) (define mull 34) (define jmr 35) (define ldlv 36)
 (define lensq 37) (define noise 38) (define lds 39) (define sts 40) (define mulv 41)
 (define synth-crt 42) (define synth-con 43) (define synth-ply 44) (define flr 45)
@@ -20,7 +20,7 @@
   '(nop jmp jmz jlt jgt ldl lda ldi sta sti
         add sub mul div abs scs atn dot crs
         sqr len dup drp cmp shf bld ret dbg
-        nrm add.x add.y add.z swp rnd mull
+        nrm mst mad msb swp rnd mull
         jmr ldlv lensq noise lds sts mulv
         synth-crt synth-con synth-ply flr mod))
 
@@ -168,68 +168,24 @@
 ;; (write! start-addr value value value ...)
 (define (emit-write! x)
   (append
-   (cadr
-    (foldl
-     (lambda (val r)
-       (list
-        (+ (car r) 1)
-        (append
-         (cadr r)
-         (emit-expr val)               ;; data
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit-expr (cadr x))          ;; address
-         (emit (vector add 0 0))       ;; add offset
-         (emit (vector sts 0 0)))))
-     (list 0 '())
-     (cddr x)))
-    (emit (vector ldl 0 0))))
+   ;; stick everything on the stack
+   (emit-expr-list-maintain-stack (reverse (cdr x)))
+   (emit (vector mst (length (cddr x)) 0))
+   (emit (vector ldl 0 0))))
 
 (define (emit-write-add! x)
   (append
-   (cadr
-    (foldl
-     (lambda (val r)
-       (list
-        (+ (car r) 1)
-        (append
-         (cadr r)
-         (emit-expr (cadr x))          ;; address
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit (vector add 0 0))       ;; add them
-         (emit (vector lds 0 0))       ;; load value
-         (emit-expr val)               ;; data
-         (emit (vector add 0 0))       ;; add them
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit-expr (cadr x))          ;; address
-         (emit (vector add 0 0))       ;; add offset
-         (emit (vector sts 0 0)))))
-     (list 0 '())
-     (cddr x)))
-    (emit (vector ldl 0 0))))
+   ;; stick everything on the stack
+   (emit-expr-list-maintain-stack (reverse (cdr x)))
+   (emit (vector mad (length (cddr x)) 0))
+   (emit (vector ldl 0 0))))
 
 (define (emit-write-sub! x)
   (append
-   (cadr
-    (foldl
-     (lambda (val r)
-       (list
-        (+ (car r) 1)
-        (append
-         (cadr r)
-         (emit-expr (cadr x))          ;; address
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit (vector add 0 0))       ;; add them
-         (emit (vector lds 0 0))       ;; load value
-         (emit-expr val)               ;; data
-         (emit (vector sub 0 0))       ;; add them
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit-expr (cadr x))          ;; address
-         (emit (vector add 0 0))       ;; add offset
-         (emit (vector sts 0 0)))))
-     (list 0 '())
-     (cddr x)))
-    (emit (vector ldl 0 0))))
-
+   ;; stick everything on the stack
+   (emit-expr-list-maintain-stack (reverse (cdr x)))
+   (emit (vector msb (length (cddr x)) 0))
+   (emit (vector ldl 0 0))))
 
 (define (emit-read x)
   (append
@@ -503,9 +459,7 @@
       ((eq? (car x) 'let) (emit-let x))
       ((eq? (car x) 'define) (emit-define x))
       ((eq? (car x) 'cond) (emit-cond x))
-      ((eq? (car x) 'if)
-       (display "emit if")(newline)
-       (emit-if x))
+      ((eq? (car x) 'if) (emit-if x))
       ((eq? (car x) 'loop) (emit-loop x))
       ((eq? (car x) 'do) (emit-expr-list (cdr x)))
       (else (emit-procedure x)))

@@ -13,16 +13,16 @@
          (t 0)
          (v 0)
          (weft-direction (vector 2 0 0))
-          (weft-position (vector 0 0 0))
-          (weft-t 0)
-          (draft-pos 0)
-          (draft-size 4)
-          (draft 1) (d-b 0) (d-c 0) (d-d 1)
-          (d-e 1) (d-f 1) (d-g 0) (d-h 0)
-          (d-i 0) (d-j 1) (d-k 1) (d-l 0)
-          (d-m 0) (d-n 0) (d-o 1) (d-p 1)
-          (weft-z (vector 0 0 0))
-          (weft-count 0))
+         (weft-position (vector 0 0 0))
+         (weft-t 0)
+         (draft-pos 0)
+         (draft-size 4)
+         (draft 1) (d-b 0) (d-c 0) (d-d 1)
+         (d-e 1) (d-f 1) (d-g 0) (d-h 0)
+         (d-i 0) (d-j 1) (d-k 1) (d-l 0)
+         (d-m 0) (d-n 0) (d-o 1) (d-p 1)
+         (weft-z (vector 0 0 0))
+         (weft-count 0))
 
      (define read-draft
        (lambda ()
@@ -33,101 +33,101 @@
                     (modulo weft-count (+ draft-size (vector 0 1 1)) )
                     (- draft-size (modulo weft-count (+ draft-size (vector 0 1 1)) ))))))))
 
-      (define calc-weft-z
-        (lambda ()
-          (set! weft-count (+ weft-count 1))
-          (if (> (read-draft) 0.5)
-              (set! weft-z (vector 0 0 0.01))
-              (set! weft-z (vector 0 0 -0.01)))
-          ))
+     (define calc-weft-z
+       (lambda ()
+         (set! weft-count (+ weft-count 1))
+         (if (> (read-draft) 0.5)
+             (set! weft-z (vector 0 0 0.01))
+             (set! weft-z (vector 0 0 -0.01)))
+         ))
 
 
-      (define right-selvedge
-        (lambda (gap)
-          ;; top corner
-          (write! vertex
-                  (- (+ weft-position (vector 2 0 0)) gap)
-                  (- (+ weft-position (vector 3 1 0)) gap)
-                  (- (+ weft-position (vector 2 1 0)) gap))
-          (set! vertex (+ vertex 3))
-          ;; vertical connection
-          (write! vertex
-                  (- (+ weft-position (vector 3 1 0)) gap)
-                  (- (+ weft-position (vector 2 1 0)) gap)
-                  (+ weft-position (vector 2 0 0))
-                  (- (+ weft-position (vector 3 1 0)) gap)
-                  (+ weft-position (vector 2 0 0))
-                  (+ weft-position (vector 3 0 0)))
-          (set! vertex (+ vertex 6))
-          ;; bottom corner
-          (write! vertex
-                  (+ weft-position (vector 2 0 0))
-                  (+ weft-position (vector 3 0 0))
-                  (+ weft-position (vector 2 1 0)))
-          (set! vertex (+ vertex 3))
-          ))
+     (define right-selvedge
+       (lambda (gap)
+         ;; top corner
+         (write! vertex
+                 (- (+ weft-position (vector 2 0 0)) gap)
+                 (- (+ weft-position (vector 3 1 0)) gap)
+                 (- (+ weft-position (vector 2 1 0)) gap))
+         (set! vertex (+ vertex 3))
+         ;; vertical connection
+         (write! vertex
+                 (- (+ weft-position (vector 3 1 0)) gap)
+                 (- (+ weft-position (vector 2 1 0)) gap)
+                 (+ weft-position (vector 2 0 0))
+                 (- (+ weft-position (vector 3 1 0)) gap)
+                 (+ weft-position (vector 2 0 0))
+                 (+ weft-position (vector 3 0 0)))
+         (set! vertex (+ vertex 6))
+         ;; bottom corner
+         (write! vertex
+                 (+ weft-position (vector 2 0 0))
+                 (+ weft-position (vector 3 0 0))
+                 (+ weft-position (vector 2 1 0)))
+         (set! vertex (+ vertex 3))
+         ))
 
-      (define left-selvedge
-        (lambda (gap)
-          ;; top corner
-          (write! vertex
-                  (- (+ weft-position (vector 0 0 0)) gap)
-                  (- (+ weft-position (vector -1 1 0)) gap)
-                  (- (+ weft-position (vector 0 1 0)) gap))
-          (set! vertex (+ vertex 3))
-          ;; vertical connection
-          (write! vertex
-                  (- (+ weft-position (vector -1 1 0)) gap)
-                  (- (+ weft-position (vector 0 1 0)) gap)
-                  (+ weft-position (vector 0 0 0))
-                  (- (+ weft-position (vector -1 1 0)) gap)
-                  (+ weft-position (vector 0 0 0))
-                  (+ weft-position (vector -1 0 0)))
-          (set! vertex (+ vertex 6))
-          ;; bottom corner
-          (write! vertex
-                  (+ weft-position (vector 0 0 0))
-                  (+ weft-position (vector -1 0 0))
-                  (+ weft-position (vector 0 1 0)))
-          (set! vertex (+ vertex 3))
-          ))
+     (define left-selvedge
+       (lambda (gap)
+         ;; top corner
+         (write! vertex
+                 (- (+ weft-position (vector 0 0 0)) gap)
+                 (- (+ weft-position (vector -1 1 0)) gap)
+                 (- (+ weft-position (vector 0 1 0)) gap))
+         (set! vertex (+ vertex 3))
+         ;; vertical connection
+         (write! vertex
+                 (- (+ weft-position (vector -1 1 0)) gap)
+                 (- (+ weft-position (vector 0 1 0)) gap)
+                 (+ weft-position (vector 0 0 0))
+                 (- (+ weft-position (vector -1 1 0)) gap)
+                 (+ weft-position (vector 0 0 0))
+                 (+ weft-position (vector -1 0 0)))
+         (set! vertex (+ vertex 6))
+         ;; bottom corner
+         (write! vertex
+                 (+ weft-position (vector 0 0 0))
+                 (+ weft-position (vector -1 0 0))
+                 (+ weft-position (vector 0 1 0)))
+         (set! vertex (+ vertex 3))
+         ))
 
-      (forever
-       (set! vertex positions-start)
-       (loop (< vertex positions-end)
-             (calc-weft-z)
+     (forever
+      (set! vertex positions-start)
+      (loop (< vertex positions-end)
+            (calc-weft-z)
 
-             (set! weft-position (+ weft-position weft-direction))
-             ;; selvedge time?
-             (cond
-              ((> (mag (*v weft-position (vector 1 0 0))) 22)
+            (set! weft-position (+ weft-position weft-direction))
+            ;; selvedge time?
+            (cond
+             ((> (mag (*v weft-position (vector 1 0 0))) 22)
 
-               (set! weft-count 0)
-               (set! draft-pos (+ draft-pos 1))
-               (cond ((> draft-pos draft-size)
-                      (set! draft-pos 0)))
-               (trace draft-pos)
+              (set! weft-count 0)
+              (set! draft-pos (+ draft-pos 1))
+              (cond ((> draft-pos draft-size)
+                     (set! draft-pos 0)))
+              (trace draft-pos)
 
-               (set! weft-position (- (+ weft-position (vector 0 1.5 0))
-                                      weft-direction))
-               (set! weft-direction (* weft-direction -1))
-               (cond
-                ((> 0 weft-direction) (right-selvedge (vector 0 1.5 0)))
-                ((< 0 weft-direction) (left-selvedge (vector 0 1.5 0))))))
+              (set! weft-position (- (+ weft-position (vector 0 1.5 0))
+                                     weft-direction))
+              (set! weft-direction (* weft-direction -1))
+              (cond
+               ((> 0 weft-direction) (right-selvedge (vector 0 1.5 0)))
+               ((< 0 weft-direction) (left-selvedge (vector 0 1.5 0))))))
 
 
-             (write! vertex
-                     (+ weft-z weft-position)
-                     (+ weft-position (+ weft-z (vector 2 1 0)))
-                     (+ weft-position (+ weft-z (vector 2 0 0)))
-                     (+ weft-z weft-position)
-                     (+ weft-position (+ weft-z (vector 2 1 0)))
-                     (+ weft-position (+ weft-z (vector 0 1 0))))
-             (set! vertex (+ vertex 6)))
-       ;;(set! t (+ t 0.01))
-       )))
-  (hint-unlit)
-; (texture (load-texture "thread.png"))
+            (write! vertex
+                    (+ weft-z weft-position)
+                    (+ weft-position (+ weft-z (vector 2 1 0)))
+                    (+ weft-position (+ weft-z (vector 2 0 0)))
+                    (+ weft-z weft-position)
+                    (+ weft-position (+ weft-z (vector 2 1 0)))
+                    (+ weft-position (+ weft-z (vector 0 1 0))))
+            (set! vertex (+ vertex 6)))
+      ;;(set! t (+ t 0.01))
+      )))
+ (hint-unlit)
+ (texture (load-texture "thread.png"))
  (scale weave-scale)
  (pdata-index-map! (lambda (i t)
                      (cond
@@ -183,8 +183,8 @@
       (define animate-shed
         (lambda (i v)
           (set! v (if (< v 0.5)
-                      (vector 0 0 3)
-                      (vector 0 0 -3)))
+                      (vector 0 0 1)
+                      (vector 0 0 -1)))
           (set! warp-end 0)
           (loop (< warp-end 20)
                 (if (> (read-draft) 0.5)
@@ -223,16 +223,16 @@
        )))
 
  (hint-unlit)
-; (texture (load-texture "thread.png"))
+ (texture (load-texture "thread.png"))
  (scale weave-scale)
  (pdata-index-map! (lambda (i t)
                      (cond
                       ((eqv? (modulo i 6) 0) (vector 0 0 0))
                       ((eqv? (modulo i 6) 1) (vector 1 10 0))
-                      ((eqv? (modulo i 6) 2) (vector 1 0 0))
+                      ((eqv? (modulo i 6) 2) (vector 0 1 0))
                       ((eqv? (modulo i 6) 3) (vector 0 0 0))
                       ((eqv? (modulo i 6) 4) (vector 1 10 0))
-                      ((eqv? (modulo i 6) 5) (vector 0 10 0))
+                      ((eqv? (modulo i 6) 5) (vector 10 0 0))
                       )) "t")
  (pdata-map! (lambda (c) (vector 1 0.5 0.2)) "c")
  (pdata-map! (lambda (n) (vector 0 0 0)) "n")
