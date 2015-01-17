@@ -416,7 +416,11 @@ int main(int argc, char *argv[])
     tex=LoadPNG(ASSETS_LOCATION+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
 
-    appEval((char*)LoadFile(ASSETS_LOCATION+"jellyfish.scm").c_str());
+    //    appEval((char*)LoadFile(ASSETS_LOCATION+"jellyfish.scm").c_str())
+
+    if (argc>1) {
+      appEval((char*)LoadFile(string(argv[1])).c_str());
+    }
 
     // setup the repl thread
 	render_mutex = new pthread_mutex_t;

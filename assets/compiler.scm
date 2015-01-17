@@ -207,6 +207,29 @@
      (cddr x)))
     (emit (vector ldl 0 0))))
 
+(define (emit-write-sub! x)
+  (append
+   (cadr
+    (foldl
+     (lambda (val r)
+       (list
+        (+ (car r) 1)
+        (append
+         (cadr r)
+         (emit-expr (cadr x))          ;; address
+         (emit (vector ldl (car r) 0)) ;; offset
+         (emit (vector add 0 0))       ;; add them
+         (emit (vector lds 0 0))       ;; load value
+         (emit-expr val)               ;; data
+         (emit (vector sub 0 0))       ;; add them
+         (emit (vector ldl (car r) 0)) ;; offset
+         (emit-expr (cadr x))          ;; address
+         (emit (vector add 0 0))       ;; add offset
+         (emit (vector sts 0 0)))))
+     (list 0 '())
+     (cddr x)))
+    (emit (vector ldl 0 0))))
+
 
 (define (emit-read x)
   (append
@@ -230,6 +253,18 @@
      (else (append (emit-cond-part (car l))
                    (_ (cdr l))))))
   (_ (cdr x)))
+
+
+(define (emit-if x)
+  (let ((tblock (emit-expr (caddr x)))
+        (fblock (emit-expr (cadddr x))))
+    (append
+     (emit-expr (cadr x))
+     (emit (vector jmz (+ (length tblock) 2) 0))
+     tblock
+     (emit (vector jmr (+ (length fblock) 1) 0))
+     fblock)))
+
 
 (define (emit-fncall x addr)
   (let ((args (emit-expr-list-maintain-stack (cdr x))))
@@ -423,6 +458,7 @@
     ((eq? (car x) 'set!) (emit-set! x))
     ((eq? (car x) 'write!) (emit-write! x))
     ((eq? (car x) 'write-add!) (emit-write-add! x))
+    ((eq? (car x) 'write-sub!) (emit-write-sub! x))
     ((eq? (car x) 'swizzle) (emit-swizzle x))
     ((eq? (car x) 'lambda) (emit-lambda x))
     ((eq? (car x) 'rndvec) (emit (vector rnd 0 0)))
@@ -467,6 +503,9 @@
       ((eq? (car x) 'let) (emit-let x))
       ((eq? (car x) 'define) (emit-define x))
       ((eq? (car x) 'cond) (emit-cond x))
+      ((eq? (car x) 'if)
+       (display "emit if")(newline)
+       (emit-if x))
       ((eq? (car x) 'loop) (emit-loop x))
       ((eq? (car x) 'do) (emit-expr-list (cdr x)))
       (else (emit-procedure x)))

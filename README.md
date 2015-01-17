@@ -92,8 +92,24 @@ Here is a program that randomly moves vertex positions around:
 Willdo...
 
 * let
+
+    (let ((name value) (name value) ...))
+
+Note: 
+Scoping is not yet implemented, so all names are global.
+True for function arguments also.
+
 * define
+* if
+
+    (if pred true-expr false-expr)
+
 * cond
+
+    (cond (pred block) (pred block) ...)
+    
+Note: currently evaluates all parts sequentially
+
 * loop
 * forever
 * do
