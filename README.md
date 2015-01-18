@@ -124,27 +124,88 @@ Returns the value of the last expression if true, zero otherwise.
 
 * cond
 
-    (cond (pred block) (pred block) ...)
+    (cond (pred block) (pred block) ... (else block))
 
-Tofix: currently evaluates all parts sequentially, and sometimes doesn't
-work remove and replace with syntatic version of 'if' forms...
+Internally evaluates to a bunch of if's
 
 * loop
+
+    (loop pred block)
+
+Repeats until the predicate is false.
+
 * forever
+
+    (forever block)
+
+Repeats forever
+
 * do
+
+    (do block)
+
+Returns the value of the last expression.
+
 * lambda
-* +
-* -
-* *
-* /
+
+    (lambda (args) block)
+
+Creates a procedure, more usually:
+
+    (define myproc
+        (lambda (a b)
+            (+ a b)))
+
+* + -
+
+Vector addition and subtraction:
+
+    (+ (vector 1 2 3) (vector 2 3 4))
+    (+ 2 (vector 3 2 1))
+
+Single numbers become (vector number 0 0) so the above lines evaluate to
+`(vector 3 5 7)` and `(vector 5 2 1)` respectively. Same for subtraction.
+
+* * /
+
+Multiplies and divides by the second parameter's x value, so:
+
+    (* (vector 1 1 1) 2) => (vector 2 2 2)
+
+and
+
+    (/ (vector 1 1 1) 2) => (vector 0.5 0.5 0.5)
+
 * *v
-* cross
-* dot
+
+Multiplies by each element, eg:
+
+    (*v (vector 1 2 3) (vector 0.5 4 3)) => (vector 0.5 8 9)
+
+
+* cross dot
+
+Cross product and dot product of two vectors
+
 * eq?
-* >
-* <
+
+Per-element equality
+
+* > <
+
+Compares x values of supplied vectors.
+Tofix: why no <= or >=?
+
 * set!
+
+    (set! name newvalue)
+
+Mutates value of an existing variable.
+
 * write!
+
+
+
 * write-add!
 * swizzle
 * rndvec
