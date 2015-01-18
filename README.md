@@ -74,12 +74,12 @@ Here is a program that randomly moves vertex positions around:
     (with-primitive
      (make-jelly-obj 1000 prim-tristrip
     ;; jellyfish lisp starts here
-      '(let ((vertex positions-start))
+      '(let ((vertex 0))
          (forever
-          (set! vertex positions-start)
-          (loop (< vertex positions-end)
-                (write! vertex (+ (read vertex) (rndvec)))
-                (set! vertex (+ vertex 1)))
+          (set! vertex positions-start) ;; start at the first vertex number
+          (loop (< vertex positions-end) ;; go to the last vertex
+                (write! vertex (+ (read vertex) (rndvec))) ;; add a random amount
+                (set! vertex (+ vertex 1))) ;; increment vertex number
          )))
     ;; jellyfish lisp ends here
     ;; normal fluxus code
@@ -89,64 +89,71 @@ Here is a program that randomly moves vertex positions around:
 
 ### Core forms ###
 
-Willdo...
+Reference for all the commands in jellyfish lisp.
 
 #### let ####
 
-    (let ((name value) (name value) ...))
+    (let ((name value) (name value) ...) block)
 
-Normal binding of names to values. All values are vectors of lenght 3,
-but can be specified as single numbers for convenience.
+Bind names to values. All values are internally vectors of length 3 in
+jellyfish (as it's a vector processor), but you can specify them as
+single numbers for convenience, which just get converted to
+`(vector x 0 0)` where x is the number you specify.
 
-*Tofix*: Let bindings are not scoped correctly, varables can be referred
-to after scope is closed and conflict with function parameters and other
-let variables of the same name.
+*Tofix*: Let bindings are not scoped correctly, variables can be
+referred to after scope is closed and conflict with function parameters
+and other let variables of the same name. This is bad.
 
-* define
+#### define ####
 
     (define name value)
 
-Tofix: scoping problem same as let.
+Assign a name to a value, can be a function or a vector.
 
-* if
+*Tofix*: same scoping problem same as let.
+
+#### if ####
 
     (if pred true-expr false-expr)
 
-Normal if expression - can be used as in normal scheme for example:
+An if expression - returns value of the executed expression, eg.:
 
-    (define a (if (< 1 10) 100 200))
+    (define a (if (< (some-func) 10) 100 200))
 
-* when
+Will assign a to be 100 or 200.
+
+#### when ####
 
     (when pred do-this-block)
 
-Returns the value of the last expression if true, zero otherwise.
+Same as if, without the false else block. Returns the value of the last
+expression if true, zero otherwise.
 
-* cond
+#### cond ####
 
     (cond (pred block) (pred block) ... (else block))
 
 Internally evaluates to a bunch of if's
 
-* loop
+#### loop ####
 
     (loop pred block)
 
 Repeats until the predicate is false.
 
-* forever
+#### forever ####
 
     (forever block)
 
 Repeats forever
 
-* do
+#### do ####
 
     (do block)
 
 Returns the value of the last expression.
 
-* lambda
+#### lambda ####
 
     (lambda (args) block)
 
@@ -156,7 +163,7 @@ Creates a procedure, more usually:
         (lambda (a b)
             (+ a b)))
 
-* + -
+#### + - ####
 
 Vector addition and subtraction:
 
@@ -166,7 +173,7 @@ Vector addition and subtraction:
 Single numbers become (vector number 0 0) so the above lines evaluate to
 `(vector 3 5 7)` and `(vector 5 2 1)` respectively. Same for subtraction.
 
-* * /
+#### * / ####
 
 Multiplies and divides by the second parameter's x value, so:
 
@@ -176,33 +183,33 @@ and
 
     (/ (vector 1 1 1) 2) => (vector 0.5 0.5 0.5)
 
-* *v
+#### *v ####
 
 Multiplies by each element, eg:
 
     (*v (vector 1 2 3) (vector 0.5 4 3)) => (vector 0.5 8 9)
 
 
-* cross dot
+#### cross dot ####
 
 Cross product and dot product of two vectors
 
-* eq?
+#### eq? ####
 
 Per-element equality
 
-* > <
+#### > < ####
 
 Compares x values of supplied vectors.
 Tofix: why no <= or >=?
 
-* set!
+#### set! ####
 
     (set! name newvalue)
 
 Mutates value of an existing variable.
 
-* write!
+#### write! ####
 
 
 
