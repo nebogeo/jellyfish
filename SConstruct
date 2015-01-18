@@ -27,7 +27,7 @@ source = ['main.cpp',
        ]
 
 if platform=='LINUX':
-   env.Append(LIBS = ['glut', 'GL', 'png', 'pthread', 'dl', 'lo'])
+   env.Append(LIBS = ['glut', 'GL', 'png', 'pthread', 'dl', 'lo', 'jpeg'])
    env.Append(CCFLAGS=' -fpermissive -DFLX_LINUX')
    env.Append(CPPPATH = '.')
    source.append(['core/db.cpp',

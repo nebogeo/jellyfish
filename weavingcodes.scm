@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; weavecoding raspberry pi installation
 
-(rotate (vector 00 45 0))
+(rotate (vector 0 -45 0))
 (define weft (build-jellyfish 4096))
 (define warp (build-jellyfish 4096))
 (define weave-scale (vector 0.2 -0.2 0.2))
@@ -18,10 +18,10 @@
          (weft-t 0)
          (draft-pos 0)
          (draft-size 4)
-         (draft 1) (d-b 0) (d-c 0) (d-d 1)
-         (d-e 1) (d-f 1) (d-g 0) (d-h 0)
-         (d-i 0) (d-j 1) (d-k 1) (d-l 0)
-         (d-m 0) (d-n 0) (d-o 1) (d-p 1)
+         (draft 1) (d-b 0) (d-c 1) (d-d 0)
+         (d-e 0) (d-f 1) (d-g 0) (d-h 1)
+         (d-i 1) (d-j 0) (d-k 1) (d-l 0)
+         (d-m 0) (d-n 1) (d-o 0) (d-p 1)
          (weft-z (vector 0 0 0))
          (weft-count 0))
 
@@ -156,10 +156,10 @@
           (weft-t 0)
           (draft-pos 0)
           (draft-size 4)
-         (draft 1) (d-b 0) (d-c 0) (d-d 1)
-         (d-e 1) (d-f 1) (d-g 0) (d-h 0)
-         (d-i 0) (d-j 1) (d-k 1) (d-l 0)
-         (d-m 0) (d-n 0) (d-o 1) (d-p 1)
+         (draft 1) (d-b 0) (d-c 1) (d-d 0)
+         (d-e 0) (d-f 1) (d-g 0) (d-h 1)
+         (d-i 1) (d-j 0) (d-k 1) (d-l 0)
+         (d-m 0) (d-n 1) (d-o 0) (d-p 1)
          (last-t 0))
 
       (define build-quad
@@ -183,13 +183,14 @@
           (set! v (if (< weft-t 0.2)
                       (vector 0 0 2)
                       (if (> weft-t 0.8)
-                          (vector 0 0 -2)
+                          (vector 0 0 -1.3)
                           (vector 0 0 0))))
           (set! warp-end 0)
           (loop (< warp-end 20)
                 (if (> (read-draft) 0.5)
-                    (write-sub! (- i 6) 0 v 0 0 v v
-                                v 0 v v)
+                    (+ 1 1)
+                    ;(write-sub! (- i 6) 0 v 0 0 v v
+                    ;            v 0 v v)
                     (write-add! (- i 6) 0 v 0 0 v v
                                 v 0 v v))
                 (set! i (+ i 24))
@@ -214,7 +215,9 @@
        (set! vertex (+ positions-start 12))
        (animate-shed vertex)
 
-       (cond ((> (- last-t weft-t) 0.5)
+       (cond ((> (- last-t weft-t) 0.1)
+              (set! draft-pos (+ draft-pos 1))
+              (cond ((> draft-pos draft-size) (set! draft-pos 0)))
               (build-warp)))
 
        (set! last-t weft-t)
@@ -246,12 +249,12 @@
    "x" 11 (with-primitive
            weft
            (pdata-ref "x" 12))))
- (with-primitive
-  warp
-  (pdata-set!
-   "x" 12 (with-primitive
-           weft
-           (pdata-ref "x" 13))))
+ ;; (with-primitive
+ ;;  warp
+ ;;  (pdata-set!
+ ;;   "x" 12 (with-primitive
+ ;;           weft
+ ;;           (pdata-ref "x" 13))))
 
  (with-primitive
   weft
