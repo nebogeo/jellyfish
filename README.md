@@ -91,7 +91,7 @@ Here is a program that randomly moves vertex positions around:
 
 Willdo...
 
-## let ##
+#### let ####
 
     (let ((name value) (name value) ...))
 
