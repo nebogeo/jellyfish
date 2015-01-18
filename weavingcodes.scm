@@ -18,12 +18,13 @@
          (weft-t 0)
          (draft-pos 0)
          (draft-size 4)
-         (draft 1) (d-b 0) (d-c 1) (d-d 0)
-         (d-e 0) (d-f 1) (d-g 0) (d-h 1)
-         (d-i 1) (d-j 0) (d-k 1) (d-l 0)
-         (d-m 0) (d-n 1) (d-o 0) (d-p 1)
+         (draft 1) (d-b 0) (d-c 0) (d-d 1)
+         (d-e 1) (d-f 1) (d-g 0) (d-h 0)
+         (d-i 0) (d-j 1) (d-k 1) (d-l 0)
+         (d-m 0) (d-n 0) (d-o 1) (d-p 1)
          (weft-z (vector 0 0 0))
-         (weft-count 0))
+         (weft-count 0)
+         (weft-total 21))
 
      (define read-draft
        (lambda ()
@@ -32,7 +33,7 @@
              (+ (* draft-pos draft-size)
                 (if (> weft-direction 0)
                     (modulo weft-count (+ draft-size (vector 0 1 1)) )
-                    (- draft-size (modulo weft-count (+ draft-size (vector 0 1 1)) ))))))))
+                    (modulo (- (- weft-total 1) weft-count) (+ draft-size (vector 0 1 1)) )))))))
 
      (define calc-weft-z
        (lambda ()
@@ -99,18 +100,17 @@
             (calc-weft-z)
             (set! weft-position (+ weft-position weft-direction))
             ;; selvedge time?
-            (cond
-             ((> weft-count 21)
-              (set! weft-count 0)
-              (set! draft-pos (+ draft-pos 1))
-              (cond ((> draft-pos draft-size)
-                     (set! draft-pos 0)))
-              (set! weft-position (- (+ weft-position (vector 0 1.5 0))
-                                     weft-direction))
-              (set! weft-direction (* weft-direction -1))
-              (cond
-               ((> 0 weft-direction) (right-selvedge (vector 0 1.5 0)))
-               ((< 0 weft-direction) (left-selvedge (vector 0 1.5 0))))))
+            (when (> weft-count weft-total)
+                  (set! weft-count 0)
+                  (set! draft-pos (+ draft-pos 1))
+                  (when (> draft-pos draft-size)
+                        (set! draft-pos 0))
+                  (set! weft-position (- (+ weft-position (vector 0 1.5 0))
+                                         weft-direction))
+                  (set! weft-direction (* weft-direction -1))
+                  (if (> 0 weft-direction)
+                      (right-selvedge (vector 0 1.5 0))
+                      (left-selvedge (vector 0 1.5 0))))
 
             (set! weft-t (/ weft-count 21))
 
@@ -156,10 +156,10 @@
           (weft-t 0)
           (draft-pos 0)
           (draft-size 4)
-         (draft 1) (d-b 0) (d-c 1) (d-d 0)
-         (d-e 0) (d-f 1) (d-g 0) (d-h 1)
-         (d-i 1) (d-j 0) (d-k 1) (d-l 0)
-         (d-m 0) (d-n 1) (d-o 0) (d-p 1)
+         (draft 1) (d-b 0) (d-c 0) (d-d 1)
+         (d-e 1) (d-f 1) (d-g 0) (d-h 0)
+         (d-i 0) (d-j 1) (d-k 1) (d-l 0)
+         (d-m 0) (d-n 0) (d-o 1) (d-p 1)
          (last-t 0))
 
       (define build-quad
@@ -187,12 +187,9 @@
                           (vector 0 0 0))))
           (set! warp-end 0)
           (loop (< warp-end 20)
-                (if (> (read-draft) 0.5)
-                    (+ 1 1)
-                    ;(write-sub! (- i 6) 0 v 0 0 v v
-                    ;            v 0 v v)
-                    (write-add! (- i 6) 0 v 0 0 v v
-                                v 0 v v))
+                (when (< (read-draft) 0.5)
+                      (write-add! (- i 6) 0 v 0 0 v v
+                                  v 0 v v))
                 (set! i (+ i 24))
                 (set! warp-end (+ warp-end 1)))))
 
@@ -215,10 +212,10 @@
        (set! vertex (+ positions-start 12))
        (animate-shed vertex)
 
-       (cond ((> (- last-t weft-t) 0.1)
-              (set! draft-pos (+ draft-pos 1))
-              (cond ((> draft-pos draft-size) (set! draft-pos 0)))
-              (build-warp)))
+       (when (> (- last-t weft-t) 0.1)
+             (set! draft-pos (+ draft-pos 1))
+             (when (> draft-pos draft-size) (set! draft-pos 0))
+             (build-warp))
 
        (set! last-t weft-t)
        )))

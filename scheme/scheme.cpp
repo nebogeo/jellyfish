@@ -281,6 +281,9 @@ INTERFACE INLINE void setimmutable(pointer p) { typeflag(p) |= T_IMMUTABLE; }
 #define cddr(p)          cdr(cdr(p))
 #define cadar(p)         car(cdr(car(p)))
 #define caddr(p)         car(cdr(cdr(p)))
+#define cadddr(p)        car(cdr(cdr(cdr(p))))
+#define caddddr(p)       car(cdr(cdr(cdr(cdr(p)))))
+#define cadddddr(p)      car(cdr(cdr(cdr(cdr(cdr(p))))))
 #define cdaar(p)         cdr(car(car(p)))
 #define cadaar(p)        car(cdr(car(car(p))))
 #define cadddr(p)        car(cdr(cdr(cdr(p))))
@@ -4279,6 +4282,118 @@ pointer db_exec(scheme* sc, db *d) {
      return ret;
 }
 
+// blob stuff, unfortunately need to be prepared to match with eavdb
+
+static int insert_blob(
+     sqlite3 *db,                   /* Database to insert data into */
+     const char *table,             /* Null-terminated key string */
+     const char *key1,         /* Null-terminated key string */
+     const char *key2,              /* Null-terminated key string */
+     const unsigned char *blob,    /* Pointer to blob of data */
+     int size                      /* Length of data pointed to by zBlob */
+     )
+{
+     char sql[1024];
+     snprintf(sql,1024,"insert into %s_value_blob values(null, ?, ?, ?, 0)", table);
+     sqlite3_stmt *pStmt;
+     int rc;
+
+     do {
+          rc = sqlite3_prepare(db, sql, -1, &pStmt, 0);
+          if( rc!=SQLITE_OK ){
+               return rc;
+          }
+
+          sqlite3_bind_text(pStmt, 1, key1, -1, SQLITE_STATIC);
+          sqlite3_bind_text(pStmt, 2, key2, -1, SQLITE_STATIC);
+          sqlite3_bind_blob(pStmt, 3, blob, size, SQLITE_STATIC);
+
+          rc = sqlite3_step(pStmt);
+          rc = sqlite3_finalize(pStmt);
+
+     } while( rc==SQLITE_SCHEMA );
+
+     return rc;
+}
+
+int insert_file_blob(sqlite3 *db, const char *table, const char* key1, const char *key2, const char* filename) {
+    FILE *file=fopen(filename,"rb");
+	if (file)
+	{
+		fseek(file,0,SEEK_END);
+		long size=ftell(file);
+		fseek(file,0,SEEK_SET);
+
+		unsigned char *buffer = new unsigned char[size];
+        long s = (long)fread(buffer,1,size,file);
+        fclose(file);
+
+        insert_blob(db,table,key1,key2,buffer,size);
+        delete[] buffer;
+        return 0;
+    }
+    printf("insert_file_blob couldn't open %s\n",filename);
+    return -1;
+}
+
+static int select_blob(
+     sqlite3 *db,               /* Database containing blobs table */
+     const char *table,          /* Null-terminated key to retrieve blob for */
+     const char *key1,          /* Null-terminated key to retrieve blob for */
+     const char *key2,          /* Null-terminated key to retrieve blob for */
+     unsigned char **blob,    /* Set *pzBlob to point to the retrieved blob */
+     int *size                /* Set *pnBlob to the size of the retrieved blob */
+     )
+{
+     char sql[1024];
+     snprintf(sql,1024,"select value from %s_value_blob where entity_id = ? and attribute_id = ?", table);
+     sqlite3_stmt *pStmt;
+     int rc;
+
+     *blob = 0;
+     *size = 0;
+
+     do {
+          /* Compile the SELECT statement into a virtual machine. */
+          rc = sqlite3_prepare(db, sql, -1, &pStmt, 0);
+          if( rc!=SQLITE_OK ){
+               return rc;
+          }
+
+          /* Bind the key to the SQL variable. */
+          sqlite3_bind_text(pStmt, 1, key1, -1, SQLITE_STATIC);
+          sqlite3_bind_text(pStmt, 1, key2, -1, SQLITE_STATIC);
+
+          rc = sqlite3_step(pStmt);
+          if( rc==SQLITE_ROW ){
+               *size = sqlite3_column_bytes(pStmt, 0);
+               *blob = (unsigned char *)malloc(*size);
+               memcpy(*blob, sqlite3_column_blob(pStmt, 0), *size);
+          }
+          rc = sqlite3_finalize(pStmt);
+     } while( rc==SQLITE_SCHEMA );
+
+     return rc;
+}
+
+int select_file_blob(sqlite3 *db, const char *table, const char* key1, const char *key2, const char* filename)
+{
+    FILE *file=fopen(filename,"wb");
+	if (file)
+	{
+         int size;
+         unsigned char *blob;
+         select_blob(db,table,key1,key2,&blob,&size);
+
+         fwrite(blob,1,size,file);
+         fclose(file);
+         free(blob);
+         return 0;
+    }
+    printf("select_file_blob couldn't open %s\n",filename);
+    return -1;
+}
+
 #endif
 
 static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
@@ -4382,6 +4497,23 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
 #endif
           s_return(sc,sc->F);
      }
+/*     case OP_INSERT_BLOB_DB: {
+#ifndef FLX_RPI
+          if (is_string(car(sc->args)) &&
+              is_string(caddr(sc->args)) &&
+              is_string(cadddr(sc->args)) &&
+              is_string(caddddr(sc->args)) &&
+              is_string(cadddddr(sc->args))) {
+               db *d=the_db_container.get(string_value(car(sc->args)));
+               if (d!=NULL)
+               {
+                    db_exec(sc,d);
+                    s_return(sc,mk_integer(sc,d->last_rowid()));
+               }
+          }
+#endif
+          s_return(sc,sc->F);
+          } */
      case OP_STATUS_DB: {
 #ifndef FLX_RPI
           if (is_string(car(sc->args))) {

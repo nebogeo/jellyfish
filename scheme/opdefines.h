@@ -196,6 +196,8 @@
     _OP_DEF(opexe_6, "db-open",                        1,  1,       TST_NONE,                        OP_OPEN_DB          )
     _OP_DEF(opexe_6, "db-exec",                        2,  INF_ARG, TST_NONE,                        OP_EXEC_DB          )
     _OP_DEF(opexe_6, "db-insert",                      2,  INF_ARG, TST_NONE,                        OP_INSERT_DB        )
+    //    _OP_DEF(opexe_6, "db-insert-blob",                 5,  5,       TST_NONE,                        OP_INSERT_BLOB_DB   )
+    //    _OP_DEF(opexe_6, "db-select-blob",                 5,  5,       TST_NONE,                        OP_SELECT_BLOB_DB   )
     _OP_DEF(opexe_6, "db-status",                      1,  1,       TST_NONE,                        OP_STATUS_DB        )
     _OP_DEF(opexe_6, "time-of-day",                    0,  0,       TST_NONE,                        OP_TIME             )
     _OP_DEF(opexe_6, "date-time",                      0,  0,       TST_NONE,                        OP_DATETIME         )

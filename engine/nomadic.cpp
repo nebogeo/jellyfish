@@ -40,10 +40,13 @@ void appInit()
     FILE *log_file=stdout;
     scheme_set_input_port_file(sc, stdin);
     #else
-    FILE *log_file=fopen("/sdcard/jellyfish-log.txt","w");
+    FILE *log_file=fopen("/sdcard/symbai/symbai-log2.txt","w");
     #endif
     #endif
     if (log_file!=NULL) scheme_set_output_port_file(sc, log_file);
+
+    fprintf(log_file,"testing...\n");
+    fflush(log_file);
 }
 
 void initGL()

@@ -331,14 +331,14 @@ void DisplayCallback()
   appRender(w, h);
   glutSwapBuffers();
 #endif
-
+/*
   static char fn[256];
   sprintf(fn,"shot-%0.4d.jpg",frame_num);
   cerr<<fn<<endl;
   WriteJPG(GetScreenBuffer(0, 0, w, h, 1),
            fn,"",0,0,w,h,95,1);
   frame_num++;
-
+*/
   pthread_mutex_unlock(render_mutex);
     } //else { printf("locked\n"); }
 }

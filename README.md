@@ -52,10 +52,10 @@ The purpose of a Jellyfish Lisp program is to manipulate 3D objects in a
 scene, move/rotate/scale or change vertex positions, lighting normals,
 texture coords. It can also act on input from outside. It can do this
 faster than in interpreted Scheme, particually on ARM devices as the VM
-(written in C++) is very small and doesn't require any memory
-allocation. The VM also has access to more data than a GPU shader,
-although tight coupling to GPU functionality (ie running parts of the VM
-on GPU cores) is planned.
+(written in C++) is very small and doesn't require any memory allocation
+so no garbage collection is required. The VM also has access to more
+data than a GPU shader, although tight coupling to GPU functionality (ie
+running parts of the VM on GPU cores) is planned.
 
 Jellyfish Lisp programs are compiled to bytecode executed by the VM -
 there is one per object potentially running in parallel threads.  The
@@ -95,20 +95,39 @@ Willdo...
 
     (let ((name value) (name value) ...))
 
-Note: 
-Scoping is not yet implemented, so all names are global.
-True for function arguments also.
+Normal binding of names to values. All values are vectors of lenght 3,
+but can be specified as single numbers for convenience.
+
+Tofix: Let bindings are not scoped correctly, varables can be referred
+to after scope is closed and conflict with function parameters and other
+let variables of the same name.
 
 * define
+
+    (define name value)
+
+Tofix: scoping problem same as let.
+
 * if
 
     (if pred true-expr false-expr)
 
+Normal if expression - can be used as in normal scheme for example:
+
+    (define a (if (< 1 10) 100 200))
+
+* when
+
+    (when pred do-this-block)
+
+Returns the value of the last expression if true, zero otherwise.
+
 * cond
 
     (cond (pred block) (pred block) ...)
-    
-Note: currently evaluates all parts sequentially
+
+Tofix: currently evaluates all parts sequentially, and sometimes doesn't
+work remove and replace with syntatic version of 'if' forms...
 
 * loop
 * forever
@@ -155,4 +174,4 @@ add sub mul div abs scs atn dot crs
 sqr len dup drp cmp shf bld ret dbg
 nrm mst mad msb swp rnd mull
 jmr ldlv lensq noise lds sts mulv
-synth-crt synth-con synth-ply flr 
+synth-crt synth-con synth-ply flr

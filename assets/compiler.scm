@@ -195,22 +195,6 @@
 (define (emit-addr x)
   (emit (vector ldl (variable-address (cadr x)) 0)))
 
-(define (emit-cond-part x)
-  (let ((block (emit-expr-list (cdr x))))
-    (append
-     (emit-expr (car x))
-     (emit (vector jmz (+ (length block) 1) 0))
-     block)))
-
-(define (emit-cond x)
-  (define (_ l)
-    (cond
-     ((null? l) '())
-     (else (append (emit-cond-part (car l))
-                   (_ (cdr l))))))
-  (_ (cdr x)))
-
-
 (define (emit-if x)
   (let ((tblock (emit-expr (caddr x)))
         (fblock (emit-expr (cadddr x))))
@@ -221,6 +205,14 @@
      (emit (vector jmr (+ (length fblock) 1) 0))
      fblock)))
 
+(define (emit-when x)
+  (let ((block (emit-expr-list (cddr x))))
+    (append
+     (emit-expr (cadr x))
+     (emit (vector jmz (+ (length block) 2) 0))
+     block
+     (emit (vector jmr 2 0))
+     (emit (vector ldl 0 0)))))
 
 (define (emit-fncall x addr)
   (let ((args (emit-expr-list-maintain-stack (cdr x))))
@@ -458,8 +450,8 @@
      (cond
       ((eq? (car x) 'let) (emit-let x))
       ((eq? (car x) 'define) (emit-define x))
-      ((eq? (car x) 'cond) (emit-cond x))
       ((eq? (car x) 'if) (emit-if x))
+      ((eq? (car x) 'when) (emit-when x))
       ((eq? (car x) 'loop) (emit-loop x))
       ((eq? (car x) 'do) (emit-expr-list (cdr x)))
       (else (emit-procedure x)))
@@ -554,6 +546,15 @@
           (cdr x))))))))
 
 
+(define (preprocess-cond-to-if x)
+  (define (_ l)
+    (cond
+      ((null? l) 0)
+      ((eq? (pre-process (caar l)) 'else) (cons 'do (pre-process (cdr (car l)))))
+      (else (list 'if (pre-process (caar l)) (cons 'do (pre-process (cdr (car l))))
+                  (_ (cdr l))))))
+  (_ (cdr x)))
+
 ;; basically diy-macro from the main tinyscheme stuff
 (define (pre-process s)
   (cond
@@ -571,6 +572,8 @@
              ((eq? (car i) '--!)
               (let ((v (pre-process (cadr i))))
                 (list 'set! v (list '- v 1))))
+             ((eq? (car i) 'cond)
+              (preprocess-cond-to-if i))
              ((eq? (car i) 'play-now)
               (append
                (list 'do)
