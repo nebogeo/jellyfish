@@ -91,14 +91,14 @@ Here is a program that randomly moves vertex positions around:
 
 Willdo...
 
-* let
+## let ##
 
     (let ((name value) (name value) ...))
 
 Normal binding of names to values. All values are vectors of lenght 3,
 but can be specified as single numbers for convenience.
 
-Tofix: Let bindings are not scoped correctly, varables can be referred
+*Tofix*: Let bindings are not scoped correctly, varables can be referred
 to after scope is closed and conflict with function parameters and other
 let variables of the same name.
 
