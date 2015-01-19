@@ -54,9 +54,9 @@
 #define RET 26
 #define DBG 27
 #define NRM 28
-#define ADDX 29
-#define ADDY 30
-#define ADDZ 31
+#define MST 29
+#define MAD 30
+#define MSB 31
 #define SWP 32
 #define RND 33
 #define MULL 34
@@ -71,6 +71,7 @@
 #define SYNTH_CON 43
 #define SYNTH_PLY 44
 #define FLR 45
+#define MOD 46
 
 // registers
 #define REG_CONTROL 0   // pc, cycles, stack
@@ -82,7 +83,8 @@
 #define REG_SENSOR_ADDR 6
 #define CODE_START 7
 
-#define REG_STK 511 // oops hardcoded :/
+// 4096
+#define REG_STK 4095 // oops hardcoded :/
 
 class jellyfish {
 

@@ -2,7 +2,6 @@ import osc,time
 from random import choice
 
 code = ["""
-(with-primitive
  (make-jelly
   10000 prim-tristrip
   '(let ((vertex positions-start)
@@ -15,32 +14,23 @@ code = ["""
             (set! v (+ (* (normalise (read vertex)) 0.05)
                        (* (- (read vertex)
                              (read (- vertex 1))) -0.5)))
-            (write-add! vertex (+ v (* (sincos (* (read vertex) 0.01)) 0.1)))
+            (write-add! vertex (+ v (* (sincos (* (read vertex) 0.01)) 0.01)))
             (set! vertex (+ vertex 1)))
 
       (set! t (+ t 0.01))
       )))
- (hint-unlit)
- (texture 0)
-
- (pdata-map! (lambda (c) (rndvec)) "c")
- (pdata-map! (lambda (n) (vector 0 0 0)) "n"))
 """,
 
 """
-(with-primitive
-   (make-jelly 1000 prim-tristrip
+   (make-jelly 10000 prim-tristrip
     '(let ((vertex positions-start))
        (write! reg-graphics (vector 512 1 2))
        (forever
         (set! vertex positions-start)
         (loop (< vertex positions-end)
-              (write! vertex (+ (read vertex) (rndvec)))
+              (write-add! vertex (* (sincos (* (read vertex) 0.01)) 0.1))
               (++! vertex))
        )))
-   (texture 0)
-   (pdata-map! (lambda (p) (srndvec)) "p")
-   (pdata-map! (lambda (c) (rndvec)) "c"))
 """,
 
 """
@@ -123,9 +113,9 @@ code = ["""
            ;; recalculate normals
            (define n (normalise
                       (cross (- (read vertex)
-                                (read (+ vertex 1)))
+                                (read (+ vertex 2)))
                              (- (read vertex)
-                                (read (+ vertex 2))))))
+                                (read (+ vertex 1))))))
 
            ;; write to normal data
            (write! (+ vertex 512) n n n)
@@ -137,9 +127,10 @@ code = ["""
                    (*v (swizzle zzz c) (vector 0 4 0))))))
 
      ;; forever
+     (set! flingdamp (*v (- (rndvec) (vector 0.5 0.5 0.5)) (vector 0.2 0.2 0)))
      (forever
 
-      (define vel (* flingdamp 0.002))
+      (define vel flingdamp)
       ;; update the world coordinates
       (set! world (+ world vel))
       (set! t (+ t 0.1))
@@ -165,8 +156,10 @@ code = ["""
             (set! vertex (+ vertex 3)))
       (set! vertex positions-start))))
 
+ (hint-none)(hint-solid)
  (pdata-map! (lambda (n) (vmul (vector (crndf) (crndf) 0) 0.001)) "n")
  (pdata-map! (lambda (c) (vector 1 1 1)) "c")
+ (identity)
  (texture (load-texture "stripes.png"))
  (translate (vector -1 2 0))
  (rotate (vector -45 0 0))

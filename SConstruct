@@ -1,4 +1,4 @@
-target = 'nomadic'
+target = 'jellyfish'
 platform = ARGUMENTS.get('TARGET','LINUX')
 env = Environment(CCFLAGS='-O3 -std=gnu++0x -ggdb -DUSE_MATH=1 -Wno-write-strings')
 source = ['main.cpp',
@@ -22,14 +22,13 @@ source = ['main.cpp',
           'engine/scenenode.cpp',
           'engine/texture.cpp',
           'engine/nomadic.cpp',
-          'jellyfish/jellyfish_primitive.cpp',
-          'jellyfish/jellyfish.cpp',
-
 	  'rpi/input.cpp'
+          'engine/jellyfish_primitive.cpp',
+          'engine/jellyfish.cpp'
        ]
 
 if platform=='LINUX':
-   env.Append(LIBS = ['glut', 'GL', 'png', 'pthread', 'dl', 'lo'])
+   env.Append(LIBS = ['glut', 'GL', 'png', 'pthread', 'dl', 'lo', 'jpeg'])
    env.Append(CCFLAGS=' -fpermissive -DFLX_LINUX')
    env.Append(CPPPATH = '.')
    source.append(['core/db.cpp',
@@ -38,7 +37,7 @@ if platform=='LINUX':
 
 if platform=='RPI':
    # raspberry pi
-   env.Append(LIBS = ['GLESv1_CM', 'EGL', 'bcm_host', 'X11', 'png', 'lo'])
+   env.Append(LIBS = ['GLESv1_CM', 'EGL', 'bcm_host', 'X11', 'png', 'lo', 'jpeg'])
    env.Append(CCFLAGS=' -DFLX_RPI -fpermissive')
    env.Append(CPPPATH = '/opt/vc/include/interface/vcos/pthreads/:/opt/vc/include/interface/vmcs_host/linux:/opt/vc/include/:.')
    env.Append(LIBPATH = '/opt/vc/lib')

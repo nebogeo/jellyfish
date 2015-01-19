@@ -529,3 +529,24 @@
   (let ((code (diy-macro (append '(begin) code))))
 ;    (display code)(newline)
     (eval code)))
+
+;;---------------------------------------------------------
+;; jellyfish helpers
+
+(define (jelly-compiled code)
+  (define addr 0)
+  (for-each
+   (lambda (v)
+     (pdata-set! "x" addr v)
+     (set! addr (+ addr 1)))
+   code))
+
+(define (program-jelly speed prim-type code)
+  (let ((c (compile-program speed prim-type 1 code)))
+    ;;(disassemble c)
+    (jelly-compiled c)))
+
+(define (disassemble-compiled code)
+  (let ((c (compile-program 50 'triangles 1 code)))
+    (disassemble c))
+  code)

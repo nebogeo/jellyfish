@@ -92,7 +92,10 @@ vec3 jellyfish::pop()
 //           (float)data.y,
 //           (float)data.z);
 
-    if (peekiz(REG_CONTROL)<0) pokez(REG_CONTROL,0);
+    if (peekiz(REG_CONTROL)<0) {
+      //printf("stack ran out!\n");
+      pokez(REG_CONTROL,0);
+    }
     return data;
 }
 
@@ -138,9 +141,34 @@ void jellyfish::run()
         poke((int)addr.x,data);
     } break;
 	case NRM: push(pop().normalise()); break;
-	case ADDX: { m_heap[argiy%m_heap_size].x+=c.z; } break;
+
+          // multiple store suck from stack, takes size
+        case MST: {
+          vec3 addr=pop();
+          for (int i=0; i<argiy; i++) {
+            vec3 t=pop();
+            poke((int)addr.x+i,t);
+          }
+        } break;
+          // multiple add
+        case MAD: {
+          vec3 addr=pop();
+          for (int i=0; i<argiy; i++) {
+            poke((int)addr.x+i,peek((int)addr.x+i)+pop());
+          }
+        } break;
+          // multople subtract
+        case MSB: {
+          vec3 addr=pop();
+          for (int i=0; i<argiy; i++) {
+            poke((int)addr.x+i,peek((int)addr.x+i)-pop());
+          }
+        } break;
+
+  // never used...
+  /*	case ADDX: { m_heap[argiy%m_heap_size].x+=c.z; } break;
 	case ADDY: { m_heap[argiy%m_heap_size].y+=c.z; } break;
-	case ADDZ: { m_heap[argiy%m_heap_size].z+=c.z; } break;
+	case ADDZ: { m_heap[argiy%m_heap_size].z+=c.z; } break; */
  	case ADD: push(pop()+pop()); break;
 	case SUB:
     {
@@ -260,9 +288,19 @@ void jellyfish::run()
         vec3 v=pop();
         m_audio_graph->Play(v.x, (int)v.y, v.z);
     } break;
-	case FLR: { vec3 t=pop(); push(vec3(floor((float)t.x),
-                                        floor((float)t.y),
-                                        floor((float)t.z))); } break;
+        case FLR:
+          { vec3 t=pop(); push(vec3(floor((float)t.x),
+                                    floor((float)t.y),
+                                    floor((float)t.z)));
+          } break;
+	case MOD:
+          {
+            vec3 m=pop();
+            vec3 t=pop();
+            push(vec3(fmod((float)t.x,(float)m.x),
+                      fmod((float)t.y,(float)m.y),
+                      fmod((float)t.z,(float)m.z)));
+          } break;
 
     default: set_instr(pc,false);
    	};
@@ -381,9 +419,9 @@ void jellyfish::print_instr(s32 addr) const
         case RET: printf("ret"); break;
         case DBG: printf("dbg"); break;
         case NRM: printf("nrm"); break;
-        case ADDX: printf("add.x"); break;
-        case ADDY: printf("add.y"); break;
-        case ADDZ: printf("add.z"); break;
+        case MST: printf("mst"); break;
+        case MAD: printf("mad"); break;
+        case MSB: printf("msb"); break;
         case SWP: printf("swp"); break;
         case RND: printf("rnd"); break;
         case MULL: printf("mull"); break;

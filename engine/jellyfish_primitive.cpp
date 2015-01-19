@@ -20,7 +20,7 @@
 #include "../engine/scenenode.h"
 #include "../core/msg.h"
 
-#include "jellyfish/jellyfish.h"
+#include "engine/jellyfish.h"
 
 jellyfish_primitive::jellyfish_primitive(u32 size):
     primitive(size, TRIANGLES)
@@ -55,9 +55,9 @@ jellyfish_primitive::~jellyfish_primitive()
 void jellyfish_primitive::execute() {
     for (int i=0; i<m_machine->peekiy(REG_CONTROL); i++) {
         m_machine->run();
-//        m_machine->pretty_dump();
-//        char cmd_str[80];
-//        fgets( cmd_str, 80, stdin );
+        //m_machine->pretty_dump();
+        //char cmd_str[80];
+        //fgets( cmd_str, 80, stdin );
 
     }
 }

@@ -33,8 +33,8 @@ LOCAL_SRC_FILES := \
 	engine/obj_reader.cpp \
     engine/nomadic.cpp \
 	engine/engine.cpp \
-	jellyfish/jellyfish.cpp \
-	jellyfish/jellyfish_primitive.cpp \
+	engine/jellyfish.cpp \
+	engine/jellyfish_primitive.cpp \
 	audio.cpp \
     app-android.c
 

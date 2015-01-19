@@ -16,7 +16,7 @@
 
 #include "engine.h"
 #include "text_primitive.h"
-#include "jellyfish/jellyfish_primitive.h"
+#include "jellyfish_primitive.h"
 #include "fluxa/Graph.h"
 #include "obj_reader.h"
 

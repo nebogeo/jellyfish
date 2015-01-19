@@ -2,6 +2,7 @@
 ;; vectorlisp: a strange language for procedural rendering
 
 (define debug #f)
+(define prim-size 4096)
 
 (define nop 0) (define jmp 1) (define jmz 2) (define jlt 3) (define jgt 4)
 (define ldl 5) (define lda 6) (define ldi 7) (define sta 8) (define sti 9)
@@ -9,18 +10,19 @@
 (define sincos 15) (define atn 16) (define dot 17) (define crs 18) (define sqr 19)
 (define len 20) (define dup 21) (define drp 22) (define cmp 23) (define shf 24)
 (define bld 25) (define ret 26) (define _dbg 27) (define nrm 28)
-(define add.x 29) (define add.y 30) (define add.z 31) (define end-check 999)
+(define mst 29) (define mad 30) (define msb 31) (define end-check 999)
 (define swp 32) (define rnd 33) (define mull 34) (define jmr 35) (define ldlv 36)
 (define lensq 37) (define noise 38) (define lds 39) (define sts 40) (define mulv 41)
 (define synth-crt 42) (define synth-con 43) (define synth-ply 44) (define flr 45)
+(define mod 46)
 
 (define instr
   '(nop jmp jmz jlt jgt ldl lda ldi sta sti
         add sub mul div abs scs atn dot crs
         sqr len dup drp cmp shf bld ret dbg
-        nrm add.x add.y add.z swp rnd mull
+        nrm mst mad msb swp rnd mull
         jmr ldlv lensq noise lds sts mulv
-        synth-crt synth-con synth-ply flr))
+        synth-crt synth-con synth-ply flr mod))
 
 (define prim-triangles 0)
 (define prim-tristrip 1)
@@ -66,7 +68,7 @@
     addr))
 
 ;; segments are data areas, positions, normals, colours etc
-(define segment-size 512)
+(define segment-size prim-size)
 
 (define (memseg n) (* segment-size n))
 
@@ -142,6 +144,17 @@
                   (emit (vector drp 0 0))
                   (emit-expr-list (cdr l))))))))
 
+
+;; append a bunch of expressions, don't drop
+;; as we want to build the stack (for fn call)
+(define (emit-expr-list-maintain-stack l)
+  (cond
+    ((null? l) '())
+    (else
+     (append (emit-expr (car l))
+             (if (null? (cdr l)) '()
+                 (emit-expr-list-maintain-stack (cdr l)))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; primitive function calls follow
 
@@ -155,68 +168,54 @@
 ;; (write! start-addr value value value ...)
 (define (emit-write! x)
   (append
-   (cadr
-    (foldl
-     (lambda (val r)
-       (list
-        (+ (car r) 1)
-        (append
-         (cadr r)
-         (emit-expr val)               ;; data
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit-expr (cadr x))          ;; address
-         (emit (vector add 0 0))       ;; add offset
-         (emit (vector sts 0 0)))))
-     (list 0 '())
-     (cddr x)))
-    (emit (vector ldl 0 0))))
+   ;; stick everything on the stack
+   (emit-expr-list-maintain-stack (reverse (cdr x)))
+   (emit (vector mst (length (cddr x)) 0))
+   (emit (vector ldl 0 0))))
 
 (define (emit-write-add! x)
   (append
-   (cadr
-    (foldl
-     (lambda (val r)
-       (list
-        (+ (car r) 1)
-        (append
-         (cadr r)
-         (emit-expr (cadr x))          ;; address
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit (vector add 0 0))       ;; add them
-         (emit (vector lds 0 0))       ;; load value
-         (emit-expr val)               ;; data
-         (emit (vector add 0 0))       ;; add them
-         (emit (vector ldl (car r) 0)) ;; offset
-         (emit-expr (cadr x))          ;; address
-         (emit (vector add 0 0))       ;; add offset
-         (emit (vector sts 0 0)))))
-     (list 0 '())
-     (cddr x)))
-    (emit (vector ldl 0 0))))
+   ;; stick everything on the stack
+   (emit-expr-list-maintain-stack (reverse (cdr x)))
+   (emit (vector mad (length (cddr x)) 0))
+   (emit (vector ldl 0 0))))
 
+(define (emit-write-sub! x)
+  (append
+   ;; stick everything on the stack
+   (emit-expr-list-maintain-stack (reverse (cdr x)))
+   (emit (vector msb (length (cddr x)) 0))
+   (emit (vector ldl 0 0))))
 
 (define (emit-read x)
   (append
    (emit-expr (cadr x)) ;; address
    (emit (vector lds 0 0))))
 
-(define (emit-cond-part x)
-  (let ((block (emit-expr-list (cdr x))))
-    (append
-     (emit-expr (car x))
-     (emit (vector jmz (+ (length block) 1) 0))
-     block)))
+(define (emit-addr x)
+  (emit (vector ldl (variable-address (cadr x)) 0)))
 
-(define (emit-cond x)
-  (define (_ l)
-    (cond
-     ((null? l) '())
-     (else (append (emit-cond-part (car l))
-                   (_ (cdr l))))))
-  (_ (cdr x)))
+(define (emit-if x)
+  (let ((tblock (emit-expr (caddr x)))
+        (fblock (emit-expr (cadddr x))))
+    (append
+     (emit-expr (cadr x))
+     (emit (vector jmz (+ (length tblock) 2) 0))
+     tblock
+     (emit (vector jmr (+ (length fblock) 1) 0))
+     fblock)))
+
+(define (emit-when x)
+  (let ((block (emit-expr-list (cddr x))))
+    (append
+     (emit-expr (cadr x))
+     (emit (vector jmz (+ (length block) 2) 0))
+     block
+     (emit (vector jmr 2 0))
+     (emit (vector ldl 0 0)))))
 
 (define (emit-fncall x addr)
-  (let ((args (emit-expr-list (cdr x))))
+  (let ((args (emit-expr-list-maintain-stack (cdr x))))
     (append
      ;; offset from here -> stitch up in second pass
      (emit (list 'add-abs-loc 'this 1
@@ -234,7 +233,7 @@
               ;; for moment use global pile for arguments :O
               (make-variable! arg)
               (vector sta (variable-address arg) 0))
-            (cadr x))
+            (reverse (cadr x)))
            ;; now args are loaded, do body
            (emit-expr-list (cddr x))
            ;; swap ret ptr to top
@@ -400,17 +399,20 @@
     ((eq? (car x) '*v) (binary-procedure mulv x))
     ((eq? (car x) 'cross) (binary-procedure crs x))
     ((eq? (car x) 'dot) (binary-procedure dot x))
+    ((eq? (car x) 'modulo) (binary-procedure mod x))
     ((eq? (car x) 'eq?) (emit-eq? x))
     ((eq? (car x) '>) (emit-> x))
     ((eq? (car x) '<) (emit-< x))
     ((eq? (car x) 'set!) (emit-set! x))
     ((eq? (car x) 'write!) (emit-write! x))
     ((eq? (car x) 'write-add!) (emit-write-add! x))
+    ((eq? (car x) 'write-sub!) (emit-write-sub! x))
     ((eq? (car x) 'swizzle) (emit-swizzle x))
     ((eq? (car x) 'lambda) (emit-lambda x))
     ((eq? (car x) 'rndvec) (emit (vector rnd 0 0)))
     ((eq? (car x) 'trace) (emit-trace x))
     ((eq? (car x) 'read) (emit-read x))
+    ((eq? (car x) 'addr) (emit-addr x))
     ((eq? (car x) 'not) (emit-not x))
     ((eq? (car x) 'mag) (unary-procedure len x))
     ((eq? (car x) 'magsq) (unary-procedure lensq x))
@@ -448,7 +450,8 @@
      (cond
       ((eq? (car x) 'let) (emit-let x))
       ((eq? (car x) 'define) (emit-define x))
-      ((eq? (car x) 'cond) (emit-cond x))
+      ((eq? (car x) 'if) (emit-if x))
+      ((eq? (car x) 'when) (emit-when x))
       ((eq? (car x) 'loop) (emit-loop x))
       ((eq? (car x) 'do) (emit-expr-list (cdr x)))
       (else (emit-procedure x)))
@@ -462,7 +465,7 @@
 (define (header code-start cycles prim hints)
   (list
    (vector code-start cycles 0) ;; control (pc, cycles, stack)
-   (vector 512 prim hints) ;; graphics
+   (vector prim-size prim hints) ;; graphics
    (vector 0 0 0) ;; translate
    (vector 1 0 0) ;; rota
    (vector 0 1 0) ;; rotb
@@ -543,6 +546,15 @@
           (cdr x))))))))
 
 
+(define (preprocess-cond-to-if x)
+  (define (_ l)
+    (cond
+      ((null? l) 0)
+      ((eq? (pre-process (caar l)) 'else) (cons 'do (pre-process (cdr (car l)))))
+      (else (list 'if (pre-process (caar l)) (cons 'do (pre-process (cdr (car l))))
+                  (_ (cdr l))))))
+  (_ (cdr x)))
+
 ;; basically diy-macro from the main tinyscheme stuff
 (define (pre-process s)
   (cond
@@ -560,6 +572,8 @@
              ((eq? (car i) '--!)
               (let ((v (pre-process (cadr i))))
                 (list 'set! v (list '- v 1))))
+             ((eq? (car i) 'cond)
+              (preprocess-cond-to-if i))
              ((eq? (car i) 'play-now)
               (append
                (list 'do)
