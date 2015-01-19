@@ -37,6 +37,7 @@ extern "C"
 #ifdef FLX_RPI
 #include <assert.h>
 #include "bcm_host.h"
+
 #include "rpi/input.h"
 
 typedef struct
@@ -348,14 +349,14 @@ void DisplayCallback()
 
 // pasted from nomadic engine...??
 void KeyboardCallback(unsigned char key,int x, int y)
-{	
+{
 	char code[256];
 #ifdef FLX_RPI
 	int imod = 0;
 	sprintf(code,"(%s #\\%c %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),key,-1,-1,-1,x,y,imod);
 	appEval(code);
 #else
-	int mod=modifiers;	
+	int mod=modifiers;
 	mod=glutGetModifiers();
 	if (key > 0 && key<0x80)
 	{ // key is 0 on ctrl+2 and ignore extended ascii for the time being
@@ -366,7 +367,7 @@ void KeyboardCallback(unsigned char key,int x, int y)
 			imod |= 2;
 		if (mod & GLUT_ACTIVE_ALT)
 			imod |= 4;
-		
+
 		sprintf(code,"(%s #\\%c %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),key,-1,-1,-1,x,y,imod);
         appEval(code);
 	}
@@ -376,7 +377,7 @@ void KeyboardCallback(unsigned char key,int x, int y)
 void KeyboardUpCallback(unsigned char key,int x, int y)
 {
   char code[256];
-  if (key > 0 && key<0x80) { 
+  if (key > 0 && key<0x80) {
     // key is 0 on ctrl+2
     sprintf(code,"(%s #\\%c %d %d %d %d %d %d)",INPUT_RELEASE_CALLBACK.c_str(),key,-1,-1,-1,x,y,0);
     appEval(code);
@@ -563,13 +564,10 @@ int main(int argc, char *argv[])
     appLoadTexture("raspberrypi.png",w,h,(char *)tex);
     tex=LoadPNG(ASSETS_LOCATION+"stripes.png",w,h);
     appLoadTexture("stripes.png",w,h,(char *)tex);
-<<<<<<< HEAD
     tex=LoadPNG(ASSETS_LOCATION+"bg.png",w,h);
     appLoadTexture("bg.png",w,h,(char *)tex);
-=======
     tex=LoadPNG(ASSETS_LOCATION+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
->>>>>>> c0810fc558c7dd18b7fd92214be0f86de69524b4
 
     //    appEval((char*)LoadFile(ASSETS_LOCATION+"jellyfish.scm").c_str())
 

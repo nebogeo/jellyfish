@@ -22,7 +22,6 @@ source = ['main.cpp',
           'engine/scenenode.cpp',
           'engine/texture.cpp',
           'engine/nomadic.cpp',
-	  'rpi/input.cpp'
           'engine/jellyfish_primitive.cpp',
           'engine/jellyfish.cpp'
        ]
@@ -41,5 +40,7 @@ if platform=='RPI':
    env.Append(CCFLAGS=' -DFLX_RPI -fpermissive')
    env.Append(CPPPATH = '/opt/vc/include/interface/vcos/pthreads/:/opt/vc/include/interface/vmcs_host/linux:/opt/vc/include/:.')
    env.Append(LIBPATH = '/opt/vc/lib')
+   source.append(['rpi/input.cpp'])
+
 
 env.Program(target=target, source=source)
