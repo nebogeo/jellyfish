@@ -207,6 +207,7 @@
     _OP_DEF(opexe_6, "grab",                           1,  1,       0,                               OP_GRAB             )
     _OP_DEF(opexe_6, "ungrab",                         0,  0,       0,                               OP_UNGRAB           )
     _OP_DEF(opexe_6, "parent",                         1,  1,       0,                               OP_PARENT           )
+    _OP_DEF(opexe_6, "lock-camera",                    1,  1,       0,                               OP_LOCK_CAMERA      )
     _OP_DEF(opexe_6, "identity",                       0,  0,       0,                               OP_IDENTITY         )
     _OP_DEF(opexe_6, "translate",                      1,  1,       0,                               OP_TRANSLATE        )
     _OP_DEF(opexe_6, "rotate",                         1,  1,       0,                               OP_ROTATE           )

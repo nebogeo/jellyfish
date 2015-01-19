@@ -23,7 +23,9 @@ source = ['main.cpp',
           'engine/texture.cpp',
           'engine/nomadic.cpp',
           'jellyfish/jellyfish_primitive.cpp',
-          'jellyfish/jellyfish.cpp'
+          'jellyfish/jellyfish.cpp',
+
+	  'rpi/input.cpp'
        ]
 
 if platform=='LINUX':

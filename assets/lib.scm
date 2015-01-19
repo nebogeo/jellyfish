@@ -108,23 +108,6 @@
            (else (_ (+ m 1) top))))))
   (_ 0 (- (length l) 1)))
 
-; utils funcs for using lists as sets
-(define (set-remove a l)
-  (cond
-   ((null? l) '())
-   (else
-    (if (eqv? (car l) a)
-        (set-remove a (cdr l))
-        (cons (car l) (set-remove a (cdr l)))))))
-
-(define (set-add a l)
-  (if (not (memv a l))
-      (cons a l) l))
-
-(define (set-contains a l)
-  (if (not (memq a l)) #f #t))
-
-
 (define (build-list fn n)
   (define (_ fn n l)
     (cond ((zero? n) l)

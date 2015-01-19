@@ -4442,6 +4442,8 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
          engine::get()->ungrab(); s_return(sc,sc->F);
      case OP_PARENT:
           engine::get()->parent(ivalue(car(sc->args))); s_return(sc,sc->F);
+     case OP_LOCK_CAMERA:
+	  engine::get()->lock_camera(ivalue(car(sc->args))); s_return(sc,sc->F);
      case OP_IDENTITY:
          engine::get()->identity(); s_return(sc,sc->F);
      case OP_TRANSLATE:
