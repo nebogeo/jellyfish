@@ -195,24 +195,26 @@
 (define (emit-addr x)
   (emit (vector ldl (variable-address (cadr x)) 0)))
 
+;; (if pred true-expr false-expr)
 (define (emit-if x)
-  (let ((tblock (emit-expr (caddr x)))
-        (fblock (emit-expr (cadddr x))))
+  (let ((tblock (emit-expr (caddr x))) ;; compile true expression to a block
+        (fblock (emit-expr (cadddr x)))) ;; compile false expression to block
     (append
-     (emit-expr (cadr x))
-     (emit (vector jmz (+ (length tblock) 2) 0))
+     (emit-expr (cadr x)) ;; predicate - returns true or false
+     (emit (vector jmz (+ (length tblock) 2) 0)) ;; if false skip true block
      tblock
-     (emit (vector jmr (+ (length fblock) 1) 0))
+     (emit (vector jmr (+ (length fblock) 1) 0)) ;; skip false block
      fblock)))
 
+;; (when pred true-block)
 (define (emit-when x)
-  (let ((block (emit-expr-list (cddr x))))
+  (let ((block (emit-expr-list (cddr x)))) ;; compile the list of expressions
     (append
-     (emit-expr (cadr x))
-     (emit (vector jmz (+ (length block) 2) 0))
+     (emit-expr (cadr x)) ;; predicate - returns true or false
+     (emit (vector jmz (+ (length block) 2) 0)) ;; skip the block
      block
-     (emit (vector jmr 2 0))
-     (emit (vector ldl 0 0)))))
+     (emit (vector jmr 2 0))    ;; return result of the block (skip next instr)
+     (emit (vector ldl 0 0))))) ;; return 0 if we didn't run the block
 
 (define (emit-fncall x addr)
   (let ((args (emit-expr-list-maintain-stack (cdr x))))

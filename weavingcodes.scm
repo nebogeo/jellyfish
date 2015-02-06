@@ -18,10 +18,10 @@
          (weft-t 0)
          (draft-pos 0)
          (draft-size 4)
-         (draft 1) (d-b 0) (d-c 0) (d-d 1)
-         (d-e 1) (d-f 1) (d-g 0) (d-h 0)
-         (d-i 0) (d-j 1) (d-k 1) (d-l 0)
-         (d-m 0) (d-n 0) (d-o 1) (d-p 1)
+         (draft 1) (d-b 0) (d-c 1) (d-d 0)
+         (d-e 0) (d-f 1) (d-g 0) (d-h 1)
+         (d-i 1) (d-j 0) (d-k 1) (d-l 0)
+         (d-m 0) (d-n 1) (d-o 0) (d-p 1)
          (weft-z (vector 0 0 0))
          (weft-count 0)
          (weft-total 21))
@@ -38,10 +38,10 @@
      (define calc-weft-z
        (lambda ()
          (set! weft-count (+ weft-count 1))
-         (if (> (read-draft) 0.5)
-             (set! weft-z (vector 0 0 0.01))
-             (set! weft-z (vector 0 0 -0.01)))
-         ))
+         (set! weft-z
+               (if (> (read-draft) 0.5)
+                   (vector 0 0 0.01)
+                   (vector 0 0 -0.01)))))
 
 
      (define right-selvedge
@@ -125,6 +125,7 @@
       ;;(set! t (+ t 0.01))
       )))
  (hint-unlit)
+ (hint-wire)
  (texture (load-texture "thread.png"))
  (scale weave-scale)
  (pdata-index-map! (lambda (i t)
@@ -156,10 +157,10 @@
           (weft-t 0)
           (draft-pos 0)
           (draft-size 4)
-         (draft 1) (d-b 0) (d-c 0) (d-d 1)
-         (d-e 1) (d-f 1) (d-g 0) (d-h 0)
-         (d-i 0) (d-j 1) (d-k 1) (d-l 0)
-         (d-m 0) (d-n 0) (d-o 1) (d-p 1)
+         (draft 1) (d-b 0) (d-c 1) (d-d 0)
+         (d-e 0) (d-f 1) (d-g 0) (d-h 1)
+         (d-i 1) (d-j 0) (d-k 1) (d-l 0)
+         (d-m 0) (d-n 1) (d-o 0) (d-p 1)
          (last-t 0))
 
       (define build-quad
