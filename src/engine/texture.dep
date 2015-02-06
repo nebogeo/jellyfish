@@ -1,0 +1,3 @@
+texture.o: src/engine/texture.cpp src/engine/../core/list.h \
+ src/engine/../core/types.h src/engine/../core/fixed.h \
+ src/engine/../core/list.h src/engine/importgl.h src/engine/texture.h

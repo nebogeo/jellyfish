@@ -1,0 +1,2 @@
+geometry.o: src/core/geometry.cpp src/core/types.h src/core/fixed.h \
+ src/core/list.h src/core/geometry.h src/core/vec3.h src/core/pdata.h

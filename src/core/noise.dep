@@ -1,0 +1,1 @@
+noise.o: src/core/noise.cpp src/core/noise.h

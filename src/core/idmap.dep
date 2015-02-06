@@ -1,0 +1,2 @@
+idmap.o: src/core/idmap.cpp src/core/idmap.h src/core/types.h \
+ src/core/fixed.h src/core/list.h

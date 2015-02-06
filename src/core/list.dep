@@ -1,0 +1,2 @@
+list.o: src/core/list.cpp src/core/list.h src/core/types.h \
+ src/core/fixed.h

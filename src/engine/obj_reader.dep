@@ -1,0 +1,2 @@
+obj_reader.o: src/engine/obj_reader.cpp src/engine/obj_reader.h \
+ src/core/vec3.h src/core/types.h src/core/fixed.h src/core/list.h

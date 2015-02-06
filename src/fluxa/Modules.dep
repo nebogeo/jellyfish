@@ -1,0 +1,2 @@
+Modules.o: src/fluxa/Modules.cpp src/fluxa/Modules.h src/fluxa/Types.h \
+ src/fluxa/Sample.h src/fluxa/Allocator.h

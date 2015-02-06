@@ -1,0 +1,13 @@
+engine.o: src/engine/engine.cpp src/engine/engine.h \
+ src/engine/scenegraph.h src/engine/scenenode.h src/engine/../core/list.h \
+ src/engine/../core/types.h src/engine/../core/fixed.h \
+ src/engine/../core/list.h src/engine/../core/mat44.h \
+ src/engine/../core/vec3.h src/engine/primitive.h src/engine/importgl.h \
+ src/engine/../core/fixed.h src/engine/../core/vec3.h \
+ src/engine/../core/pdata.h src/engine/texture.h \
+ src/engine/text_primitive.h src/core/fixed.h \
+ src/engine/jellyfish_primitive.h src/engine/primitive.h \
+ src/fluxa/Graph.h src/fluxa/GraphNode.h src/fluxa/Sample.h \
+ src/fluxa/Types.h src/fluxa/Allocator.h src/fluxa/ModuleNodes.h \
+ src/fluxa/Modules.h src/engine/obj_reader.h src/core/vec3.h \
+ src/core/types.h src/core/fixed.h

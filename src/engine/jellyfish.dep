@@ -1,0 +1,12 @@
+jellyfish.o: src/engine/jellyfish.cpp src/engine/engine.h \
+ src/engine/scenegraph.h src/engine/scenenode.h src/engine/../core/list.h \
+ src/engine/../core/types.h src/engine/../core/fixed.h \
+ src/engine/../core/list.h src/engine/../core/mat44.h \
+ src/engine/../core/vec3.h src/engine/primitive.h src/engine/importgl.h \
+ src/engine/../core/fixed.h src/engine/../core/vec3.h \
+ src/engine/../core/pdata.h src/engine/texture.h src/engine/jellyfish.h \
+ src/engine/../core/types.h src/engine/../fluxa/Graph.h \
+ src/engine/../fluxa/GraphNode.h src/engine/../fluxa/Sample.h \
+ src/engine/../fluxa/Types.h src/engine/../fluxa/Allocator.h \
+ src/engine/../fluxa/ModuleNodes.h src/engine/../fluxa/Modules.h \
+ src/core/msg.h src/core/noise.h
