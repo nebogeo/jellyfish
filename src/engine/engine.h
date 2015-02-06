@@ -37,6 +37,7 @@ public:
     void pop();
     void grab(int id);
     void ungrab();
+    void lock_camera(int id);
 
     void identity();
     void translate(float x, float y, float z);
@@ -126,6 +127,9 @@ private:
     Graph *m_audio_graph;
     unsigned int m_screen_width;
     unsigned int m_screen_height;
+    // camera attached to primitive...
+    int m_attached_id;
+    scenenode *m_attached_prim;
     mat44 m_camera_tx;
     //mat44 m_inv_camera_tx;
 };

@@ -38,6 +38,8 @@ extern "C"
 #include <assert.h>
 #include "bcm_host.h"
 
+#include "rpi/input.h"
+
 typedef struct
 {
    uint32_t screen_width;
@@ -59,6 +61,8 @@ int w,h=0;
 int gAppAlive = 1;
 int modifiers = 0;
 pthread_mutex_t* render_mutex;
+static const string INPUT_CALLBACK="fluxus-input-callback";
+static const string INPUT_RELEASE_CALLBACK="fluxus-input-release-callback";
 
 // setup the assets location
 // on linux, mimic android, otherwise load locally on rpi
@@ -345,6 +349,44 @@ void DisplayCallback()
     } //else { printf("locked\n"); }
 }
 
+// pasted from nomadic engine...??
+void KeyboardCallback(unsigned char key,int x, int y)
+{
+	char code[256];
+#ifdef FLX_RPI
+	int imod = 0;
+	sprintf(code,"(%s #\\%c %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),key,-1,-1,-1,x,y,imod);
+	appEval(code);
+#else
+	int mod=modifiers;
+	mod=glutGetModifiers();
+	if (key > 0 && key<0x80)
+	{ // key is 0 on ctrl+2 and ignore extended ascii for the time being
+		int imod = 0;
+		if (mod & GLUT_ACTIVE_SHIFT)
+			imod |= 1;
+		if (mod & GLUT_ACTIVE_CTRL)
+			imod |= 2;
+		if (mod & GLUT_ACTIVE_ALT)
+			imod |= 4;
+
+		sprintf(code,"(%s #\\%c %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),key,-1,-1,-1,x,y,imod);
+        appEval(code);
+	}
+#endif
+}
+
+void KeyboardUpCallback(unsigned char key,int x, int y)
+{
+  char code[256];
+  if (key > 0 && key<0x80) {
+    // key is 0 on ctrl+2
+    sprintf(code,"(%s #\\%c %d %d %d %d %d %d)",INPUT_RELEASE_CALLBACK.c_str(),key,-1,-1,-1,x,y,0);
+    appEval(code);
+  }
+}
+
+
 #ifdef FLX_RPI
 
 static void init_ogl_rpi(RPI_STATE_T *state)
@@ -367,6 +409,7 @@ static void init_ogl_rpi(RPI_STATE_T *state)
       EGL_GREEN_SIZE, 8,
       EGL_BLUE_SIZE, 8,
       EGL_ALPHA_SIZE, 8,
+      EGL_DEPTH_SIZE, 16,
       EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
       EGL_NONE
    };
@@ -423,13 +466,13 @@ static void init_ogl_rpi(RPI_STATE_T *state)
    assert(EGL_FALSE != result);
 
    // Set background color and clear buffers
-   glClearColor(0.f, 0.f, 0.f, 0.5f);
+   /*   glClearColor(1.f, 0.f, 0.f, 0.5f);
    glClear( GL_COLOR_BUFFER_BIT );
    glClear( GL_DEPTH_BUFFER_BIT );
    //glShadeModel(GL_FLAT);
 
    // Enable back face culling.
-   // glEnable(GL_CULL_FACE);
+   glEnable(GL_CULL_FACE); */
 }
 
 #endif
@@ -523,6 +566,8 @@ int main(int argc, char *argv[])
     appLoadTexture("raspberrypi.png",w,h,(char *)tex);
     tex=LoadPNG(ASSETS_LOCATION+"stripes.png",w,h);
     appLoadTexture("stripes.png",w,h,(char *)tex);
+    tex=LoadPNG(ASSETS_LOCATION+"bg.png",w,h);
+    appLoadTexture("bg.png",w,h,(char *)tex);
     tex=LoadPNG(ASSETS_LOCATION+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
 
@@ -533,16 +578,23 @@ int main(int argc, char *argv[])
     }
 
     // setup the repl thread
-	render_mutex = new pthread_mutex_t;
+      	render_mutex = new pthread_mutex_t;
 	pthread_mutex_init(render_mutex,NULL);
-    pthread_t *repl_thread = new pthread_t;
+	/*pthread_t *repl_thread = new pthread_t;
     pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
 
     setup_osc_repl();
-
+    */
 #ifdef FLX_RPI
+	getMouse();
+	getKeys();
+
   while (!terminate_prog)
    {
+      doEvents(state->screen_width, state->screen_height,
+	       KeyboardCallback,
+	       KeyboardUpCallback);
+
       //usleep(5*1000);
      DisplayCallback();
    }

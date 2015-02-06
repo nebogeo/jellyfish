@@ -51,6 +51,8 @@ engine::engine()
 {
     m_sg=new scenegraph();
     clear();
+    m_attached_prim = NULL;
+    m_attached_id = 0;
     m_audio_graph = new Graph(70,16000);
 }
 
@@ -127,6 +129,12 @@ scenenode *engine::grabbed_node()
 //        cerr<<"could not find node "<<grabbed_id()<<endl;
     }
     return n;
+}
+
+void engine::lock_camera(int id)
+{
+    m_attached_id=id;
+    m_attached_prim=m_sg->find(id);
 }
 
 void engine::identity()
@@ -370,6 +378,12 @@ void engine::clear()
 
 void engine::destroy(int id)
 {
+    // clear camera attachment if it's this primitive
+    if (m_attached_id == id) {
+      m_attached_prim = NULL;
+      m_attached_id = 0;
+    }
+    
     m_sg->remove(id);
 }
 
@@ -533,6 +547,11 @@ void engine::render()
     glLightxv(GL_LIGHT0, GL_POSITION, (GLfixed *)buf);
 
    glMultMatrixx((GLfixed*)&m_camera_tx.m[0][0]);
+
+   if (m_attached_prim!=NULL) {
+       glMultMatrixx((GLfixed*)&m_attached_prim->m_tx.inverse().m[0][0]);
+   }
+
 //    glMultMatrixf(&m_camera_tx.m[0][0]);
 #endif
     m_sg->render();

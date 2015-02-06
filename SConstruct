@@ -36,9 +36,11 @@ if platform=='LINUX':
 
 if platform=='RPI':
    # raspberry pi
-   env.Append(LIBS = ['GLESv1_CM', 'EGL', 'bcm_host', 'X11', 'png', 'lo'])
+   env.Append(LIBS = ['GLESv1_CM', 'EGL', 'bcm_host', 'X11', 'png', 'lo', 'jpeg'])
    env.Append(CCFLAGS=' -DFLX_RPI -fpermissive')
    env.Append(CPPPATH = '/opt/vc/include/interface/vcos/pthreads/:/opt/vc/include/interface/vmcs_host/linux:/opt/vc/include/:.')
    env.Append(LIBPATH = '/opt/vc/lib')
+   source.append(['rpi/input.cpp'])
+
 
 env.Program(target=target, source=source)

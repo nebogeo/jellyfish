@@ -69,17 +69,17 @@
 (define (set-remove a l)
   (if (null? l)
       '()
-      (if (eq? (car l) a)
+      (if (eqv? (car l) a)
           (set-remove a (cdr l))
           (cons (car l) (set-remove a (cdr l))))))
 
 (define (set-add a l)
-  (if (not (memq a l))
+  (if (not (memv a l))
       (cons a l)
       l))
 
 (define (set-contains a l)
-  (if (not (memq a l))
+  (if (not (memv a l))
       #f
       #t))
 
@@ -93,7 +93,7 @@
 
 (define (register-down key button special state x y mod)
   (when (not (or (number? key) (eq? key -1))) ; ordinary keypress
-    (set! keys (set-add key keys))
+	(set! keys (set-add key keys))
 	(set! keys-this-frame (set-add key keys-this-frame)))
   (when (not (= special -1)) ; special keypress
     (set! special-keys (set-add special special-keys))
@@ -146,7 +146,8 @@
 
 (define (fluxus-input-callback key button special state x y mod)
   (register-down key button special state x y mod)
-  (input-camera key button special state x y mod width height))
+  ;(input-camera key button special state x y mod width height)
+  )
 
 (define (fluxus-input-release-callback key button special state x y mod)
   (register-up key button special state x y mod))
