@@ -3816,6 +3816,20 @@ _ACEOF
 fi
 
 
+echo "                             Are we on Raspberry Pi?"
+for ac_header in /opt/vc/include/bcm_host.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "/opt/vc/include/bcm_host.h" "ac_cv_header__opt_vc_include_bcm_host_h" "$ac_includes_default"
+if test "x$ac_cv_header__opt_vc_include_bcm_host_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__OPT_VC_INCLUDE_BCM_HOST_H 1
+_ACEOF
+
+fi
+
+done
+
+
 ac_config_files="$ac_config_files Makefile"
 
 cat >confcache <<\_ACEOF
