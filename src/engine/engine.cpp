@@ -17,7 +17,6 @@
 #include "engine.h"
 #include "text_primitive.h"
 #include "jellyfish_primitive.h"
-#include "fluxa/Graph.h"
 #include "obj_reader.h"
 
 #ifdef _EE
@@ -53,7 +52,6 @@ engine::engine()
     clear();
     m_attached_prim = NULL;
     m_attached_id = 0;
-    m_audio_graph = new Graph(70,16000);
 }
 
 engine::~engine()

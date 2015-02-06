@@ -27,7 +27,6 @@ jellyfish::jellyfish(vec3 *heap_ptr, u32 heap_size) :
     m_heap_size(heap_size)
 {
     m_instruction = new bool[m_heap_size];
-    m_audio_graph = engine::get()->get_audio_graph();
 
 	for (u32 n=0; n<m_heap_size; n++)
 	{
@@ -273,7 +272,7 @@ void jellyfish::run()
         push(vec3(n,n,n));
     } break;
 
- 	case SYNTH_CRT:
+    /* 	case SYNTH_CRT:
     {
         vec3 v=pop();
         m_audio_graph->Create((int)v.x, (Graph::Type)((int)v.y), v.z);
@@ -287,7 +286,7 @@ void jellyfish::run()
     {
         vec3 v=pop();
         m_audio_graph->Play(v.x, (int)v.y, v.z);
-    } break;
+	} break;*/
         case FLR:
           { vec3 t=pop(); push(vec3(floor((float)t.x),
                                     floor((float)t.y),

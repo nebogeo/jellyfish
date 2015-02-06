@@ -41,16 +41,18 @@
 
 #include "../engine/engine.h"
 #include "../core/geometry.h"
+#include "../fluxa/Graph.h"
+
+Graph *m_audio_graph = NULL;
 
 char *starwisp_data = NULL;
 
 #ifdef USE_SQLITE
 #include "core/db_container.h"
 db_container the_db_container;
-#endif
-
 #include "core/idmap.h"
 idmap the_idmap;
+#endif
 
 #ifdef _EE
 #define USE_STRLWR 0
@@ -4551,6 +4553,8 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                                                cons(sc,mk_integer(sc,now->tm_sec), sc->NIL)))))));
 
      }
+
+#ifdef USE_SQLITE
      case OP_ID_MAP_ADD: {
           the_idmap.add(
                string_value(car(sc->args)),
@@ -4562,6 +4566,31 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                sc,mk_integer(sc,the_idmap.get(
                                string_value(car(sc->args)))));
      }
+#endif
+
+//////////////////// fluxa /////////////////////////////////////////
+     case OP_SYNTH_INIT: {	 
+	  m_audio_graph = new Graph(10,16000);
+     } break;
+     case OP_SYNTH_CRT: {	 
+	  m_audio_graph
+	       ->Create(ivalue(car(sc->args)), 
+			(Graph::Type)(ivalue(cadr(sc->args))),
+			rvalue(caddr(sc->args)));
+     } break;
+     case OP_SYNTH_CON: {
+	  m_audio_graph
+	       ->Connect(ivalue(car(sc->args)), 
+			 ivalue(cadr(sc->args)), 
+			 ivalue(caddr(sc->args)));
+     } break;
+     case OP_SYNTH_PLY: {
+	  m_audio_graph
+	       ->Play(rvalue(car(sc->args)), 
+		      ivalue(cadr(sc->args)), 		 
+		      rvalue(caddr(sc->args)));
+     } break;
+
 //////////////////// fluxus /////////////////////////////////////////
 
      case OP_PUSH:
@@ -4748,7 +4777,7 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
          vec3 evec(rvalue(vector_elem(cadr(sc->args),0)),
                    rvalue(vector_elem(cadr(sc->args),1)),
                    rvalue(vector_elem(cadr(sc->args),2)));
-         list *points=engine::get()->geo_line_intersect(svec,evec);
+	 bb::list *points=engine::get()->geo_line_intersect(svec,evec);
          if (points!=NULL)
          {
               pointer list=sc->NIL;

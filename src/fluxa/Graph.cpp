@@ -30,9 +30,10 @@ m_MaxPlaying(10),
 m_NumNodes(NumNodes),
 m_SampleRate(SampleRate)
 {
-	Init();
-	m_Mutex = new pthread_mutex_t;
-	pthread_mutex_init(m_Mutex,NULL);
+  cerr<<"Creating a graph: "<<this<<endl;
+  Init();
+  m_Mutex = new pthread_mutex_t;
+  pthread_mutex_init(m_Mutex,NULL);
 }
 
 
@@ -50,7 +51,8 @@ void Graph::Init()
 		
 		unsigned int count=m_NumNodes;
 		
-		if (type==TERMINAL) count=2000;
+		if (type==TERMINAL) count=20;
+		count=10;
 		
 		for(unsigned int n=0; n<count; n++)
 		{

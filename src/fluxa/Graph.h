@@ -72,7 +72,7 @@ private:
 	};
 	
 	unsigned int m_MaxPlaying;
-    std::list<pair<unsigned int, float> > m_RootNodes;
+	std::list<pair<unsigned int, float> > m_RootNodes;
 	map<unsigned int,GraphNode*> m_NodeMap;
 	map<Type,NodeDescVec*> m_NodeDescMap;
 	unsigned int m_NumNodes;

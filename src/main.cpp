@@ -23,10 +23,12 @@
 #include <png.h>
 #include <pthread.h>
 
+#ifdef USE_JPGLIB
 extern "C"
 {
 #include <jpeglib.h>
 }
+#endif
 
 #include <lo/lo.h>
 
@@ -187,6 +189,8 @@ unsigned char* LoadPNG(const string filename,long &width, long &height)
     return data;
 }
 
+#ifdef USE_JPGLIB
+
 int WriteJPG(GLubyte *image, const char *filename, const char *description, int x, int y, int width, int height, int quality, int super)
 {
 	struct jpeg_compress_struct cinfo;
@@ -232,6 +236,7 @@ int WriteJPG(GLubyte *image, const char *filename, const char *description, int 
 	return 0;
 }
 
+#endif
 
 string LoadFile(string filename)
 {
@@ -338,12 +343,15 @@ void DisplayCallback()
   glutSwapBuffers();
 #endif
 
+#ifdef USE_JPGLIB
+
   static char fn[256];
   sprintf(fn,"shot-%0.4d.jpg",frame_num);
   cerr<<fn<<endl;
   WriteJPG(GetScreenBuffer(0, 0, w, h, 1),
            fn,"",0,0,w,h,95,1);
   frame_num++;
+#endif
 
   pthread_mutex_unlock(render_mutex);
     } //else { printf("locked\n"); }
@@ -531,7 +539,7 @@ int main(int argc, char *argv[])
    // Clear application state
    memset( state, 0, sizeof( *state ) );
 
-   init_ogl_rpi(state);
+   //   init_ogl_rpi(state);
 #else
    w=640;
    h=480;
@@ -549,8 +557,8 @@ int main(int argc, char *argv[])
    glutIdleFunc(IdleCallback);
 #endif
 
-    appInit();
-    initGL();
+       appInit();
+   // initGL();
 
     //appEval((char*)LoadFile("material/flx/init.scm").c_str());
     //appEval((char*)LoadFile("material/flx/boot.scm").c_str());
@@ -559,7 +567,7 @@ int main(int argc, char *argv[])
     appEval((char*)LoadFile(ASSETS_LOCATION+"boot.scm").c_str());
     appEval((char*)LoadFile(ASSETS_LOCATION+"lib.scm").c_str());
     appEval((char*)LoadFile(ASSETS_LOCATION+"compiler.scm").c_str());
-
+    /*
     // preload the textures
     long w=0,h=0;
     unsigned char *tex=LoadPNG(ASSETS_LOCATION+"raspberrypi.png",w,h);
@@ -570,7 +578,7 @@ int main(int argc, char *argv[])
     appLoadTexture("bg.png",w,h,(char *)tex);
     tex=LoadPNG(ASSETS_LOCATION+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
-
+    */
     //    appEval((char*)LoadFile(ASSETS_LOCATION+"jellyfish.scm").c_str())
 
     if (argc>1) {
@@ -578,18 +586,17 @@ int main(int argc, char *argv[])
     }
 
     // setup the repl thread
-      	render_mutex = new pthread_mutex_t;
-	pthread_mutex_init(render_mutex,NULL);
-	/*pthread_t *repl_thread = new pthread_t;
-    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
-
-    setup_osc_repl();
-    */
+    //      	render_mutex = new pthread_mutex_t;
+    //	pthread_mutex_init(render_mutex,NULL);
+//-	pthread_t *repl_thread = new pthread_t;
+//-    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
+//-    setup_osc_repl();
+    
 #ifdef FLX_RPI
-	getMouse();
-	getKeys();
+    //	getMouse();
+    //	getKeys();
 
-  while (!terminate_prog)
+    /*  while (!terminate_prog)
    {
       doEvents(state->screen_width, state->screen_height,
 	       KeyboardCallback,
@@ -597,7 +604,7 @@ int main(int argc, char *argv[])
 
       //usleep(5*1000);
      DisplayCallback();
-   }
+     }*/
 #else
 	glutMainLoop();
 #endif

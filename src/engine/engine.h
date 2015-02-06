@@ -16,8 +16,6 @@
 
 #include "scenegraph.h"
 
-class Graph;
-
 #ifndef FLX_ENGINE
 #define FLX_ENGINE
 
@@ -89,8 +87,6 @@ public:
 
     float m_clear_r,m_clear_g,m_clear_b,m_clear_a;
 
-    Graph *get_audio_graph() { return m_audio_graph; }
-
 private:
 
     list m_state_stack;
@@ -124,7 +120,6 @@ private:
 
     static engine *m_engine;
     scenegraph *m_sg;
-    Graph *m_audio_graph;
     unsigned int m_screen_width;
     unsigned int m_screen_height;
     // camera attached to primitive...

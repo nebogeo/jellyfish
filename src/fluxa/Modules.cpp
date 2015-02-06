@@ -17,6 +17,7 @@
 #include "Modules.h"
 #include <stdlib.h>
 #include <math.h>
+#include <iostream>
 
 using namespace std;
 
@@ -123,6 +124,7 @@ void WaveTable::Reset()
 
 void WaveTable::WriteWaves()
 {
+  cerr<<"writing waves"<<endl;
 	for (int n=0; n<NUM_TABLES; n++)
 	{
 		m_Table[n].Allocate(m_TableLength);
@@ -198,6 +200,8 @@ void WaveTable::WriteWaves()
 		if (n<m_TableLength/1.5) m_Table[PULSE2].Set(n,1);
 		else m_Table[PULSE2].Set(n,-1);				
 	}
+	cerr<<"written waves"<<endl;
+
 }
 
 void WaveTable::Trigger(float time, float pitch, float slidepitch, float vol)
