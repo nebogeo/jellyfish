@@ -1,2 +1,0 @@
-db.o: core/db.cpp core/db.h sqlite/sqlite3.h core/list.h core/types.h \
- core/fixed.h core/list.h

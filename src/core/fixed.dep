@@ -1,1 +1,0 @@
-fixed.o: src/core/fixed.cpp src/core/fixed.h

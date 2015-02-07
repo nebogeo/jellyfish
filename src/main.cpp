@@ -35,6 +35,7 @@ extern "C"
 #include "engine/importgl.h"
 #include "core/fixed.h"
 #include "app.h"
+#include "audio/alsa.h"
 
 #ifdef FLX_RPI
 #include <assert.h>
@@ -560,6 +561,8 @@ int main(int argc, char *argv[])
        appInit();
    // initGL();
 
+
+
     //appEval((char*)LoadFile("material/flx/init.scm").c_str());
     //appEval((char*)LoadFile("material/flx/boot.scm").c_str());
 
@@ -582,6 +585,7 @@ int main(int argc, char *argv[])
     //    appEval((char*)LoadFile(ASSETS_LOCATION+"jellyfish.scm").c_str())
 
     if (argc>1) {
+        cerr<<"hello"<<endl;
       appEval((char*)LoadFile(string(argv[1])).c_str());
     }
 
@@ -591,7 +595,7 @@ int main(int argc, char *argv[])
 //-	pthread_t *repl_thread = new pthread_t;
 //-    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
 //-    setup_osc_repl();
-    
+
 #ifdef FLX_RPI
     //	getMouse();
     //	getKeys();
@@ -606,8 +610,9 @@ int main(int argc, char *argv[])
      DisplayCallback();
      }*/
 #else
-	glutMainLoop();
+//	glutMainLoop();
 #endif
+    while (1) {}
 
 	return 0;
 }

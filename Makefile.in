@@ -13,6 +13,7 @@ SRCS    := src/main.cpp\
           src/fluxa/GraphNode.cpp\
           src/fluxa/Modules.cpp\
           src/fluxa/ModuleNodes.cpp\
+		  src/audio/alsa.cpp \
           src/engine/obj_reader.cpp\
           src/engine/engine.cpp\
           src/engine/primitive.cpp\
@@ -25,9 +26,9 @@ SRCS    := src/main.cpp\
           src/engine/jellyfish.cpp
 
 # for the minute, go out and up to link to the vision lib
-CCFLAGS = -ggdb -Wall -O3 -fpermissive -ffast-math -Wno-unused -DFLX_LINUX -Isrc -DASSETS_PATH=@prefix@/lib/jellyfish/
+CCFLAGS = -ggdb -O3 -fpermissive -ffast-math -Wno-unused -DFLX_LINUX -Isrc -Wno-write-strings -DASSETS_PATH=@prefix@/lib/jellyfish/
 LDFLAGS =
-LIBS    = -lglut -lGL -lpng -lpthread -ldl -llo -ljpeg
+LIBS    = -lglut -lGL -lpng -lpthread -ldl -llo -ljpeg -lasound
 
 CC = @CXX@
 OBJS    := ${SRCS:.cpp=.o}
@@ -49,11 +50,11 @@ ${OBJS}: %.o: %.cpp %.dep
 ${DEPS}: %.dep: %.cpp Makefile
 	${CC} ${CCFLAGS} -MM $< > $@
 
-clean::
-	-rm -f *~ src/*.o ${TARGET}
+clean:: cleandeps
+	-rm -f *~ src/*.o src/*/*.o ${TARGET}
 
-cleandeps:: clean
-	-rm -f src/*.dep
+cleandeps::
+	-rm -f src/*.dep src/*/*.dep
 
 install:: ${TARGET}
 	-cp jellyfish @prefix@/bin/

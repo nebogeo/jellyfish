@@ -42,8 +42,10 @@
 #include "../engine/engine.h"
 #include "../core/geometry.h"
 #include "../fluxa/Graph.h"
+#include "../audio/alsa.h"
 
 Graph *m_audio_graph = NULL;
+alsa_device *m_alsa_device = NULL;
 
 char *starwisp_data = NULL;
 
@@ -4569,26 +4571,32 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
 #endif
 
 //////////////////// fluxa /////////////////////////////////////////
-     case OP_SYNTH_INIT: {	 
-	  m_audio_graph = new Graph(10,16000);
+     case OP_SYNTH_INIT: {
+          m_alsa_device = new alsa_device();
+          m_audio_graph = new Graph(20,48000);
+          m_alsa_device->start_crank(m_audio_graph);
+          s_return(sc,sc->F);
      } break;
-     case OP_SYNTH_CRT: {	 
-	  m_audio_graph
-	       ->Create(ivalue(car(sc->args)), 
-			(Graph::Type)(ivalue(cadr(sc->args))),
-			rvalue(caddr(sc->args)));
+     case OP_SYNTH_CRT: {
+          m_audio_graph
+               ->Create(ivalue(car(sc->args)),
+                        (Graph::Type)(ivalue(cadr(sc->args))),
+                        rvalue(caddr(sc->args)));
+          s_return(sc,sc->F);
      } break;
      case OP_SYNTH_CON: {
-	  m_audio_graph
-	       ->Connect(ivalue(car(sc->args)), 
-			 ivalue(cadr(sc->args)), 
-			 ivalue(caddr(sc->args)));
+          m_audio_graph
+               ->Connect(ivalue(car(sc->args)),
+                         ivalue(cadr(sc->args)),
+                         ivalue(caddr(sc->args)));
+          s_return(sc,sc->F);
      } break;
      case OP_SYNTH_PLY: {
-	  m_audio_graph
-	       ->Play(rvalue(car(sc->args)), 
-		      ivalue(cadr(sc->args)), 		 
-		      rvalue(caddr(sc->args)));
+          m_audio_graph
+               ->Play(rvalue(car(sc->args)),
+                      ivalue(cadr(sc->args)),
+                      rvalue(caddr(sc->args)));
+          s_return(sc,sc->F);
      } break;
 
 //////////////////// fluxus /////////////////////////////////////////

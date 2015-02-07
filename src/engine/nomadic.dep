@@ -1,8 +1,0 @@
-nomadic.o: src/engine/nomadic.cpp src/engine/importgl.h src/app.h \
- src/engine/engine.h src/engine/scenegraph.h src/engine/scenenode.h \
- src/engine/../core/list.h src/engine/../core/types.h \
- src/engine/../core/fixed.h src/engine/../core/list.h \
- src/engine/../core/mat44.h src/engine/../core/vec3.h \
- src/engine/primitive.h src/engine/../core/fixed.h \
- src/engine/../core/vec3.h src/engine/../core/pdata.h \
- src/engine/texture.h src/scheme/scheme.h

@@ -1,7 +1,0 @@
-scenegraph.o: src/engine/scenegraph.cpp src/engine/scenegraph.h \
- src/engine/scenenode.h src/engine/../core/list.h \
- src/engine/../core/types.h src/engine/../core/fixed.h \
- src/engine/../core/list.h src/engine/../core/mat44.h \
- src/engine/../core/vec3.h src/engine/primitive.h src/engine/importgl.h \
- src/engine/../core/fixed.h src/engine/../core/vec3.h \
- src/engine/../core/pdata.h src/engine/texture.h

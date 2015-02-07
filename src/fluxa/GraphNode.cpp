@@ -20,26 +20,28 @@
 
 using namespace std;
 
+#define DEFAULT_BUFSIZE 4096
+
 ///////////////////////////////////////////
-	
-GraphNode::GraphNode(unsigned int numinputs) 
-{ 
+
+GraphNode::GraphNode(unsigned int numinputs)
+{
 	for(unsigned int n=0; n<numinputs; n++)
 	{
 		m_ChildNodes.push_back(NULL);
 	}
-	
-	m_Output.Allocate(1);
+
+	m_Output.Allocate(DEFAULT_BUFSIZE);
 }
 
-GraphNode::~GraphNode() 
+GraphNode::~GraphNode()
 {
 	Clear();
 }
 
 void GraphNode::TriggerChildren(float time)
 {
-	for(vector<GraphNode*>::iterator i=m_ChildNodes.begin(); 
+	for(vector<GraphNode*>::iterator i=m_ChildNodes.begin();
 		i!=m_ChildNodes.end(); ++i)
 	{
 		if (*i!=NULL)
@@ -51,7 +53,7 @@ void GraphNode::TriggerChildren(float time)
 
 void GraphNode::ProcessChildren(unsigned int bufsize)
 {
-	for(vector<GraphNode*>::iterator i=m_ChildNodes.begin(); 
+	for(vector<GraphNode*>::iterator i=m_ChildNodes.begin();
 		i!=m_ChildNodes.end(); ++i)
 	{
 		if (*i!=NULL)
@@ -72,7 +74,7 @@ void GraphNode::Clear()
 void GraphNode::SetChild(unsigned int num, GraphNode *s)
 {
 	if(num<m_ChildNodes.size())
-	{ 
+	{
 		m_ChildNodes[num]=s;
 	}
 }
@@ -82,19 +84,19 @@ bool GraphNode::ChildExists(unsigned int num)
 	return GetChild(num)!=NULL;
 }
 
-GraphNode* GraphNode::GetChild(unsigned int num) 
+GraphNode* GraphNode::GetChild(unsigned int num)
 {
 	if(num<m_ChildNodes.size())
-	{ 
-		return m_ChildNodes[num]; 
+	{
+		return m_ChildNodes[num];
 	}
 	return NULL;
 }
 
-Sample &GraphNode::GetInput(unsigned int num) 
-{ 
+Sample &GraphNode::GetInput(unsigned int num)
+{
 	assert(GetChild(num)!=NULL);
-	return GetChild(num)->GetOutput(); 
+	return GetChild(num)->GetOutput();
 }
 
 float GraphNode::GetCVValue()
