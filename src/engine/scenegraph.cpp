@@ -168,11 +168,24 @@ void scenegraph::render()
 
     // render immediate mode
     render_node_walk(m_immediate_root,1);
+    // protect the instances from being deleted...
+    clear_primitives_walk(m_immediate_root);
 
     // clear immediate mode
     delete m_immediate_root;
 	m_immediate_root=new scenenode(NULL);
     m_immediate_root->m_id=9999;
+}
+
+void scenegraph::clear_primitives_walk(scenenode *node)
+{
+    node->m_primitive=NULL;
+    scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
+    while (n!=NULL)
+    {
+        clear_primitives_walk(n);
+        n=static_cast<scenenode*>(n->m_next);
+    }
 }
 
 void scenegraph::render_node_walk(scenenode *node, int depth)
@@ -214,7 +227,8 @@ void scenegraph::render_node_walk(scenenode *node, int depth)
     }
     else glDisable(GL_TEXTURE_2D);
 
-    if (node->m_primitive!=NULL)
+    // hint-none = hidden
+    if (node->m_primitive!=NULL && node->m_hints)
     {
         node->m_primitive->render(node->m_hints);
     }

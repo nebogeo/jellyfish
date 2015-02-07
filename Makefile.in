@@ -65,3 +65,4 @@ install:: ${TARGET}
 	-cp assets @prefix@/lib/jellyfish/ -r
 
 distclean:: clean
+	-rm -rf config.status autom4te.cache config.log Makefile

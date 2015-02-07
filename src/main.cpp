@@ -191,6 +191,8 @@ int main(int argc, char *argv[])
    glutCreateWindow(windowtitle);
    glutDisplayFunc(DisplayCallback);
    glutIdleFunc(IdleCallback);
+   glutKeyboardFunc(KeyboardCallback);
+   glutKeyboardUpFunc(KeyboardUpCallback);
 #endif
 
    appInit();
@@ -221,8 +223,8 @@ int main(int argc, char *argv[])
     render_mutex = new pthread_mutex_t;
     pthread_mutex_init(render_mutex,NULL);
     pthread_t *repl_thread = new pthread_t;
-    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
-    setup_osc_repl();
+    //pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
+    //setup_osc_repl();
 
 #ifdef FLX_RPI
     //	getMouse();

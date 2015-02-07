@@ -10,6 +10,7 @@
   `(begin (set! frame-thunk (lambda () ,@args))))
 
 (define (frame-hook)
+;;  (identity)
   (set! flx_time (+ flx_time 1))
   (if (not (null? frame-thunk))
       (frame-thunk))
@@ -550,3 +551,9 @@
   (let ((c (compile-program 50 'triangles 1 code)))
     (disassemble c))
   code)
+
+;;----------------------------------------------------------------
+;; immediate mode (everyone loves immediate mode)
+
+(define immediate-cube (with-state (hint-none) (build-cube)))
+(define (draw-cube) (draw-instance immediate-cube))

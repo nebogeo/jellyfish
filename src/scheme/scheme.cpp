@@ -4676,6 +4676,9 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
           s_return(sc,sc->F);
      case OP_LOAD_TEXTURE:
           s_return(sc,mk_integer(sc,engine::get()->get_texture(string_value(car(sc->args)))));
+     case OP_DRAW_INSTANCE:
+          engine::get()->draw_instance(ivalue(car(sc->args)));
+          s_return(sc,sc->F);
      case OP_BUILD_CUBE:
          s_return(sc,mk_integer(sc,engine::get()->build_cube()));
      case OP_LOAD_OBJ:

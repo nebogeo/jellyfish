@@ -29,10 +29,12 @@ scenenode::scenenode(primitive *p) :
 
 scenenode::~scenenode()
 {
+    // list destr deletes children
+
 	if (m_parent!=NULL)
 	{
 		m_parent->remove_child(m_id);
-	} 
+	}
 
     if (m_primitive!=NULL) delete m_primitive;
 }
@@ -45,7 +47,7 @@ scenenode *scenenode::find_child(int id)
         if (n->m_id==id) return n;
         n=static_cast<scenenode*>(n->m_next);
     }
-    return NULL; 
+    return NULL;
 }
 
 
@@ -54,7 +56,7 @@ void scenenode::remove_child(int id)
     scenenode *n=find_child(id);
     if (n!=NULL)
     {
+        delete n;
         m_children.remove(n);
     }
 }
-

@@ -28,7 +28,7 @@ public:
 
     /// adds a node onto a parent node (0 is the root)
     int add(int pid, scenenode *n);
-    /// adds immediate mode node referencing existing primitive, 
+    /// adds immediate mode node referencing existing primitive,
     /// will be removed after rendering
     void add_immediate(scenenode *n);
     /// delete a node and it's children
@@ -41,14 +41,14 @@ public:
     void clear();
 	/// is the child attached to the parent?
 	bool is_attached_to(scenenode *parent, scenenode *n) const;
-	scenenode *root() { return m_root; }    
+	scenenode *root() { return m_root; }
     mat44 get_global_transform(scenenode *n);
 
     void render();
     void dump() const;
 
     texture_manager m_texture_manager;
-    
+
     // returns the first node intersecting with the line
     u32 intersect_node_walk(scenenode *node, const vec3 &start, const vec3 &end);
 
@@ -57,6 +57,7 @@ protected:
 	scenenode* find_node_walk(scenenode *n, int id) const;
 	void dump_walk(scenenode *n, int d) const;
     void render_node_walk(scenenode *n, int depth);
+    void clear_primitives_walk(scenenode *node);
 	scenenode *m_root;
 	scenenode *m_immediate_root;
     int m_current_id;

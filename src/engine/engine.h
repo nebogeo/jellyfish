@@ -60,6 +60,7 @@ public:
     vec3 *pdata_get(const char *name, int i);
     void pdata_set(const char *name, int i, vec3 v);
 
+    void draw_instance(int id);
     int build_cube();
     int load_obj(char *fn);
     int raw_obj(char *data);

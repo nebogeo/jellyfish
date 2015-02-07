@@ -275,6 +275,20 @@ void engine::setup_state(scenenode *n)
     n->m_texture=state_top()->m_texture;
 }
 
+void engine::draw_instance(int id)
+{
+    scenenode *node = m_sg->find(id);
+    if (node) {
+        // copy the primitive only
+        // (set to null after rendering so it don't get deleted)
+        // perhaps allocate a bunch of these at startup?
+        scenenode *n=new scenenode(node->m_primitive);
+        setup_state(n);
+        m_sg->add_immediate(n);
+    }
+}
+
+
 int engine::build_cube()
 {
     scenenode *n=new scenenode(new primitive());
@@ -381,7 +395,7 @@ void engine::destroy(int id)
       m_attached_prim = NULL;
       m_attached_id = 0;
     }
-    
+
     m_sg->remove(id);
 }
 

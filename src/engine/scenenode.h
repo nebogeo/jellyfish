@@ -43,7 +43,7 @@
 #define HINT_NOBLEND        0x00040000
 #define HINT_NOZWRITE       0x00080000
 
-class scenenode : public list::node 
+class scenenode : public list::node
 {
 public:
     scenenode(primitive *p);
@@ -51,7 +51,7 @@ public:
 
     scenenode *find_child(int id);
     void remove_child(int id);
-    
+
     u32 m_id;
     primitive *m_primitive;
     scenenode *m_parent;

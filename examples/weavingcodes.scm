@@ -238,7 +238,7 @@
   )
 
 
-
+(msg "hello")
 
 (every-frame
  (with-primitive
