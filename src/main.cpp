@@ -173,11 +173,9 @@ int main(int argc, char *argv[])
 {
 #ifdef FLX_RPI
    bcm_host_init();
-
    // Clear application state
    memset( state, 0, sizeof( *state ) );
-
-   //   init_ogl_rpi(state);
+   init_ogl_rpi(state);
 #else
    w=640;
    h=480;
@@ -195,19 +193,14 @@ int main(int argc, char *argv[])
    glutIdleFunc(IdleCallback);
 #endif
 
-       appInit();
-   // initGL();
+   appInit();
+   initGL();
 
+   appEval((char*)LoadFile(ASSETS_LOCATION+"init.scm").c_str());
+   appEval((char*)LoadFile(ASSETS_LOCATION+"boot.scm").c_str());
+   appEval((char*)LoadFile(ASSETS_LOCATION+"lib.scm").c_str());
+   appEval((char*)LoadFile(ASSETS_LOCATION+"compiler.scm").c_str());
 
-
-    //appEval((char*)LoadFile("material/flx/init.scm").c_str());
-    //appEval((char*)LoadFile("material/flx/boot.scm").c_str());
-
-    appEval((char*)LoadFile(ASSETS_LOCATION+"init.scm").c_str());
-    appEval((char*)LoadFile(ASSETS_LOCATION+"boot.scm").c_str());
-    appEval((char*)LoadFile(ASSETS_LOCATION+"lib.scm").c_str());
-    appEval((char*)LoadFile(ASSETS_LOCATION+"compiler.scm").c_str());
-    /*
     // preload the textures
     long w=0,h=0;
     unsigned char *tex=LoadPNG(ASSETS_LOCATION+"raspberrypi.png",w,h);
@@ -218,20 +211,17 @@ int main(int argc, char *argv[])
     appLoadTexture("bg.png",w,h,(char *)tex);
     tex=LoadPNG(ASSETS_LOCATION+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
-    */
-    //    appEval((char*)LoadFile(ASSETS_LOCATION+"jellyfish.scm").c_str())
 
     if (argc>1) {
-        cerr<<"hello"<<endl;
-      appEval((char*)LoadFile(string(argv[1])).c_str());
+        appEval((char*)LoadFile(string(argv[1])).c_str());
     }
 
     // setup the repl thread
-    //      	render_mutex = new pthread_mutex_t;
-    //	pthread_mutex_init(render_mutex,NULL);
-//-	pthread_t *repl_thread = new pthread_t;
-//-    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
-//-    setup_osc_repl();
+    render_mutex = new pthread_mutex_t;
+    pthread_mutex_init(render_mutex,NULL);
+    pthread_t *repl_thread = new pthread_t;
+    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
+    setup_osc_repl();
 
 #ifdef FLX_RPI
     //	getMouse();
@@ -247,9 +237,8 @@ int main(int argc, char *argv[])
      DisplayCallback();
      }*/
 #else
-//	glutMainLoop();
+	glutMainLoop();
 #endif
-    while (1) {}
 
 	return 0;
 }
