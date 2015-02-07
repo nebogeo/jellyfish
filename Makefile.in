@@ -7,6 +7,8 @@ SRCS    := src/main.cpp\
           src/scheme/scheme.cpp\
           src/core/geometry.cpp\
           src/core/noise.cpp\
+          src/core/pixels.cpp\
+          src/core/osc.cpp\
           src/fluxa/Sample.cpp\
           src/fluxa/Allocator.cpp\
           src/fluxa/Graph.cpp\
@@ -23,7 +25,8 @@ SRCS    := src/main.cpp\
           src/engine/texture.cpp\
           src/engine/nomadic.cpp\
           src/engine/jellyfish_primitive.cpp\
-          src/engine/jellyfish.cpp
+          src/engine/jellyfish.cpp\
+		  src/linux/glut_graphics.cpp
 
 # for the minute, go out and up to link to the vision lib
 CCFLAGS = -ggdb -O3 -fpermissive -ffast-math -Wno-unused -DFLX_LINUX -Isrc -Wno-write-strings -DASSETS_PATH=@prefix@/lib/jellyfish/
