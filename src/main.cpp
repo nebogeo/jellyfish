@@ -200,6 +200,7 @@ int main(int argc, char *argv[])
    appEval((char*)LoadFile(ASSETS_LOCATION+"boot.scm").c_str());
    appEval((char*)LoadFile(ASSETS_LOCATION+"lib.scm").c_str());
    appEval((char*)LoadFile(ASSETS_LOCATION+"compiler.scm").c_str());
+   appEval((char*)LoadFile(ASSETS_LOCATION+"fluxa.scm").c_str());
 
     // preload the textures
     long w=0,h=0;

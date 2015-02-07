@@ -201,6 +201,6 @@ code = ["""
 while 1:
 
     print("sending")
-    osc.Message("/eval",[choice(code)]).sendto("192.168.1.192",8000)
-    #osc.Message("/eval",[choice(code)]).sendlocal(8000)
+    #osc.Message("/eval",[choice(code)]).sendto("192.168.1.192",8000)
+    osc.Message("/eval",[choice(code)]).sendlocal(8000)
     time.sleep(30)
