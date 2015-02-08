@@ -2297,62 +2297,6 @@ static INLINE pointer slot_value_in_env(pointer slot)
 
 /* ========== Evaluation Cycle ========== */
 
-
-static pointer _Error_1(scheme *sc, const char *s, pointer a) {
-#if SHOW_ERROR_LINE
-     const char *str = s;
-     char sbuf[STRBUFFSIZE];
-
-     /* make sure error is not in REPL */
-     if(sc->load_stack[sc->file_i].rep.stdio.file != stdin) {
-       int ln = sc->load_stack[sc->file_i].curr_line;
-       const char *fname;// = sc->load_stack[sc->file_i].filename;
-
-       /* should never happen */
-       if(!fname) fname = "<unknown>";
-
-       /* we started from 0 */
-       ln++;
-       snprintf(sbuf, STRBUFFSIZE, "(%s : %i) %s", fname, ln, s);
-
-       str = (const char*)sbuf;
-     }
-#else
-     const char *str = s;
-#endif
-
-#if USE_ERROR_HOOK
-     pointer x;
-     pointer hdl=sc->ERROR_HOOK;
-
-     x=find_slot_in_env(sc,sc->envir,hdl,1);
-    if (x != sc->NIL) {
-         if(a!=0) {
-               sc->code = cons(sc, cons(sc, sc->QUOTE, cons(sc,(a), sc->NIL)), sc->NIL);
-         } else {
-               sc->code = sc->NIL;
-         }
-         sc->code = cons(sc, mk_string(sc, str), sc->code);
-         setimmutable(car(sc->code));
-         sc->code = cons(sc, slot_value_in_env(x), sc->code);
-         sc->op = (int)OP_EVAL;
-         return sc->T;
-    }
-#endif
-
-    if(a!=0) {
-          sc->args = cons(sc, (a), sc->NIL);
-    } else {
-          sc->args = sc->NIL;
-    }
-    sc->args = cons(sc, mk_string(sc, str), sc->args);
-    setimmutable(car(sc->args));
-    sc->op = (int)OP_ERR0;
-    return sc->T;
-}
-#define Error_1(sc,s, a) return _Error_1(sc,s,a)
-#define Error_0(sc,s)    return _Error_1(sc,s,0)
-
 /* Too small to turn into function */
 # define  BEGIN     do {
 # define  END  } while (0)
@@ -5396,6 +5340,138 @@ void scheme_define(scheme *sc, pointer envir, pointer symbol, pointer value) {
      } else {
           new_slot_spec_in_env(sc, envir, symbol, value);
      }
+}
+
+static void print_dump(scheme *sc, pointer x, int depth)
+{
+     if (depth>2) return;
+     if (is_atom(x)) {
+          printatom(sc, x, sc->print_flag);
+     }
+     else
+     {
+          putstr(sc, "(");
+          while (x != sc->NIL)
+          {
+               if (is_pair(car(x)))
+               {
+                    print_dump(sc,car(x),depth+1);
+               }
+               else
+               {
+                    printatom(sc, car(x), sc->print_flag);
+                    putstr(sc, " ");
+               }
+               x=cdr(x);
+          }
+          putstr(sc, ") ");
+     }
+
+}
+
+static void dump_stack_print(scheme *sc, char *str)
+{
+     int nframes = (int)sc->dump;
+     struct dump_stack_frame *frame;
+
+     if (nframes <= 0) {
+          snprintf(str,STRBUFFSIZE,"stack empty\n");
+     }
+
+     putstr(sc, "======= stack follows ======\n");
+
+     while (nframes>=0) {
+          frame = (struct dump_stack_frame *)sc->dump_base + nframes;
+          op_code_info *pcd=dispatch_table+frame->op;
+
+          snprintf(str,STRBUFFSIZE,"\n-------- frame %d -------\n", nframes);
+          putstr(sc, str);
+          snprintf(str,STRBUFFSIZE,"op: %d %s\n", frame->op, pcd->name);
+          putstr(sc, str);
+
+          putstr(sc, "args: ");
+          print_dump(sc,frame->args,0);
+          putstr(sc, "\n");
+
+          putstr(sc, "code: ");
+          print_dump(sc,frame->code,0);
+
+          //putstr(sc, "envir:");
+          //print_dump(sc,frame->envir,0);
+          //printatom(sc, frame->envir, sc->print_flag);
+
+          putstr(sc, "\n");
+
+
+          /*sc->op = frame->op;
+            sc->args = frame->args;
+            sc->envir = frame->envir;
+            sc->code = frame->code;
+            sc->dump = (pointer)nframes;*/
+          nframes--;
+     }
+}
+
+static pointer _Error_1(scheme *sc, const char *s, pointer a) {
+#if SHOW_ERROR_LINE
+     const char *str = s;
+     char sbuf[STRBUFFSIZE];
+     char stkbuf[STRBUFFSIZE];
+
+     putstr(sc, "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
+
+     /* make sure error is not in REPL */
+     if(sc->load_stack[sc->file_i].rep.stdio.file != stdin) {
+       int ln = sc->load_stack[sc->file_i].curr_line;
+       const char *fname;// = sc->load_stack[sc->file_i].filename;
+
+       /* should never happen */
+       if(!fname) fname = "<unknown>";
+
+
+       /* we started from 0 */
+       ln++;
+       snprintf(sbuf, STRBUFFSIZE, "\n(%s : %i) %s ", fname, ln, s);
+       putstr(sc,sbuf);
+       print_dump(sc,sc->code,0);
+       putstr(sc,"\n");
+
+       dump_stack_print(sc, stkbuf);
+
+       str = "";
+     }
+#else
+     const char *str = s;
+#endif
+
+#if USE_ERROR_HOOK
+     pointer x;
+     pointer hdl=sc->ERROR_HOOK;
+
+     x=find_slot_in_env(sc,sc->envir,hdl,1);
+    if (x != sc->NIL) {
+         if(a!=0) {
+               sc->code = cons(sc, cons(sc, sc->QUOTE, cons(sc,(a), sc->NIL)), sc->NIL);
+         } else {
+               sc->code = sc->NIL;
+         }
+         sc->code = cons(sc, mk_string(sc, str), sc->code);
+         setimmutable(car(sc->code));
+         sc->code = cons(sc, slot_value_in_env(x), sc->code);
+         sc->op = (int)OP_EVAL;
+         return sc->T;
+    }
+#endif
+
+    if(a!=0) {
+          sc->args = cons(sc, (a), sc->NIL);
+    } else {
+          sc->args = sc->NIL;
+    }
+    sc->args = cons(sc, mk_string(sc, str), sc->args);
+    setimmutable(car(sc->args));
+    sc->op = (int)OP_ERR0;
+    return sc->T;
 }
 
 #if !STANDALONE

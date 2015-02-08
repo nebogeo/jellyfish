@@ -355,55 +355,6 @@
         (vector-ref m 14)))
     w))))
 
-;------------------------------------------------------------
-
-(define random-maker
-  (let* ((multiplier 48271)
-         (modulus 2147483647)
-         (apply-congruence
-          (lambda (current-seed)
-            (let ((candidate (modulo (* current-seed multiplier)
-                                     modulus)))
-              (if (zero? candidate)
-                  modulus
-                  candidate))))
-         (coerce
-          (lambda (proposed-seed)
-            (if (integer? proposed-seed)
-                (- modulus (modulo proposed-seed modulus))
-                19860617))))  ;; an arbitrarily chosen birthday
-  (lambda (initial-seed)
-    (let ((seed (coerce initial-seed)))
-      (lambda args
-        (cond ((null? args)
-               (set! seed (apply-congruence seed))
-               (/ (- modulus seed) modulus))
-              ((null? (cdr args))
-               (let* ((proposed-top
-                       (ceiling (abs (car args))))
-                      (exact-top
-                       (if (inexact? proposed-top)
-                           (inexact->exact proposed-top)
-                           proposed-top))
-                      (top
-                       (if (zero? exact-top)
-                           1
-                           exact-top)))
-                 (set! seed (apply-congruence seed))
-                 (inexact->exact (floor (* top (/ seed modulus))))))
-              ((eq? (cadr args) 'reset)
-               (set! seed (coerce (car args))))
-              (else
-               (display "random: unrecognized message")
-               (newline))))))))
-
-(define rand
-  (random-maker 19781116))  ;; another arbitrarily chosen birthday
-
-(define rndf rand)
-
-(define (random n) (floor (abs (* (rndf) n))))
-
 (define (rndvec) (vector (rndf) (rndf) (rndf)))
 
 (define (crndf)

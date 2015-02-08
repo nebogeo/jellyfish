@@ -4,17 +4,17 @@
 (define debug #f)
 (define prim-size 4096)
 
-(define nop 0) (define jmp 1) (define jmz 2) (define jlt 3) (define jgt 4)
-(define ldl 5) (define lda 6) (define ldi 7) (define sta 8) (define sti 9)
-(define add 10) (define sub 11) (define mul 12) (define div 13) (define abs 14)
-(define sincos 15) (define atn 16) (define dot 17) (define crs 18) (define sqr 19)
-(define len 20) (define dup 21) (define drp 22) (define cmp 23) (define shf 24)
-(define bld 25) (define ret 26) (define _dbg 27) (define nrm 28)
-(define mst 29) (define mad 30) (define msb 31) (define end-check 999)
-(define swp 32) (define rnd 33) (define mull 34) (define jmr 35) (define ldlv 36)
-(define lensq 37) (define noise 38) (define lds 39) (define sts 40) (define mulv 41)
-(define synth-crt 42) (define synth-con 43) (define synth-ply 44) (define flr 45)
-(define mod 46)
+(define jfsh-op-nop 0) (define jfsh-op-jmp 1) (define jfsh-op-jmz 2) (define jfsh-op-jlt 3) (define jfsh-op-jgt 4)
+(define jfsh-op-ldl 5) (define jfsh-op-lda 6) (define jfsh-op-ldi 7) (define jfsh-op-sta 8) (define jfsh-op-sti 9)
+(define jfsh-op-add 10) (define jfsh-op-sub 11) (define jfsh-op-mul 12) (define jfsh-op-div 13) (define jfsh-op-abs 14)
+(define jfsh-op-sincos 15) (define jfsh-op-atn 16) (define jfsh-op-dot 17) (define jfsh-op-crs 18) (define jfsh-op-sqr 19)
+(define jfsh-op-len 20) (define jfsh-op-dup 21) (define jfsh-op-drp 22) (define jfsh-op-cmp 23) (define jfsh-op-shf 24)
+(define jfsh-op-bld 25) (define jfsh-op-ret 26) (define jfsh-op-dbg 27) (define jfsh-op-nrm 28)
+(define jfsh-op-mst 29) (define jfsh-op-mad 30) (define jfsh-op-msb 31) (define jfsh-op-end-check 999)
+(define jfsh-op-swp 32) (define jfsh-op-rnd 33) (define jfsh-op-mull 34) (define jfsh-op-jmr 35) (define jfsh-op-ldlv 36)
+(define jfsh-op-lensq 37) (define jfsh-op-noise 38) (define jfsh-op-lds 39) (define jfsh-op-sts 40) (define jfsh-op-mulv 41)
+(define jfsh-op-synth-crt 42) (define jfsh-op-synth-con 43) (define jfsh-op-synth-ply 44) (define jfsh-op-flr 45)
+(define jfsh-op-mod 46)
 
 (define instr
   '(nop jmp jmz jlt jgt ldl lda ldi sta sti
@@ -91,18 +91,18 @@
   (let ((seg (get-segment name)))
     (cond
      ;; if a memory segment constant is found
-     (seg (emit (vector ldl seg 0)))
+     (seg (emit (vector jfsh-op-ldl seg 0)))
      ;; other constants
-     ((eq? name 'reg-control) (emit (vector ldl reg-control 0)))
-     ((eq? name 'reg-graphics) (emit (vector ldl reg-graphics 0)))
-     ((eq? name 'reg-tx-translate) (emit (vector ldl reg-tx-translate 0)))
-     ((eq? name 'reg-tx-rotatea) (emit (vector ldl reg-tx-rotatea 0)))
-     ((eq? name 'reg-tx-rotateb) (emit (vector ldl reg-tx-rotateb 0)))
-     ((eq? name 'reg-tx-rotatec) (emit (vector ldl reg-tx-rotatec 0)))
-     ((eq? name 'reg-fling) (emit (vector ldl reg-fling 0)))
+     ((eq? name 'reg-control) (emit (vector jfsh-op-ldl reg-control 0)))
+     ((eq? name 'reg-graphics) (emit (vector jfsh-op-ldl reg-graphics 0)))
+     ((eq? name 'reg-tx-translate) (emit (vector jfsh-op-ldl reg-tx-translate 0)))
+     ((eq? name 'reg-tx-rotatea) (emit (vector jfsh-op-ldl reg-tx-rotatea 0)))
+     ((eq? name 'reg-tx-rotateb) (emit (vector jfsh-op-ldl reg-tx-rotateb 0)))
+     ((eq? name 'reg-tx-rotatec) (emit (vector jfsh-op-ldl reg-tx-rotatec 0)))
+     ((eq? name 'reg-fling) (emit (vector jfsh-op-ldl reg-fling 0)))
      ;; load variable
      (else
-      (emit (vector lda (variable-address name) 0))))))
+      (emit (vector jfsh-op-lda (variable-address name) 0))))))
 
 ;; create empty space for variable data
 (define (variables->data)
@@ -118,10 +118,10 @@
 ;; push whatever this immediate value is onto the stack
 (define (emit-push x)
   (cond
-   ((number? x) (emit (vector ldl x 0)))
-   ((vector? x) (emit (vector ldlv 0 0) x))
+   ((number? x) (emit (vector jfsh-op-ldl x 0)))
+   ((vector? x) (emit (vector jfsh-op-ldlv 0 0) x))
    ((symbol? x) (emit-constant-or-variable x))
-   ((list? x) (emit (vector ldlv 0 0) (list->vector (cdr x))))
+   ((list? x) (emit (vector jfsh-op-ldlv 0 0) (list->vector (cdr x))))
    (else
     (error "can't push" x))))
 
@@ -141,7 +141,7 @@
                   ;; from expressions in the list we're not
                   ;; using (must have side effects)
                   ;; - keep last push
-                  (emit (vector drp 0 0))
+                  (emit (vector jfsh-op-drp 0 0))
                   (emit-expr-list (cdr l))))))))
 
 
@@ -162,38 +162,38 @@
   (append
    (emit-expr (caddr x))
    (emit
-    (vector sta (variable-address (cadr x)) 0))
-   (emit (vector ldl 0 0))))
+    (vector jfsh-op-sta (variable-address (cadr x)) 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 ;; (write! start-addr value value value ...)
 (define (emit-write! x)
   (append
    ;; stick everything on the stack
    (emit-expr-list-maintain-stack (reverse (cdr x)))
-   (emit (vector mst (length (cddr x)) 0))
-   (emit (vector ldl 0 0))))
+   (emit (vector jfsh-op-mst (length (cddr x)) 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 (define (emit-write-add! x)
   (append
    ;; stick everything on the stack
    (emit-expr-list-maintain-stack (reverse (cdr x)))
-   (emit (vector mad (length (cddr x)) 0))
-   (emit (vector ldl 0 0))))
+   (emit (vector jfsh-op-mad (length (cddr x)) 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 (define (emit-write-sub! x)
   (append
    ;; stick everything on the stack
    (emit-expr-list-maintain-stack (reverse (cdr x)))
-   (emit (vector msb (length (cddr x)) 0))
-   (emit (vector ldl 0 0))))
+   (emit (vector jfsh-op-msb (length (cddr x)) 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 (define (emit-read x)
   (append
    (emit-expr (cadr x)) ;; address
-   (emit (vector lds 0 0))))
+   (emit (vector jfsh-op-lds 0 0))))
 
 (define (emit-addr x)
-  (emit (vector ldl (variable-address (cadr x)) 0)))
+  (emit (vector jfsh-op-ldl (variable-address (cadr x)) 0)))
 
 ;; (if pred true-expr false-expr)
 (define (emit-if x)
@@ -201,9 +201,9 @@
         (fblock (emit-expr (cadddr x)))) ;; compile false expression to block
     (append
      (emit-expr (cadr x)) ;; predicate - returns true or false
-     (emit (vector jmz (+ (length tblock) 2) 0)) ;; if false skip true block
+     (emit (vector jfsh-op-jmz (+ (length tblock) 2) 0)) ;; if false skip true block
      tblock
-     (emit (vector jmr (+ (length fblock) 1) 0)) ;; skip false block
+     (emit (vector jfsh-op-jmr (+ (length fblock) 1) 0)) ;; skip false block
      fblock)))
 
 ;; (when pred true-block)
@@ -211,20 +211,20 @@
   (let ((block (emit-expr-list (cddr x)))) ;; compile the list of expressions
     (append
      (emit-expr (cadr x)) ;; predicate - returns true or false
-     (emit (vector jmz (+ (length block) 2) 0)) ;; skip the block
+     (emit (vector jfsh-op-jmz (+ (length block) 2) 0)) ;; skip the block
      block
-     (emit (vector jmr 2 0))    ;; return result of the block (skip next instr)
-     (emit (vector ldl 0 0))))) ;; return 0 if we didn't run the block
+     (emit (vector jfsh-op-jmr 2 0))    ;; return result of the block (skip next instr)
+     (emit (vector jfsh-op-ldl 0 0))))) ;; return 0 if we didn't run the block
 
 (define (emit-fncall x addr)
   (let ((args (emit-expr-list-maintain-stack (cdr x))))
     (append
      ;; offset from here -> stitch up in second pass
      (emit (list 'add-abs-loc 'this 1
-                 (vector ldl (+ (length args) 3) 0)))
+                 (vector jfsh-op-ldl (+ (length args) 3) 0)))
      args ;; push arguments to stack
-     (emit (vector lda addr 0)) ;; fn ptr is in data mem
-     (emit (vector ret 0 0))))) ;; jump to fn
+     (emit (vector jfsh-op-lda addr 0)) ;; fn ptr is in data mem
+     (emit (vector jfsh-op-ret 0 0))))) ;; jump to fn
 
 ;; lambda args body
 (define (emit-lambda x)
@@ -234,33 +234,33 @@
             (lambda (arg)
               ;; for moment use global pile for arguments :O
               (make-variable! arg)
-              (vector sta (variable-address arg) 0))
+              (vector jfsh-op-sta (variable-address arg) 0))
             (reverse (cadr x)))
            ;; now args are loaded, do body
            (emit-expr-list (cddr x))
            ;; swap ret ptr to top
-           (emit (vector swp 0 0))
-           (emit (vector ret 0 0))))
+           (emit (vector jfsh-op-swp 0 0))
+           (emit (vector jfsh-op-ret 0 0))))
          (loc (make-function! body)))
     (append
      (if debug (emit (list "function code...")) '())
      (emit
       ;; offset from function code -> stitch up in linking pass
        (list 'add-abs-loc 'function-code 1
-            (vector ldl loc 0))))))
+            (vector jfsh-op-ldl loc 0))))))
 
 (define (emit-define x)
   (make-variable! (cadr x))
   (append
    (emit-expr (caddr x))
-   (emit (vector sta (variable-address (cadr x)) 0))
-   (emit (vector ldl 0 0))))
+   (emit (vector jfsh-op-sta (variable-address (cadr x)) 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 (define (emit-let-part x)
   (make-variable! (car x))
   (append
    (emit-expr (cadr x))
-   (emit (vector sta (variable-address (car x)) 0))))
+   (emit (vector jfsh-op-sta (variable-address (car x)) 0))))
 
 (define (emit-let x)
   (define (_ l)
@@ -275,29 +275,29 @@
 (define (emit-trace x)
   (append
    (emit-expr (cadr x))
-   (emit (vector _dbg 0 0))
-   (emit (vector ldl 0 0))))
+   (emit (vector jfsh-op-dbg 0 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 (define (emit-not x)
   (append
    (emit-expr (cadr x))
-   (emit (vector jmz 3 0))
-   (emit (vector ldl 0 0))
-   (emit (vector jmr 2 0))
-   (emit (vector ldl 1 0))))
+   (emit (vector jfsh-op-jmz 3 0))
+   (emit (vector jfsh-op-ldl 0 0))
+   (emit (vector jfsh-op-jmr 2 0))
+   (emit (vector jfsh-op-ldl 1 0))))
 
 ;(loop pred block)
 (define (emit-loop x)
   (let ((block
          (append
           (emit-expr-list (cdr (cdr x)))
-          (emit (vector drp 0 0))
+          (emit (vector jfsh-op-drp 0 0))
           (emit-expr (cadr x)))))
     (append
      block
-     (emit (vector jmz 2 0))
-     (emit (vector jmr (- (+ (length block) 1)) 0))
-     (emit (vector ldl 0 0))
+     (emit (vector jfsh-op-jmz 2 0))
+     (emit (vector jfsh-op-jmr (- (+ (length block) 1)) 0))
+     (emit (vector jfsh-op-ldl 0 0))
      )))
 
 (define (binary-procedure proc x)
@@ -315,53 +315,34 @@
   (append
    (emit-expr (cadr x))
    (emit-expr (caddr x))
-   (emit (vector sub 0 0))
-   (emit (vector jmz 3 0))
-   (emit (vector ldl 0 0))
-   (emit (vector jmr 2 0))
-   (emit (vector ldl 1 0))))
+   (emit (vector jfsh-op-sub 0 0))
+   (emit (vector jfsh-op-jmz 3 0))
+   (emit (vector jfsh-op-ldl 0 0))
+   (emit (vector jfsh-op-jmr 2 0))
+   (emit (vector jfsh-op-ldl 1 0))))
 
 (define (emit-< x)
   (append
    (emit-expr (cadr x))
    (emit-expr (caddr x))
-   (emit (vector jlt 3 0))
-   (emit (vector ldl 1 0))
-   (emit (vector jmr 2 0))
-   (emit (vector ldl 0 0))))
+   (emit (vector jfsh-op-jlt 3 0))
+   (emit (vector jfsh-op-ldl 1 0))
+   (emit (vector jfsh-op-jmr 2 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 (define (emit-> x)
   (append
    (emit-expr (cadr x))
    (emit-expr (caddr x))
-   (emit (vector jgt 3 0))
-   (emit (vector ldl 1 0))
-   (emit (vector jmr 2 0))
-   (emit (vector ldl 0 0))))
-
-(define (emit-synth-create x)
-  (append
-   (emit-expr (cadr x)) ;; id, type, value
-   (emit (vector synth-crt 0 0))
-   (emit (vector ldl 0 0))))
-
-(define (emit-synth-connect x)
-  (append
-   (emit-expr (cadr x)) ;; from, arg, to
-   (emit (vector synth-con 0 0))
-   (emit (vector ldl 0 0))))
-
-(define (emit-synth-play x)
-  (append
-   (emit-expr (cadr x)) ;; time, id, pan
-   (emit (vector synth-ply 0 0))
-   (emit (vector ldl 0 0))))
-
+   (emit (vector jfsh-op-jgt 3 0))
+   (emit (vector jfsh-op-ldl 1 0))
+   (emit (vector jfsh-op-jmr 2 0))
+   (emit (vector jfsh-op-ldl 0 0))))
 
 (define (emit-swizzle x)
   (append
    (emit-expr (caddr x))
-   (emit (vector ldlv 0 0))
+   (emit (vector jfsh-op-ldlv 0 0))
    (cond
     ((eq? (cadr x) 'xxx) (emit (vector 0 0 0)))
     ((eq? (cadr x) 'xxy) (emit (vector 0 0 1)))
@@ -394,14 +375,14 @@
 
 (define (emit-procedure x)
   (cond
-    ((eq? (car x) '+) (binary-procedure add x))
-    ((eq? (car x) '-) (binary-procedure sub x))
-    ((eq? (car x) '*) (binary-procedure mul x))
-    ((eq? (car x) '/) (binary-procedure div x))
-    ((eq? (car x) '*v) (binary-procedure mulv x))
-    ((eq? (car x) 'cross) (binary-procedure crs x))
-    ((eq? (car x) 'dot) (binary-procedure dot x))
-    ((eq? (car x) 'modulo) (binary-procedure mod x))
+    ((eq? (car x) '+) (binary-procedure jfsh-op-add x))
+    ((eq? (car x) '-) (binary-procedure jfsh-op-sub x))
+    ((eq? (car x) '*) (binary-procedure jfsh-op-mul x))
+    ((eq? (car x) '/) (binary-procedure jfsh-op-div x))
+    ((eq? (car x) '*v) (binary-procedure jfsh-op-mulv x))
+    ((eq? (car x) 'cross) (binary-procedure jfsh-op-crs x))
+    ((eq? (car x) 'dot) (binary-procedure jfsh-op-dot x))
+    ((eq? (car x) 'modulo) (binary-procedure jfsh-op-mod x))
     ((eq? (car x) 'eq?) (emit-eq? x))
     ((eq? (car x) '>) (emit-> x))
     ((eq? (car x) '<) (emit-< x))
@@ -411,29 +392,26 @@
     ((eq? (car x) 'write-sub!) (emit-write-sub! x))
     ((eq? (car x) 'swizzle) (emit-swizzle x))
     ((eq? (car x) 'lambda) (emit-lambda x))
-    ((eq? (car x) 'rndvec) (emit (vector rnd 0 0)))
+    ((eq? (car x) 'rndvec) (emit (vector jfsh-op-rnd 0 0)))
     ((eq? (car x) 'trace) (emit-trace x))
     ((eq? (car x) 'read) (emit-read x))
     ((eq? (car x) 'addr) (emit-addr x))
     ((eq? (car x) 'not) (emit-not x))
-    ((eq? (car x) 'mag) (unary-procedure len x))
-    ((eq? (car x) 'magsq) (unary-procedure lensq x))
-    ((eq? (car x) 'noise) (unary-procedure noise x))
-    ((eq? (car x) 'normalise) (unary-procedure nrm x))
-    ((eq? (car x) 'abs) (unary-procedure abs x))
-    ((eq? (car x) 'floor) (unary-procedure flr x))
-    ((eq? (car x) 'sincos) (unary-procedure sincos x))
-    ((eq? (car x) 'ignore) (unary-procedure drp x))
+    ((eq? (car x) 'mag) (unary-procedure jfsh-op-len x))
+    ((eq? (car x) 'magsq) (unary-procedure jfsh-op-lensq x))
+    ((eq? (car x) 'noise) (unary-procedure jfsh-op-noise x))
+    ((eq? (car x) 'normalise) (unary-procedure jfsh-op-nrm x))
+    ((eq? (car x) 'abs) (unary-procedure jfsh-op-abs x))
+    ((eq? (car x) 'floor) (unary-procedure jfsh-op-flr x))
+    ((eq? (car x) 'sincos) (unary-procedure jfsh-op-sincos x))
+    ((eq? (car x) 'ignore) (unary-procedure jfsh-op-drp x))
     ((eq? (car x) 'round)
      (append
       (emit-expr (cadr x))
-      (emit (vector ldlv 0 0))
+      (emit (vector jfsh-op-ldlv 0 0))
       (emit (vector 0.5 0.5 0.5))
-      (emit (vector add 0 0))
-      (emit (vector flr 0 0))))
-    ((eq? (car x) 'synth-create) (emit-synth-create x))
-    ((eq? (car x) 'synth-connect) (emit-synth-connect x))
-    ((eq? (car x) 'synth-play) (emit-synth-play x))
+      (emit (vector jfsh-op-add 0 0))
+      (emit (vector jfsh-op-flr 0 0))))
     (else
      (let ((addr (variable-address (car x))))
        (if addr
@@ -508,46 +486,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define aid 0)
-(define (new-aid) (set! aid (+ aid 1)) aid)
-
-(define synth-ops
-  '(sine saw tri squ white pink adsr add sub mul div pow
-         mooglp moogbp mooghp formant crush distort clip
-         delay ks xfade samplenhold tracknhold))
-
-(define (get-opn op)
-  (define (_ l n)
-    (cond
-     ((null? l) #f)
-     ((eq? (car l) op) n)
-     (else (_ (cdr l) (+ n 1)))))
-  (_ synth-ops 1))
-
-(define (synth-operator parent argn x)
-  (let ((id (new-aid))) ;; compile time ids bad
-    (cond
-     ((number? x)
-      (append
-       (list (list 'synth-create (list 'vector id 0 x)))
-       (list (list 'synth-connect (list 'vector parent argn id)))))
-     (else
-      (let ((argc -1))
-        (append
-         (list (list 'synth-create (list 'vector id (get-opn (car x)) 0)))
-         (if (zero? parent)
-             '()
-             (list (list 'synth-connect (list 'vector parent argn id))))
-         (foldl
-          (lambda (c r)
-            (set! argc (+ argc 1))
-            (append
-             (synth-operator id argc c)
-             r))
-          '()
-          (cdr x))))))))
-
-
 (define (preprocess-cond-to-if x)
   (define (_ l)
     (cond
@@ -576,11 +514,6 @@
                 (list 'set! v (list '- v 1))))
              ((eq? (car i) 'cond)
               (preprocess-cond-to-if i))
-             ((eq? (car i) 'play-now)
-              (append
-               (list 'do)
-               (synth-operator 0 0 (cadr i))
-               (list '(synth-play (vector 0 1 0)))))
              (else (pre-process i)))
             (pre-process i)))
       s))
@@ -614,7 +547,7 @@
      (display ln)(display ": ")
      (cond
       ((vector? i)
-
+       (msg i)
        (if (and (>= (vector-ref i 0) 0)
                 (< (vector-ref i 0) (length instr)))
            (begin

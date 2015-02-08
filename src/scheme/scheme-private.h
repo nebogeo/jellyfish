@@ -21,6 +21,10 @@ enum scheme_port_kind {
   port_saw_EOF=64,
 };
 
+static pointer _Error_1(scheme *sc, const char *s, pointer a);
+#define Error_1(sc,s, a) return _Error_1(sc,s,a)
+#define Error_0(sc,s)    return _Error_1(sc,s,0)
+
 typedef struct port {
   unsigned char kind;
 #if SHOW_ERROR_LINE

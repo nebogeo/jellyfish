@@ -34,9 +34,7 @@
 #include "bcm_host.h"
 #include "rpi/input.h"
 #include "rpi/graphics.h"
-#endif
-
-#ifndef FLX_RPI
+#else
 #include "linux/glut_graphics.h"
 #endif
 
