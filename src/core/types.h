@@ -15,11 +15,17 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "fixed.h"
+#include "config.h"
 
 #ifndef FLX_TYPES
 #define FLX_TYPES
 
 #include <math.h>
+
+// autoconf can tell us if we are on Pi
+#ifdef HAVE__OPT_VC_INCLUDE_BCM_HOST_H
+#define FLX_RPI
+#endif
 
 #ifndef _EE
 typedef unsigned char u8;
@@ -38,7 +44,8 @@ typedef Fixed x32;
 using namespace bb;
 
 #ifdef FLX_LINUX
-//-Linux--------------------------------
+//-Linux/RPI---------------------------
+// use the fixed point version here
 #define flx_real x32
 
 #else

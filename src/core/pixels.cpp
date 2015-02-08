@@ -113,7 +113,7 @@ unsigned char* LoadPNG(const string filename,long &width, long &height)
     return data;
 }
 
-#ifdef USE_JPGLIB
+#ifdef HAVE_LIBJPEG
 
 int WriteJPG(GLubyte *image, const char *filename, const char *description, int x, int y, int width, int height, int quality, int super)
 {
