@@ -684,3 +684,78 @@ void HoldNode::Process(unsigned int bufsize)
 		}
 	}
 }
+
+PadNode::PadNode(unsigned int SampleRate):
+    GraphNode(4),
+    m_Pad(SampleRate)
+{
+}
+
+void PadNode::Trigger(float time)
+{
+	TriggerChildren(time);
+
+	float freq=440;
+	if (ChildExists(0) && GetChild(0)->IsTerminal())
+	{
+		freq=GetChild(0)->GetValue();
+	}
+
+	if (ChildExists(1) && GetChild(1)->IsTerminal())
+	{
+		m_Pad.SetGap(GetChild(1)->GetValue());
+	}
+
+	if (ChildExists(2) && GetChild(2)->IsTerminal())
+	{
+		m_Pad.SetCutoff(GetChild(2)->GetValue());
+	}
+
+	if (ChildExists(3) && GetChild(3)->IsTerminal())
+	{
+		m_Pad.SetResonance(GetChild(3)->GetValue());
+	}
+
+	m_Pad.Trigger(time, freq, freq, 1);
+}
+
+void PadNode::Process(unsigned int bufsize)
+{
+	if (bufsize>(unsigned int)m_Output.GetLength())
+	{
+		m_Output.Allocate(bufsize);
+	}
+	ProcessChildren(bufsize);
+
+    bool HaveFreqCV = false;
+    bool HaveGapCV = false;
+
+    // if frequency cv exists
+	HaveFreqCV=ChildExists(0) && !GetChild(0)->IsTerminal();
+	HaveGapCV=ChildExists(1) && !GetChild(1)->IsTerminal();
+
+/*    if (HaveFreqCV)
+    {
+        if (HaveGapCV)
+        {
+            m_Pad.Process(bufsize, m_Output,
+                          GetChild(0)->GetOutput(),
+                          GetChild(1)->GetOutput());
+        }
+        else
+        {
+            m_Pad.ProcessFM(bufsize, m_Output, GetChild(0)->GetOutput());
+        }
+    }
+    else
+    {
+        if (HaveGapCV)
+        {
+            m_Pad.Process(bufsize, m_Output, GetChild(1)->GetOutput());
+        }
+        else
+        {*/
+            m_Pad.Process(bufsize, m_Output);
+            // }
+            //}
+}

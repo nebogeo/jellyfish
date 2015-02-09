@@ -163,6 +163,11 @@
   (function-desc 'distort (list (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
   (function-desc 'klip (list (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
   (function-desc 'echo (list (arg-desc 'float 0 1) (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
+  (function-desc 'ks (list (arg-desc 'float 0 1) (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
+  (function-desc 'xfade (list (arg-desc 'float 0 1) (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
+  (function-desc 's&h (list (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
+  (function-desc 't&h (list (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
+  (function-desc 'pad (list (arg-desc 'float 0 1) (arg-desc 'float 0 1) (arg-desc 'float 0 1) (arg-desc 'float 0 1)))
 ))
 
 (random 13)

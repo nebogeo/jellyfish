@@ -32,7 +32,7 @@ public:
 	virtual void SetValue(float s) { m_Value=s; }
 	virtual bool IsTerminal() { return true; }
 	//virtual void Clear() { GraphNode::Clear(); m_Value=0; }
-	
+
 private:
 	float m_Value;
 };
@@ -43,7 +43,7 @@ public:
 	OscNode(unsigned int Shape, unsigned int SampleRate);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
-	
+
 private:
 	WaveTable m_WaveTable;
 	unsigned int m_Shape;
@@ -55,7 +55,7 @@ public:
     KSNode(unsigned int SampleRate);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
-	
+
 private:
 	KS m_KS;
 	unsigned int m_Shape;
@@ -73,7 +73,7 @@ class HoldNode : public GraphNode
 {
 public:
 	enum Type{SAMP, TRACK};
-	
+
 	HoldNode(Type t);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
@@ -91,7 +91,7 @@ public:
 	ADSRNode(unsigned int SampleRate);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
-	
+
 private:
 	Envelope m_Envelope;
 	Sample m_Temp;
@@ -105,7 +105,7 @@ public:
 	MathNode(Type t);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
-	
+
 private:
 	Type m_Type;
 };
@@ -118,7 +118,7 @@ public:
 	FilterNode(Type t, unsigned int samplerate);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
-	
+
 private:
 	Type m_Type;
 	FilterWrapper m_Filter;
@@ -133,7 +133,7 @@ public:
 	SampleNode(unsigned int samplerate);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
-	
+
 private:
 	PlayMode m_PlayMode;
 	Sampler m_Sampler;
@@ -148,11 +148,21 @@ public:
 	EffectNode(Type type, unsigned int samplerate);
 	virtual void Trigger(float time);
 	virtual void Process(unsigned int bufsize);
-	
+
 private:
 	Type m_Type;
 	Delay m_Delay;
 };
 
-#endif
+class PadNode : public GraphNode
+{
+public:
+	PadNode(unsigned int SampleRate);
+	virtual void Trigger(float time);
+	virtual void Process(unsigned int bufsize);
 
+private:
+	Pad m_Pad;
+};
+
+#endif

@@ -40,18 +40,18 @@ void Crush(Sample &buf, float freq, float bits)
        if (phasor >= 1.0)
 	   {
           phasor = phasor - 1.0;
-          last = step * floor( buf[i]/step + 0.5 ); 
+          last = step * floor( buf[i]/step + 0.5 );
        }
-       buf[i] = last; 
+       buf[i] = last;
     }
 }
 
 void Distort(Sample &buf, float amount)
 {
 	if (amount>=0.99) amount = 0.99;
-	
+
 	float k=2*amount/(1-amount);
-	
+
 	for(unsigned int i=0; i<buf.GetLength(); i++)
 	{
 		buf[i]=((1+k)*buf[i]/(1+k*fabs(buf[i])))*(1-amount);
@@ -66,7 +66,7 @@ void MovingDistort(Sample &buf, const Sample &amount)
 		float a =fabs(amount[i]);
         if (a>0.99) a = 0.99;
 		float k=2*a/(1-a);
-		
+
         buf[i]=((1+k)*buf[i]/(1+k*fabs(buf[i])))*(1-a);
 	}
 }
@@ -74,7 +74,7 @@ void MovingDistort(Sample &buf, const Sample &amount)
 void HardClip(Sample &buf, float level)
 {
 	if (feq(level,0,0.0001)) level==0.0001;
-	
+
 	for(unsigned int i=0; i<buf.GetLength(); i++)
 	{
 		if (buf[i]>level) buf[i]=level;
@@ -104,7 +104,7 @@ WaveTable::WaveTable(int SampleRate) :
 Module(SampleRate)
 {
 	m_TimePerSample=1/(float)m_SampleRate;
-	m_CyclePos=0;	
+	m_CyclePos=0;
 	m_Pitch=m_SampleRate/DEFAULT_TABLE_LEN;
 	m_TargetPitch=m_Pitch;
 	m_Volume=1.0f;
@@ -129,17 +129,17 @@ void WaveTable::WriteWaves()
 	{
 		m_Table[n].Allocate(m_TableLength);
 	}
-	
+
 	float RadCycle = (M_PI/180)*360;
-	float Pos=0; 
+	float Pos=0;
 
 	for (unsigned int n=0; n<m_TableLength; n++)
 	{
 		if (n==0) Pos=0;
 		else Pos=(n/(float)m_TableLength)*RadCycle;
-		m_Table[NOISE].Set(n,RandRange(-1,1));		
+		m_Table[NOISE].Set(n,RandRange(-1,1));
 	}
-	
+
 	// todo - might be better to run this a few cycles before storing
 	float White=0;
 	float b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
@@ -155,25 +155,25 @@ void WaveTable::WriteWaves()
   		m_Table[PINKNOISE].Set(n,b0 + b1 + b2 + b3 + b4 + b5 + b6 + White * 0.5362f);
   		b6 = White * 0.115926f;
 	}
-	
+
 	for (unsigned int n=0; n<m_TableLength; n++)
 	{
 		if (n==0) Pos=0;
 		else Pos=(n/(float)m_TableLength)*RadCycle;
-		m_Table[SINE].Set(n,sin(Pos));		
+		m_Table[SINE].Set(n,sin(Pos));
 	}
 
 	for (unsigned int n=0; n<m_TableLength; n++)
 	{
 		if (n<m_TableLength/2) m_Table[SQUARE].Set(n,1.0f);
-		else m_Table[SQUARE].Set(n,-1);				
+		else m_Table[SQUARE].Set(n,-1);
 	}
-	
+
 	for (unsigned int n=0; n<m_TableLength; n++)
 	{
 		m_Table[REVSAW].Set(n,((n/(float)m_TableLength)*2.0f)-1.0f);
 	}
-	
+
 	for (unsigned int n=0; n<m_TableLength; n++)
 	{
 		m_Table[SAW].Set(n,1-(n/(float)m_TableLength)*2.0f);
@@ -186,19 +186,19 @@ void WaveTable::WriteWaves()
 		if (n<HalfTab) v=1-(n/HalfTab)*2.0f;
 		else v=(((n-HalfTab)/HalfTab)*2.0f)-1.0f;
 		v*=0.99;
-		m_Table[TRIANGLE].Set(n,v);		
+		m_Table[TRIANGLE].Set(n,v);
 	}
 
 	for (unsigned int n=0; n<m_TableLength; n++)
 	{
 		if (n<m_TableLength/1.2) m_Table[PULSE1].Set(n,1);
-		else m_Table[PULSE1].Set(n,-1);				
+		else m_Table[PULSE1].Set(n,-1);
 	}
-	
+
 	for (unsigned int n=0; n<m_TableLength; n++)
 	{
 		if (n<m_TableLength/1.5) m_Table[PULSE2].Set(n,1);
-		else m_Table[PULSE2].Set(n,-1);				
+		else m_Table[PULSE2].Set(n,-1);
 	}
 	cerr<<"written waves"<<endl;
 
@@ -207,7 +207,7 @@ void WaveTable::WriteWaves()
 void WaveTable::Trigger(float time, float pitch, float slidepitch, float vol)
 {
 	m_TargetPitch=pitch;
-	if (m_SlideLength==0) m_Pitch=pitch; 
+	if (m_SlideLength==0) m_Pitch=pitch;
 	m_Volume=vol*1.0f;
 	m_SlideTime=0;
 }
@@ -229,15 +229,15 @@ void WaveTable::Process(unsigned int BufSize, Sample &In)
 		if (m_Octave<0) SlideFreq/=1<<(-m_Octave);
 
 		for (unsigned int n=0; n<BufSize; n++)
-		{	
+		{
 			float t=m_SlideTime/m_SlideLength;
 			if (t>1) Freq=SlideFreq;
 			else Freq=(1-t)*StartFreq+t*SlideFreq;
 			Incr = Freq*m_TablePerSample;
 			m_CyclePos+=Incr;
 			if (m_CyclePos<0) m_CyclePos=m_TableLength-m_CyclePos;
-			m_CyclePos=fmod(m_CyclePos,m_TableLength-1);	
-			In[n]=m_Table[(int)m_Type][m_CyclePos]*m_Volume;	
+			m_CyclePos=fmod(m_CyclePos,m_TableLength-1);
+			In[n]=m_Table[(int)m_Type][m_CyclePos]*m_Volume;
 			m_SlideTime+=m_TimePerSample;
 		}
 	}
@@ -251,11 +251,11 @@ void WaveTable::Process(unsigned int BufSize, Sample &In)
 		Incr = Freq*m_TablePerSample;
 
 		for (unsigned int n=0; n<BufSize; n++)
-		{	
+		{
 			m_CyclePos+=Incr;
 			if (m_CyclePos<0) m_CyclePos=m_TableLength-m_CyclePos;
 			m_CyclePos=fmod(m_CyclePos,m_TableLength-1);
-			In[n]=m_Table[(int)m_Type][m_CyclePos]*m_Volume;	
+			In[n]=m_Table[(int)m_Type][m_CyclePos]*m_Volume;
 		}
 	}
 }
@@ -263,13 +263,13 @@ void WaveTable::Process(unsigned int BufSize, Sample &In)
 void WaveTable::ProcessFM(unsigned int BufSize, Sample &In, const Sample &Pitch)
 {
 	for (unsigned int n=0; n<BufSize; n++)
-	{	
+	{
 		if (isfinite(Pitch[n]))
 		{
 			m_CyclePos+=Pitch[n]*m_TablePerSample;
 			if (m_CyclePos<0) m_CyclePos=m_TableLength-m_CyclePos;
 			m_CyclePos=fmod(m_CyclePos,m_TableLength-1);
-			In[n]=m_Table[(int)m_Type][m_CyclePos]*m_Volume;	
+			In[n]=m_Table[(int)m_Type][m_CyclePos]*m_Volume;
 		}
 	}
 }
@@ -278,11 +278,11 @@ void WaveTable::SimpleProcess(unsigned int BufSize, Sample &In)
 {
 	float Incr = m_Pitch*m_FineFreq*(m_TableLength/(float)m_SampleRate);
 	for (unsigned int n=0; n<BufSize; n++)
-	{	
+	{
 		m_CyclePos+=Incr;
 		if (m_CyclePos<0) m_CyclePos=m_TableLength-m_CyclePos;
-		m_CyclePos=fmod(m_CyclePos,m_TableLength-1);	
-		In[n]+=m_Table[(int)m_Type][m_CyclePos]*m_Volume;	
+		m_CyclePos=fmod(m_CyclePos,m_TableLength-1);
+		In[n]+=m_Table[(int)m_Type][m_CyclePos]*m_Volume;
 	}
 }
 
@@ -294,12 +294,12 @@ m_TableLength(DEFAULT_TABLE_LEN)
 {
 	m_CyclePos=0;
 	Reset();
-	
+
 	for (int n=0; n<NUM_TABLES; n++)
 	{
 		m_Table.Allocate(m_TableLength);
 	}
-	
+
 	WriteWaves();
 }
 
@@ -318,14 +318,14 @@ void SimpleWave::WriteWaves()
 	{
 		if (n==0) Pos=0;
 		else Pos=(n/(float)m_TableLength)*RadCycle;
-		m_Table.Set(n,sin(Pos));		
+		m_Table.Set(n,sin(Pos));
 	}
 }
 
 void SimpleWave::Trigger(float time, float pitch, float slidepitch, float vol)
 {
-	m_Pitch=pitch; 
-	m_SlidePitch=slidepitch; 
+	m_Pitch=pitch;
+	m_SlidePitch=slidepitch;
 	m_Volume=vol*1.0;
 }
 
@@ -333,17 +333,17 @@ void SimpleWave::Process(unsigned int BufSize, Sample &In)
 {
 	float Incr = m_Pitch*m_FineFreq*(m_TableLength/(float)m_SampleRate);
 	for (unsigned int n=0; n<BufSize; n++)
-	{	
+	{
 		m_CyclePos+=Incr;
 		if (m_CyclePos<0) m_CyclePos=m_TableLength-m_CyclePos;
-		m_CyclePos=fmod(m_CyclePos,m_TableLength-1);	
-		In[n]+=m_Table[m_CyclePos]*m_Volume;	
+		m_CyclePos=fmod(m_CyclePos,m_TableLength-1);
+		In[n]+=m_Table[m_CyclePos]*m_Volume;
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-Envelope::Envelope(int SampleRate) : 
+Envelope::Envelope(int SampleRate) :
 Module(SampleRate)
 {
 	m_t=-1000.0f;
@@ -352,7 +352,7 @@ Module(SampleRate)
 	m_Current=0;
 	Reset();
 }
-	
+
 void Envelope::Reset()
 {
 	m_Attack=0.0f;
@@ -364,9 +364,9 @@ void Envelope::Reset()
 	m_Trigger=false;
 	m_Current=0;
 }
-	
-void Envelope::Process(unsigned int BufSize, Sample &CV, bool Smooth) 
-{	
+
+void Envelope::Process(unsigned int BufSize, Sample &CV, bool Smooth)
+{
 	if (m_Attack==0 && m_Decay==0 && m_Release==0)
 	{
 		return;
@@ -377,27 +377,27 @@ void Envelope::Process(unsigned int BufSize, Sample &CV, bool Smooth)
 	// a bit of a crap filter to smooth clicks
 	static float SMOOTH = 0.98;
 	static float ONEMINUS_SMOOTH = 1-SMOOTH;
-	
+
 	float temp=0;
 	bool Freeze=false;
 	float nt;
-	
+
 	if (m_t==-1000)
 	{
 		CV.Zero();
 		m_Current=0;
 		return;
 	}
-	
-	
+
+
 	for (unsigned int n=0; n<BufSize; n++)
 	{
-	
-		// if we are in the delay (before really being triggered)		
-		if (m_t<0) 
+
+		// if we are in the delay (before really being triggered)
+		if (m_t<0)
 		{
 			float temp=0;
-			if (!feq(temp,m_Current,0.01) && Smooth) 
+			if (!feq(temp,m_Current,0.01) && Smooth)
 			{
 				// only filter if necc
 				temp=(temp*ONEMINUS_SMOOTH+m_Current*SMOOTH);
@@ -409,12 +409,12 @@ void Envelope::Process(unsigned int BufSize, Sample &CV, bool Smooth)
 		else // in the envelope
 		{
 			// if we are in the envelope...
-			if (m_t>=0 && m_t<m_Attack+m_Decay+m_Release) 
-			{				
-				// find out what part of the envelope we are in	
+			if (m_t>=0 && m_t<m_Attack+m_Decay+m_Release)
+			{
+				// find out what part of the envelope we are in
 				// in the attack
 				if (m_t<m_Attack)
-				{	
+				{
 					// get normalised position to
 					// get the volume between 0 and 1
 					temp=m_t/m_Attack;
@@ -434,20 +434,20 @@ void Envelope::Process(unsigned int BufSize, Sample &CV, bool Smooth)
 					// normalised position in m_Decay->m_Release range
 					nt=(m_t-(m_Attack+m_Decay))/m_Release;
 
-					// volume between m_Sustain and 0			
+					// volume between m_Sustain and 0
 					temp=m_Sustain*(1-nt);
 
 					if (m_Release<0.2f)
 					{
 						temp=m_Sustain;
-					}	
+					}
 
 					//if (m_Trigger) Freeze=true;
 				}
 
 				temp*=m_Volume;
 
-				if (!feq(temp,m_Current,0.01) && Smooth) 
+				if (!feq(temp,m_Current,0.01) && Smooth)
 				{
 					// only filter if necc
 					temp=(temp*ONEMINUS_SMOOTH+m_Current*SMOOTH);
@@ -459,7 +459,7 @@ void Envelope::Process(unsigned int BufSize, Sample &CV, bool Smooth)
 			}
 			else
 			{
-				if (!feq(temp,m_Current,0.01) && Smooth) 
+				if (!feq(temp,m_Current,0.01) && Smooth)
 				{
 					temp=m_Current*SMOOTH;
 				}
@@ -474,10 +474,10 @@ void Envelope::Process(unsigned int BufSize, Sample &CV, bool Smooth)
 				}
 			}
 		}
-	} 	
+	}
 }
 
-void Envelope::Trigger(float time, float pitch, float vol) 
+void Envelope::Trigger(float time, float pitch, float vol)
 {
 	if (vol<0.0001)
 	{
@@ -485,13 +485,13 @@ void Envelope::Trigger(float time, float pitch, float vol)
 	}
 	else
 	{
-		m_t=time; 
+		m_t=time;
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-SimpleEnvelope::SimpleEnvelope(int SampleRate) : 
+SimpleEnvelope::SimpleEnvelope(int SampleRate) :
 Module(SampleRate)
 {
 	m_Trigger=false;
@@ -502,21 +502,21 @@ Module(SampleRate)
 	m_Decay=1.0f;
 	m_Volume=1.0f;
 }
-	
+
 void SimpleEnvelope::Reset()
 {
 	//m_Decay=1.0f;
 	//m_Volume=0.1f;
 }
 
-void SimpleEnvelope::Process(unsigned int BufSize, Sample &In, Sample &CV, bool Smooth) 
-{	
+void SimpleEnvelope::Process(unsigned int BufSize, Sample &In, Sample &CV, bool Smooth)
+{
 	// a bit of a crap filter to smooth clicks
 	static float SMOOTH = 0.999;
 	static float ONEMINUS_SMOOTH = 1-SMOOTH;
 	float OneOverDecay=1/m_Decay;
 	float temp=0;
-	
+
 	if (m_t==-1000)
 	{
 		In.Zero();
@@ -527,51 +527,51 @@ void SimpleEnvelope::Process(unsigned int BufSize, Sample &In, Sample &CV, bool 
 
 	for (unsigned int n=0; n<BufSize; n++)
 	{
-		// if we are in the delay (before really being triggered)		
-		if (m_t<0) 
+		// if we are in the delay (before really being triggered)
+		if (m_t<0)
 		{
-			In[n]*=m_Current; 
+			In[n]*=m_Current;
 			CV[n]=m_Current;
 		}
 		else // in the envelope
 		{
 			// if we are in the envelope...
-			if (m_t<m_Decay) 
-			{				
+			if (m_t<m_Decay)
+			{
 				// in the decay
 				temp=(1-m_t*OneOverDecay)*m_Volume;
-				if (!feq(temp,m_Current,0.01) && Smooth) 
+				if (!feq(temp,m_Current,0.01) && Smooth)
 				{
 					// only filter if necc
 					temp=(temp*ONEMINUS_SMOOTH+m_Current*SMOOTH);
 				}
-				In[n]*=temp; 
+				In[n]*=temp;
 				CV[n]=temp;
 				m_Current=temp;
 			}
 			else
 			{
-				In[n]*=0; 
+				In[n]*=0;
 				CV[n]=0;
 				m_Current=0;
-				
+
 				// we've run off the end
 				m_t=-1000;
 			}
 		}
-		
+
 		m_t+=m_SampleTime;
-	} 	
+	}
 }
 
-void SimpleEnvelope::Trigger(float time, float pitch, float vol) 
+void SimpleEnvelope::Trigger(float time, float pitch, float vol)
 {
-	m_t=time; 
+	m_t=time;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // CSound source code, Stilson/Smith CCRMA paper., Paul Kellett version
-// Moog VCF, variation 1 from musicdsp archive 
+// Moog VCF, variation 1 from musicdsp archive
 
 MoogFilter::MoogFilter(int SampleRate) :
 Module(SampleRate),
@@ -605,40 +605,40 @@ void MoogFilter::Process(unsigned int BufSize, Sample &In, Sample *CutoffCV, Sam
 		if (n%FILTER_GRANULARITY==0)
 		{
 			fc = Cutoff;
-			if (CutoffCV!=NULL) fc+=(*CutoffCV)[n]; 
+			if (CutoffCV!=NULL) fc+=(*CutoffCV)[n];
 			fc*=0.25;
 			if (fc<0) fc=0;
 			else if (fc>1) fc=1;
-			
+
 			q = 1.0f - fc;
 			p = fc + 0.8f * fc * q;
 			f = p + p - 1.0f;
 			Q = Resonance*6-3;
 			q = Q + (1.0f + 0.5f * q * (1.0f - q + 5.6f * q * q));
 		}
-		
+
 		in = In[n];
-		
+
 		// say no to denormalisation!
-		in+=(rand()%1000)*0.000000001;	
-		
+		in+=(rand()%1000)*0.000000001;
+
 		in -= q * b4;
-		
+
 		if (in>1) in=1;
 		if (in<-1) in=-1;
-								
+
 		t1 = b1; b1 = (in + b0) * p - b1 * f;
 		t2 = b2; b2 = (b1 + t1) * p - b2 * f;
-		t1 = b3; b3 = (b2 + t2) * p - b3 * f;		
-     		     b4 = (b3 + t1) * p - b4 * f;	
+		t1 = b3; b3 = (b2 + t2) * p - b3 * f;
+     		     b4 = (b3 + t1) * p - b4 * f;
 		b4 = b4 - b4 * b4 * b4 * 0.166667f;
-		
+
 		b0 = in;
-		
-		if (LPFOut) (*LPFOut)[n]=b4;	 
+
+		if (LPFOut) (*LPFOut)[n]=b4;
 		if (BPFOut) (*BPFOut)[n]=(in-b4);
-		if (HPFOut) (*HPFOut)[n]=3.0f * (b3 - b4);			
-	}			
+		if (HPFOut) (*HPFOut)[n]=3.0f * (b3 - b4);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -676,19 +676,19 @@ Module(SampleRate)
 void FormantFilter::Reset()
 {
 	for (int x=0; x<5; x++)
-		for (int y=0; y<10; y++) 
+		for (int y=0; y<10; y++)
 			memory[x][y]=0;
 	m_Vowel=0;
 }
 
 void FormantFilter::Process(unsigned int BufSize, Sample &In, Sample *CutoffCV, Sample &Out)
-{		
+{
 	float res,o[5],out=0, in=0;
-		
+
 	for (unsigned int n=0; n<BufSize; n++)
-	{		
+	{
 		in = In[n];
-		
+
 		// work around denormal calculation CPU spikes where in --> 0
 		if ((in >= 0) && (in < 0.000000001))
 			in += 0.000000001;
@@ -699,7 +699,7 @@ void FormantFilter::Process(unsigned int BufSize, Sample &In, Sample *CutoffCV, 
 		for (int v=0; v<5; v++)
 		{
 			res= (float) (coeff[v][0]*in +
-                          coeff[v][1]*memory[v][0] +  
+                          coeff[v][1]*memory[v][0] +
                           coeff[v][2]*memory[v][1] +
                           coeff[v][3]*memory[v][2] +
                           coeff[v][4]*memory[v][3] +
@@ -709,7 +709,7 @@ void FormantFilter::Process(unsigned int BufSize, Sample &In, Sample *CutoffCV, 
                           coeff[v][8]*memory[v][7] +
                           coeff[v][9]*memory[v][8] +
                           coeff[v][10]*memory[v][9]);
-        
+
 			memory[v][9]=memory[v][8];
 			memory[v][8]=memory[v][7];
 			memory[v][7]=memory[v][6];
@@ -728,33 +728,33 @@ void FormantFilter::Process(unsigned int BufSize, Sample &In, Sample *CutoffCV, 
 		if (CutoffCV!=NULL) vowel+=(*CutoffCV)[n];
 
 		// mix between vowel sounds
-		if (vowel<1) 
+		if (vowel<1)
 		{
-			out=Linear(0,1,vowel,o[1],o[0]); 
-		}	
-		else 
-		if (vowel>1 && vowel<2) 
+			out=Linear(0,1,vowel,o[1],o[0]);
+		}
+		else
+		if (vowel>1 && vowel<2)
 		{
 			out=Linear(0,1,vowel-1.0f,o[2],o[1]);
-		}	
-		else 
-		if (vowel>2 && vowel<3) 
+		}
+		else
+		if (vowel>2 && vowel<3)
 		{
 			out=Linear(0,1,m_Vowel-2.0f,o[3],o[2]);
-		}	
-		else 
-		if (vowel>3 && vowel<4) 
+		}
+		else
+		if (vowel>3 && vowel<4)
 		{
 			out=Linear(0,1,vowel-3.0f,o[4],o[3]);
-		}	
-		else 
-		if (vowel==4) 
+		}
+		else
+		if (vowel==4)
 		{
 			out=o[4];
-		}	
-	
+		}
+
 		Out[n]=out;
-	}	
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -780,7 +780,7 @@ void FilterWrapper::Process(unsigned int BufSize, Sample &in, Sample &CutoffCV, 
 		case MOOG_BAND : m_MoogFilter.Process(BufSize, in, &CutoffCV, NULL, &out, NULL); break;
 		case MOOG_HI : m_MoogFilter.Process(BufSize, in, &CutoffCV, NULL, NULL, &out); break;
 		case FORMANT : m_FormantFilter.Process(BufSize, in, &CutoffCV, out); break;
-	}		
+	}
 }
 
 void FilterWrapper::Process(unsigned int BufSize, Sample &in, Sample &out)
@@ -791,7 +791,7 @@ void FilterWrapper::Process(unsigned int BufSize, Sample &in, Sample &out)
 		case MOOG_BAND : m_MoogFilter.Process(BufSize, in, NULL, NULL, &out, NULL); break;
 		case MOOG_HI : m_MoogFilter.Process(BufSize, in, NULL, NULL, NULL, &out); break;
 		case FORMANT : m_FormantFilter.Process(BufSize, in, NULL, out); break;
-	}		
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -814,20 +814,20 @@ void Delay::Reset()
 
 void Delay::Process(unsigned int BufSize, Sample &In, Sample &DelayCV, Sample &FeedbackCV, Sample &Out)
 {
-	
+
 }
 
 void Delay::Process(unsigned int BufSize, Sample &In, Sample &Out)
 {
 	unsigned int delay=(unsigned int)(m_SampleRate*m_Delay);
-	
-	if (delay==0) 
+
+	if (delay==0)
 	{
 		return;
 	}
 
 	if (delay>=(unsigned int)m_Buffer.GetLength()) delay=m_Buffer.GetLength()-1;
-	
+
 	for (unsigned int n=0; n<BufSize; n++)
 	{
 		m_Buffer[m_Position]=In[n]+m_Buffer[m_Position]*m_Feedback;
@@ -864,7 +864,7 @@ f1p0(0),
 f1p1(0),
 f1p2(0),
 f1p3(0),
-hf(0), 
+hf(0),
 f2p0(0),
 f2p1(0),
 f2p2(0),
@@ -877,7 +877,7 @@ m_Mid(1),
 m_High(1)
 {
 	lf = 2 * sin(M_PI * (880.0f / (float)SampleRate));
-	hf = 2 * sin(M_PI * (5000.0f / (float)SampleRate));	
+	hf = 2 * sin(M_PI * (5000.0f / (float)SampleRate));
 }
 
 void Eq::Process(unsigned int BufSize, Sample &In)
@@ -911,7 +911,7 @@ void Eq::Process(unsigned int BufSize, Sample &In)
 		// Shuffle history buffer
 		sdm3 = sdm2;
 		sdm2 = sdm1;
-		sdm1 = In[n];  			  
+		sdm1 = In[n];
 
 		// Return result
 		In[n]=(l + m + h);
@@ -927,13 +927,13 @@ void Eq::Process(unsigned int BufSize, Sample &In)
 
 Compressor::Compressor(int SampleRate) :
 Module(SampleRate),
-threshold(0.5),  
-slope(0.5),      
-sr(SampleRate),    
-tla(1.0f*1e-3),         
-twnd(3.0f*1e-3),        
-tatt(0.1f*1e-3),        
-trel(300.0f*1e-3)        
+threshold(0.5),
+slope(0.5),
+sr(SampleRate),
+tla(1.0f*1e-3),
+twnd(3.0f*1e-3),
+tatt(0.1f*1e-3),
+trel(300.0f*1e-3)
 {
 }
 
@@ -961,7 +961,7 @@ void Compressor::Process(unsigned int BufSize, Sample &In)
             unsigned int lki = i + j + lhsmp;
             float  smp;
             if (lki < BufSize) smp = In[lki];
-            else smp = 0.0;      
+            else smp = 0.0;
             summ += smp * smp;  // square em..
         }
 
@@ -978,9 +978,9 @@ void Compressor::Process(unsigned int BufSize, Sample &In)
         In[i] *= gain;
 //		if (i==0) cerr<<threshold<<" "<<env<<" "<<gain<<endl;
     }
-	
-	
-	
+
+
+
 }
 
 
@@ -1004,7 +1004,7 @@ void KS::Reset()
 
 void KS::Trigger(float time, float pitch, float slidepitch, float vol)
 {
-	m_Delay=1.0f/pitch; 
+	m_Delay=1.0f/pitch;
 	//m_Volume=vol*1.0;
 
 	unsigned int delay=(unsigned int)(m_SampleRate*m_Delay);
@@ -1018,18 +1018,88 @@ void KS::Trigger(float time, float pitch, float slidepitch, float vol)
 void KS::Process(unsigned int BufSize, Sample &Out)
 {
 	unsigned int delay=(unsigned int)(m_SampleRate*m_Delay);
-	
+
 	if (delay==0) return;
-	if (delay>=(unsigned int)m_Buffer.GetLength()) 
+	if (delay>=(unsigned int)m_Buffer.GetLength())
     {
         delay=m_Buffer.GetLength()-1;
 	}
 
 	for (unsigned int n=0; n<BufSize; n++)
 	{
-        m_Buffer[m_Position]=m_Filter.ProcessSingle(m_Buffer[m_Position]);        
+        m_Buffer[m_Position]=m_Filter.ProcessSingle(m_Buffer[m_Position]);
 		Out[n]=m_Buffer[m_Position];
 		m_Position=(m_Position+1)%delay;
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+
+Pad::Pad(int SampleRate) :
+Module(SampleRate),
+m_TableLength(4096),
+m_Filter(SampleRate)
+{
+	Reset();
+
+	m_TablePerSample=m_TableLength/(float)SampleRate;
+	m_CyclePos=0;
+    m_WritePos=0;
+    m_State=0;
+    m_Table.Allocate(m_TableLength);
+
+    m_Filter.SetCutoff(0.1);
+    m_Filter.SetResonance(0.3);
+
+	WriteWaves();
+}
+
+void Pad::Reset()
+{
+    m_Filter.Reset();
+	m_Pitch=0;
+}
+
+void Pad::WriteWaves()
+{
+	float RadCycle = (M_PI/180)*360;
+	float Pos=0;
+//    m_Table.Zero();
+    m_Table.Set(0,1);
+}
+
+void Pad::Trigger(float time, float pitch, float slidepitch, float vol)
+{
+	m_Pitch=pitch;
+	m_Volume=vol*1.0;
+//    WriteWaves();
+    m_CyclePos=0;
+    m_WritePos=0;
+}
+
+void Pad::Process(unsigned int BufSize, Sample &In)
+{
+	float Incr = m_Pitch*(m_TableLength/(float)m_SampleRate);
+
+    if (m_Gap==0) m_Gap=0.00001;
+    if (m_Gap>1) m_Gap=1;
+
+    for (unsigned int n=0; n<BufSize; n++)
+    {
+        m_CyclePos+=Incr;
+        m_WritePos++;
+
+        In[n]=0;
+        for (int i=0; i<12; i++)
+        {
+            In[n]+=m_Table[m_CyclePos*((i+1)*m_Gap)]/12.0f;
+        }
+
+        if (m_Table[m_WritePos]<-1 || m_Table[m_WritePos]>1)
+            m_Table[m_WritePos]=m_Filter.ProcessSingle(In[n]+m_Table[m_WritePos])*0.99;
+        else
+            m_Table[m_WritePos]=m_Filter.ProcessSingle(In[n]+m_Table[m_WritePos]);
+
+
+    }
+}
