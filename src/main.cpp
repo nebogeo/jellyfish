@@ -135,6 +135,8 @@ void KeyboardCallback(unsigned char key,int x, int y)
 #endif
 }
 
+#ifdef FLX_LINUX
+
 void ReshapeCallback(int width, int height)
 {
     w=width;
@@ -145,6 +147,8 @@ void IdleCallback()
 {
 	glutPostRedisplay();
 }
+
+#endif
 
 void KeyboardUpCallback(unsigned char key,int x, int y)
 {
@@ -170,10 +174,10 @@ void repl_loop() {
 int main(int argc, char *argv[])
 {
 #ifdef FLX_RPI
-   bcm_host_init();
+  //bcm_host_init();
    // Clear application state
    memset( state, 0, sizeof( *state ) );
-   init_ogl_rpi(state);
+   //   init_ogl_rpi(state);
 #else
    w=640;
    h=480;
@@ -196,21 +200,21 @@ int main(int argc, char *argv[])
    appInit();
    initGL();
 
-   appEval((char*)LoadFile(ASSETS_LOCATION+"init.scm").c_str());
-   appEval((char*)LoadFile(ASSETS_LOCATION+"boot.scm").c_str());
-   appEval((char*)LoadFile(ASSETS_LOCATION+"lib.scm").c_str());
-   appEval((char*)LoadFile(ASSETS_LOCATION+"compiler.scm").c_str());
-   appEval((char*)LoadFile(ASSETS_LOCATION+"fluxa.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"init.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"boot.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"lib.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"compiler.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"fluxa.scm").c_str());
 
     // preload the textures
     long w=0,h=0;
     unsigned char *tex=LoadPNG(ASSETS_LOCATION+"raspberrypi.png",w,h);
     appLoadTexture("raspberrypi.png",w,h,(char *)tex);
-    tex=LoadPNG(ASSETS_LOCATION+"stripes.png",w,h);
+    tex=LoadPNG(string(ASSETS_LOCATION)+"stripes.png",w,h);
     appLoadTexture("stripes.png",w,h,(char *)tex);
-    tex=LoadPNG(ASSETS_LOCATION+"bg.png",w,h);
+    tex=LoadPNG(string(ASSETS_LOCATION)+"bg.png",w,h);
     appLoadTexture("bg.png",w,h,(char *)tex);
-    tex=LoadPNG(ASSETS_LOCATION+"thread.png",w,h);
+    tex=LoadPNG(string(ASSETS_LOCATION)+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
 
     if (argc>1) {

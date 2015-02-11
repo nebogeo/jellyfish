@@ -44,7 +44,7 @@ void audio_loop(void *c) {
         left->Zero();
         right->Zero();
 
-        g->Process(AUDIO_BUFSIZE, *left, *right);
+	g->Process(AUDIO_BUFSIZE, *left, *right);
 
         unsigned int pos=0;
         for (unsigned int i=0; i<AUDIO_BUFSIZE*2; i+=2)

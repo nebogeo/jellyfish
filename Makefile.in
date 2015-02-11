@@ -26,12 +26,14 @@ SRCS    := src/main.cpp\
           src/engine/nomadic.cpp\
           src/engine/jellyfish_primitive.cpp\
           src/engine/jellyfish.cpp\
-		  src/linux/glut_graphics.cpp
+	  src/linux/glut_graphics.cpp\
+	  src/rpi/graphics.cpp\
+	  src/rpi/input.cpp
 
 # for the minute, go out and up to link to the vision lib
-CCFLAGS = -ggdb -O3 -fpermissive -ffast-math -Wno-unused -DFLX_LINUX -Isrc -Wno-write-strings -DASSETS_PATH=@prefix@/lib/jellyfish/
-LDFLAGS =
-LIBS    = -lglut -lGL -lpng -lpthread -ldl -llo -ljpeg -lasound
+CCFLAGS = @CFLAGS@ -ggdb -O3 -fpermissive -ffast-math -Wno-unused -Isrc -Wno-write-strings -DASSETS_PATH=@prefix@/lib/jellyfish/
+LDFLAGS = @LDFLAGS@
+LIBS    = @LIBS@
 
 CC = @CXX@
 OBJS    := ${SRCS:.cpp=.o}

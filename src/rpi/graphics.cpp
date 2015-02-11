@@ -1,4 +1,8 @@
-static void init_ogl_rpi(RPI_STATE_T *state)
+#include "bcm_host.h"
+#include "graphics.h"
+#include <assert.h>
+
+void init_ogl_rpi(RPI_STATE_T *state)
 {
    int32_t success = 0;
    EGLBoolean result;
