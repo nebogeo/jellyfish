@@ -1,3 +1,4 @@
+#ifdef FLX_RPI
 
 
 // code adapted from https://github.com/chriscamacho/gles2framework
@@ -32,7 +33,7 @@ void restoreKbd() {
   }
 }
 
-void doEvents(int __display_width, int __display_height, 
+void doEvents(int __display_width, int __display_height,
 	      void (*KeyDownCallback)(unsigned char,int,int),
 	      void (*KeyUpCallback)(unsigned char,int,int)) {
 
@@ -62,7 +63,7 @@ void doEvents(int __display_width, int __display_height,
       //printf(" %i %i %i\n",ev.type,ev.code,ev.value);
       // should probably handle MSC and SYN as well - meh
       if (ev.type==EV_KEY) {
-	
+
 	if (ev.value==1) {
 	  //printf("%d\n",lc_map[ev.code]);
 	  KeyDownCallback(lc_map[ev.code&0xff],0,0);
@@ -192,3 +193,5 @@ void getKeys()
   }
 }
 
+
+#endif

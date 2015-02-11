@@ -4,7 +4,6 @@ CFLAGS="$CFLAGS -I/opt/vc/include/"
 LDFLAGS="$LDFLAGS -L/opt/vc/lib"
 dnl FIXME: EGL of RPi depends on GLESv1 or GLESv2
 dnl FIXME: GLESv2 of RPi depends on EGL... WTF!
-LIBS="$LIBS -lvcos -lvchiq_arm"
 AC_CHECK_LIB([bcm_host], [bcm_host_init], [
 
 CFLAGS="$CFLAGS -DFLX_RPI -I/opt/vc/include/interface/vcos/pthreads/ -I/opt/vc/include/interface/vmcs_host/linux/"

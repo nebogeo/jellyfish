@@ -1,5 +1,7 @@
 #include "engine/importgl.h"
 
+#ifdef FLX_RPI
+
 typedef struct
 {
    uint32_t screen_width;
@@ -14,3 +16,5 @@ static volatile int terminate_prog;
 static RPI_STATE_T _state, *state=&_state;
 
 void init_ogl_rpi(RPI_STATE_T *state);
+
+#endif

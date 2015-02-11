@@ -1,6 +1,9 @@
-#include "bcm_host.h"
 #include "graphics.h"
 #include <assert.h>
+
+#ifdef FLX_RPI
+
+#include "bcm_host.h"
 
 void init_ogl_rpi(RPI_STATE_T *state)
 {
@@ -87,3 +90,5 @@ void init_ogl_rpi(RPI_STATE_T *state)
    // Enable back face culling.
    glEnable(GL_CULL_FACE); */
 }
+
+#endif
