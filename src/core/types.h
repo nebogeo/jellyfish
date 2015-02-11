@@ -23,8 +23,9 @@
 #include <math.h>
 
 // autoconf can tell us if we are on Pi
-#ifdef HAVE__OPT_VC_INCLUDE_BCM_HOST_H
-#define FLX_RPI
+// only support Pi and linux for the moment
+#ifndef FLX_RPI
+#define FLX_LINUX
 #endif
 
 #ifndef _EE

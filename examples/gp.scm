@@ -184,8 +184,9 @@
 (define (trig)
   (let ((p (make-function vocab 0)))
     (display p)(newline)
-    (play-now (eval p) 0))
-  (loop 9999)
+;;    (play-now (eval p) 0)
+    )
+  (loop 99)
   (trig))
 
 (trig)

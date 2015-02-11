@@ -13,4 +13,4 @@ typedef struct
 static volatile int terminate_prog;
 static RPI_STATE_T _state, *state=&_state;
 
-static void init_ogl_rpi(RPI_STATE_T *state);
+void init_ogl_rpi(RPI_STATE_T *state);

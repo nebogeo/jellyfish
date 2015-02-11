@@ -25,6 +25,8 @@
 #ifndef IMPORTGL_H_INCLUDED
 #define IMPORTGL_H_INCLUDED
 
+#include <core/types.h>
+
 #ifndef _EE
 
 #ifdef FLX_RPI

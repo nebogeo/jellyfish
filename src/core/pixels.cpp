@@ -1,5 +1,8 @@
 #include "core/pixels.h"
 
+#include <iostream>
+using namespace std;
+
 GLubyte *GetScreenBuffer(int x, int y, unsigned int width, unsigned int height, int super)
 {
 	// get the raw image
