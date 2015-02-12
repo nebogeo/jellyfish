@@ -47,16 +47,6 @@ pthread_mutex_t* render_mutex;
 static const string INPUT_CALLBACK="fluxus-input-callback";
 static const string INPUT_RELEASE_CALLBACK="fluxus-input-release-callback";
 
-// setup the assets location
-// on linux, mimic android, otherwise load locally on rpi
-#ifndef ASSETS_LOCATION
-#ifdef ANDROID_NDK
-static const string ASSETS_LOCATION("../assets/");
-#else
-static const string ASSETS_LOCATION("assets/");
-#endif
-#endif
-
 string LoadFile(string filename)
 {
     FILE *file=fopen(filename.c_str(),"r");
@@ -174,10 +164,10 @@ void repl_loop() {
 int main(int argc, char *argv[])
 {
 #ifdef FLX_RPI
-  //bcm_host_init();
+   bcm_host_init();
    // Clear application state
    memset( state, 0, sizeof( *state ) );
-   //   init_ogl_rpi(state);
+   init_ogl_rpi(state);
 #else
    w=640;
    h=480;
@@ -200,21 +190,23 @@ int main(int argc, char *argv[])
    appInit();
    initGL();
 
-   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"init.scm").c_str());
-   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"boot.scm").c_str());
-   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"lib.scm").c_str());
-   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"compiler.scm").c_str());
-   appEval((char*)LoadFile(string(ASSETS_LOCATION)+"fluxa.scm").c_str());
+   cerr<<ASSETS_PATH<<endl;
+
+   appEval((char*)LoadFile(string(ASSETS_PATH)+"init.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_PATH)+"boot.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_PATH)+"lib.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_PATH)+"compiler.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_PATH)+"fluxa.scm").c_str());
 
     // preload the textures
     long w=0,h=0;
-    unsigned char *tex=LoadPNG(ASSETS_LOCATION+"raspberrypi.png",w,h);
+    unsigned char *tex=LoadPNG(string(ASSETS_PATH)+"raspberrypi.png",w,h);
     appLoadTexture("raspberrypi.png",w,h,(char *)tex);
-    tex=LoadPNG(string(ASSETS_LOCATION)+"stripes.png",w,h);
+    tex=LoadPNG(string(ASSETS_PATH)+"stripes.png",w,h);
     appLoadTexture("stripes.png",w,h,(char *)tex);
-    tex=LoadPNG(string(ASSETS_LOCATION)+"bg.png",w,h);
+    tex=LoadPNG(string(ASSETS_PATH)+"bg.png",w,h);
     appLoadTexture("bg.png",w,h,(char *)tex);
-    tex=LoadPNG(string(ASSETS_LOCATION)+"thread.png",w,h);
+    tex=LoadPNG(string(ASSETS_PATH)+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
 
     if (argc>1) {
@@ -225,14 +217,14 @@ int main(int argc, char *argv[])
     render_mutex = new pthread_mutex_t;
     pthread_mutex_init(render_mutex,NULL);
     pthread_t *repl_thread = new pthread_t;
-    //pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
-    //setup_osc_repl();
+    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
+    setup_osc_repl();
 
 #ifdef FLX_RPI
-    //	getMouse();
-    //	getKeys();
+    getMouse();
+    getKeys();
 
-    /*  while (!terminate_prog)
+   while (!terminate_prog)
    {
       doEvents(state->screen_width, state->screen_height,
 	       KeyboardCallback,
@@ -240,7 +232,7 @@ int main(int argc, char *argv[])
 
       //usleep(5*1000);
      DisplayCallback();
-     }*/
+     }
 #else
 	glutMainLoop();
 #endif
