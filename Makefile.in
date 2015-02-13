@@ -62,8 +62,10 @@ cleandeps::
 	-rm -f src/*.dep src/*/*.dep
 
 install:: ${TARGET}
-	install jellyfish @prefix@/bin/
-	install assets/* @prefix@/lib/jellyfish/
+	install -d $(DESTDIR)@prefix@/bin/
+	install jellyfish $(DESTDIR)@prefix@/bin/
+	install -d $(DESTDIR)@prefix@/lib/jellyfish/
+	install assets/* $(DESTDIR)@prefix@/lib/jellyfish/
 
 distclean:: clean
 	-rm -rf config.status autom4te.cache config.log Makefile

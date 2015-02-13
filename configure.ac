@@ -15,7 +15,7 @@ AC_CHECK_LIB(EGL, eglCopyBuffers)
 
 AC_CHECK_LIB(m, cos)
 AC_CHECK_LIB(glut, main)
-AC_CHECK_LIB(gl, main)
+AC_CHECK_LIB(GL, main)
 AC_CHECK_LIB(png, main)
 AC_CHECK_LIB(pthread, main)
 AC_CHECK_LIB(dl, main)
