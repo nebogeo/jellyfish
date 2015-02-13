@@ -1,0 +1,29 @@
+jellyfish-engine (0.0.2-7~utopic) utopic; urgency=low
+
+  * explicit link to libGL
+
+ -- Dave Griffiths <dave@fo.am>  Thu, 13 Feb 2015 15:33:51 +0000
+
+jellyfish-engine (0.0.1-3ubuntu1~utopicppa1) utopic; urgency=low
+
+  * build dependency fix (3rd try)
+
+ -- Dave Griffiths <dave@fo.am>  Thu, 13 Feb 2015 15:33:51 +0000
+
+jellyfish-engine (0.0.1-2ubuntu1~utopicppa1) utopic; urgency=low
+
+  * build dependency fix (2nd try)
+
+ -- Dave Griffiths <dave@fo.am>  Thu, 13 Feb 2015 15:33:51 +0000
+
+jellyfish-engine (0.0.1-1ubuntu1~utopicppa1) utopic; urgency=low
+
+  * build dependency fix
+
+ -- Dave Griffiths <dave@fo.am>  Thu, 13 Feb 2015 15:33:51 +0000
+
+jellyfish-engine (0.0.1-0ubuntu1~utopicppa1) utopic; urgency=low
+
+  * Initial release
+
+ -- Dave Griffiths <dave@fo.am>  Thu, 12 Feb 2015 22:32:51 +0000

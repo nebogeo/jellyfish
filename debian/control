@@ -1,0 +1,17 @@
+Source: jellyfish-engine
+Section: devel
+Priority: extra
+Maintainer: Dave Griffiths <dave@fo.am>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev, freeglut3-dev, libasound-dev, libgl-dev, libjpeg-dev, liblo-dev, libpng-dev
+Standards-Version: 3.9.2
+Homepage: https://github.com/nebogeo/jellyfish
+#Vcs-Git: git://git.debian.org/collab-maint/jellyfish.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/jellyfish.git;a=summary
+
+Package: jellyfish
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Small live-codable 3D game engine and modular synth
+ A minimalistic fluxus compatible programmable game engine and 3D renderer
+ for exprimenting with livecoding ARM devices such as Raspberry Pi, OUYA
+ and Android, as well as Linux.
