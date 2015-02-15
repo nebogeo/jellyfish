@@ -75,7 +75,18 @@
 
 (translate (vector 2 -6 0))
 (texture 0)
+
+(identity)
 (define a (build-cube))
 (define b (with-state (parent a) (build-cube)))
 (define c (build-cube))
 (with-primitive b (parent c))
+
+(with-primitive
+ a
+ (recalc-bb)
+ (msg "bb/point-intersect? 1=" (bb/point-intersect? (vector 0 0 0) 0))
+ (msg "bb/point-intersect? 0=" (bb/point-intersect? (vector 10 0 0) 0))
+ (translate (vector 10 0 0))
+ (msg "bb/point-intersect? 1=" (bb/point-intersect? (vector 10 0 0) 0))
+ )

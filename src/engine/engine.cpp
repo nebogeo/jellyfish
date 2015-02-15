@@ -526,7 +526,7 @@ bool engine::bb_point_intersect(const vec3 &p, flx_real threshold)
         scenenode *n = grabbed_node();
         if (n && n->m_primitive!=NULL)
         {
-            vec3 pt=n->m_tx.transform(p);
+            vec3 pt=n->m_tx.inverse().transform(p);
             return n->m_primitive->intersect_bb(pt,threshold);
         }
     }

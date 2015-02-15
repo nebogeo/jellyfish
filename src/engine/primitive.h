@@ -69,6 +69,7 @@ protected:
     u32 m_size;
     list m_pdata;
 
+    bool m_bb_empty;
     vec3 m_bbmin;
     vec3 m_bbmax;
 

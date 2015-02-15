@@ -25,7 +25,8 @@
 
 #include "cube.h"
 
-primitive::primitive(unsigned int size, type t)
+primitive::primitive(unsigned int size, type t) :
+    m_bb_empty(true)
 {
     #ifndef _EE
     switch (t)
@@ -57,7 +58,8 @@ void primitive::build()
     m_tex=get_pdata_arr("t");
 }
 
-primitive::primitive()
+primitive::primitive():
+    m_bb_empty(true)
 {
     m_size=12*3;
 #ifndef _EE
@@ -172,14 +174,26 @@ void primitive::recalc_bb()
 {
     for (int i=0; i<m_size; i++)
     {
-        if (m_bbmin>m_positions[i]) m_bbmin=m_positions[i];
-        if (m_bbmax<m_positions[i]) m_bbmax=m_positions[i];
+        if (m_bb_empty)
+        {
+            m_bbmin=m_positions[i];
+            m_bbmax=m_positions[i];
+            m_bb_empty=false;
+        }
+
+        if (m_positions[i].x<m_bbmin.x) m_bbmin.x=m_positions[i].x;
+        if (m_positions[i].y<m_bbmin.y) m_bbmin.y=m_positions[i].y;
+        if (m_positions[i].z<m_bbmin.z) m_bbmin.z=m_positions[i].z;
+
+        if (m_positions[i].x>=m_bbmax.x) m_bbmax.x=m_positions[i].x;
+        if (m_positions[i].y>=m_bbmax.y) m_bbmax.y=m_positions[i].y;
+        if (m_positions[i].z>=m_bbmax.z) m_bbmax.z=m_positions[i].z;
     }
 }
 
 bool primitive::intersect_bb(const vec3 &p, flx_real threshold)
 {
-    return intersect_point_bb(p, m_bbmin, m_bbmin, threshold);
+    return intersect_point_bb(p, m_bbmin, m_bbmax, threshold);
 }
 
 list *primitive::intersect(const vec3 &start, const vec3 &end)
