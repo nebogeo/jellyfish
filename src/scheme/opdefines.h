@@ -243,6 +243,8 @@
     _OP_DEF(opexe_6, "pdata-ref",                      2,  2,       0,                               OP_PDATA_REF        )
     _OP_DEF(opexe_6, "pdata-set!",                     3,  3,       0,                               OP_PDATA_SET        )
     _OP_DEF(opexe_6, "set-text",                       1,  1,       0,                               OP_SET_TEXT         )
+    _OP_DEF(opexe_6, "recalc-bb",                      0,  0,       0,                               OP_RECALC_BB        )
+    _OP_DEF(opexe_6, "bb/point-intersect?",             2,  2,       0,                               OP_BB_POINT_INTERSECT )
     _OP_DEF(opexe_6, "geo/line-intersect",             2,  2,       0,                               OP_GEO_LINE_INTERSECT )
     _OP_DEF(opexe_6, "get-line-intersect",             2,  2,       0,                               OP_GET_LINE_INTERSECT )
     _OP_DEF(opexe_6, "get-screen-size",                0,  0,       0,                               OP_GET_SCREEN_SIZE  )

@@ -351,8 +351,8 @@ int engine::build_text(char *str)
 {
 	// 16*16 grid of letters
 	text_primitive *p = new text_primitive(strlen(str),16/256.0f,16/256.0f,16,0);
-    p->set_text(str);
     scenenode *n=new scenenode(p);
+    p->set_text(str);
     setup_state(n);
     return m_sg->add(state_top()->m_parent,n);
 }
@@ -369,6 +369,7 @@ int engine::build_polygons(unsigned int size, int type)
     scenenode *n=new scenenode(
         new primitive(size,
                       static_cast<primitive::type>(type)));
+    // todo: why not setup_state(n); ??
     n->m_tx=state_top()->m_tx;
     n->m_hints=state_top()->m_hints;
     n->m_line_width=state_top()->m_line_width;
@@ -503,6 +504,33 @@ void engine::pdata_set(const char *name, int i, vec3 v)
             n->m_primitive->pdata_set(name,i,v);
         }
     }
+}
+
+void engine::recalc_bb()
+{
+    if (grabbed())
+    {
+        scenenode *n = grabbed_node();
+        if (n && n->m_primitive!=NULL)
+        {
+            n->m_primitive->recalc_bb();
+        }
+    }
+    return;
+}
+
+bool engine::bb_point_intersect(const vec3 &p, flx_real threshold)
+{
+    if (grabbed())
+    {
+        scenenode *n = grabbed_node();
+        if (n && n->m_primitive!=NULL)
+        {
+            vec3 pt=n->m_tx.transform(p);
+            return n->m_primitive->intersect_bb(pt,threshold);
+        }
+    }
+    return false;
 }
 
 bb::list *engine::geo_line_intersect(const vec3 &start, const vec3 &end)

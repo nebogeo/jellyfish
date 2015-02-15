@@ -50,13 +50,13 @@ scenenode *scenenode::find_child(int id)
     return NULL;
 }
 
-
+// deleting the node is someone elses business - we may be reparenting
 void scenenode::remove_child(int id)
 {
     scenenode *n=find_child(id);
     if (n!=NULL)
     {
-        delete n;
+        //delete n;
         m_children.remove(n);
     }
 }

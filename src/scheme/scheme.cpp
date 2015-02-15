@@ -4348,6 +4348,8 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      pointer x, y;
      long v;
 
+     print_opcode_name(sc,op);
+
      switch (op) {
      case OP_LIST_LENGTH:     /* length */   /* a.k */
           v=list_length(sc,car(sc->args));
@@ -4565,9 +4567,16 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                                   rvalue(vector_elem(car(sc->args),2)));
           s_return(sc,sc->F);
      case OP_SCALE:
-         engine::get()->scale(rvalue(vector_elem(car(sc->args),0)),
-                              rvalue(vector_elem(car(sc->args),1)),
-                              rvalue(vector_elem(car(sc->args),2)));
+          if (!is_vector(car(sc->args))) // uniform scale with one arg
+          {
+               engine::get()->scale(rvalue(car(sc->args)),
+                                    rvalue(car(sc->args)),
+                                    rvalue(car(sc->args)));
+          } else {
+               engine::get()->scale(rvalue(vector_elem(car(sc->args),0)),
+                                    rvalue(vector_elem(car(sc->args),1)),
+                                    rvalue(vector_elem(car(sc->args),2)));
+          }
          s_return(sc,sc->F);
      case OP_ROTATE:
          engine::get()->rotate(rvalue(vector_elem(car(sc->args),0)),
@@ -4692,7 +4701,7 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                                      rvalue(vector_elem(car(sc->args),3)));
          s_return(sc,sc->F);
      case OP_PDATA_SIZE:
-         s_return(sc,mk_integer(sc,engine::get()->pdata_size()));
+          s_return(sc,mk_integer(sc,engine::get()->pdata_size()));
      case OP_PDATA_ADD:
          engine::get()->pdata_add(string_value(car(sc->args)));
          s_return(sc,sc->F);
@@ -4723,6 +4732,18 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      {
           engine::get()->text_set(string_value(car(sc->args)));
           s_return(sc,sc->F);
+     }
+     case OP_RECALC_BB:
+     {
+          engine::get()->recalc_bb();
+          s_return(sc,sc->F);
+     }
+     case OP_BB_POINT_INTERSECT:
+     {
+         vec3 pvec(rvalue(vector_elem(car(sc->args),0)),
+                   rvalue(vector_elem(car(sc->args),1)),
+                   rvalue(vector_elem(car(sc->args),2)));
+         s_return(sc,mk_integer(sc,engine::get()->bb_point_intersect(pvec,rvalue(cadr(sc->args)))));
      }
      case OP_GEO_LINE_INTERSECT:
      {
@@ -4871,6 +4892,11 @@ static op_code_info dispatch_table[]= {
 #include "opdefines.h"
   { 0 }
 };
+
+void print_opcode_name(scheme *sc, enum scheme_opcodes op) {
+     //op_code_info *pcd=dispatch_table+sc->op;
+     //cerr<<pcd->name<<endl;
+}
 
 static const char *procname(pointer x) {
  int n=procnum(x);

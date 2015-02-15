@@ -30,11 +30,31 @@
 (define (hint-anti-alias) (hint 5))
 (define (hint-bound) (hint 6))
 (define (hint-unlit) (hint 7))
+(define (hint-vertcols) (hint 8))
+(define (hint-origin) (hint 9))
+(define (hint-cast-shadow) (hint 10))
+(define (hint-ignore-depth) (hint 11))
+(define (hint-depth-sort) (hint 12))
+(define (hint-lazy-parent) (hint 13))
+(define (hint-cull-ccw) (hint 14))
+(define (hint-wire-stippled) (hint 15))
+(define (hint-spere-map) (hint 16))
+(define (hint-frustum-cull) (hint 17))
+(define (hint-normalise) (hint 18))
+(define (hint-noblend) (hint 19))
+(define (hint-nozwrite) (hint 20))
 
 ;------------------------------------------------------------
 
-(define _mouse-x 0)
-(define _mouse-y 0)
+(define keys '())
+(define keys-this-frame '())
+(define special-keys '())
+(define special-keys-this-frame '())
+(define mouse (vector 0 0))
+(define mouse-buttons (vector #f #f #f #f))
+(define mouse-wheel-v 0)
+(define key-mods '())
+;; this stuff for touchscreens
 (define _mouse-b -1)
 (define _mouse-s 1) ; state - 0 down, 1 up
 
@@ -46,25 +66,21 @@
   (when (zero? _mouse-s) ; eh?
         (set! _touching #t)
         (set! _touches (list (list 0 x y))))
-  (set! _mouse-x x)
-  (set! _mouse-y y))
+  (vector-set! mouse 0 x)
+  (vector-set! mouse 1 y))
 
-(define (mouse-x) _mouse-x)
-(define (mouse-y) _mouse-y)
+(define (mouse-x) (vector-ref mouse 0))
+(define (mouse-y) (vector-ref mouse 1))
+
+;;(define (mouse-button n)
+;;  (if _touching
+;;      #t
+;;      (if (zero? _mouse-s)
+;;          (eqv? _mouse-b n) #f)))
+
 (define (mouse-button n)
-  (if _touching
-      #t
-      (if (zero? _mouse-s)
-          (eqv? _mouse-b n) #f)))
+  (vector-ref mouse-buttons (- n 1)))
 
-(define keys '())
-(define keys-this-frame '())
-(define special-keys '())
-(define special-keys-this-frame '())
-(define mouse (vector 0 0))
-(define mouse-buttons (vector #f #f #f))
-(define mouse-wheel-v 0)
-(define key-mods '())
 
 ; utils funcs for using lists as sets
 (define (set-remove a l)
@@ -104,19 +120,19 @@
   ;      (for/list ([bitmask (list 1 2 4)]
   ;                 [bitsym '(shift ctrl alt)]
   ; #:when (> (bitwise-and mod bitmask) 0))
-  ;                bitsym))
+                                        ;                bitsym))
   (cond ; mouse
-   ((and (eq? key 0) (eq? special -1))
+   ((and (eqv? key 0) (eqv? special -1))
     (when (eq? button 3) (set! mouse-wheel-v 1))
     (when (eq? button 4) (set! mouse-wheel-v -1))
-    (when (and (eq? state 0)
+    (when (and (eqv? state 0)
                (< button (vector-length mouse-buttons)))
           (vector-set! mouse-buttons button #t))
-    (when (and (eq? state 1)
+    (when (and (eqv? state 1)
                (< button (vector-length mouse-buttons)))
-          (vector-set! mouse-buttons button #f))
-    (vector-set! mouse 0 x)
-    (vector-set! mouse 1 y))))
+          (vector-set! mouse-buttons button #f))))
+  (vector-set! mouse 0 x)
+  (vector-set! mouse 1 y))
 
 (define (register-up key button special state x y mod)
   (when (not (eq? key -1))
@@ -288,6 +304,27 @@
                              pdata-read-names))))
                          (loop (+ n 1) total))))))
        (loop 0 (- (pdata-size) 1)))))
+
+(define (pdata-range-map! start end . args)
+  (let ((proc (car args))
+        (pdata-write-name (cadr args))
+        (pdata-read-names (cddr args)))
+     (letrec
+         ((loop (lambda (n total)
+                  (cond ((not (> n total))
+                         (pdata-set!
+                          pdata-write-name n
+                          (apply
+                           proc
+                           (cons
+                            (pdata-ref pdata-write-name n)
+                            (map
+                             (lambda (read)
+                               (pdata-ref read n))
+                             pdata-read-names))))
+                         (loop (+ n 1) total))))))
+       (loop start (min (pdata-size) end)))))
+
 
 (define (pdata-index-map! . args)
   (let ((proc (car args))
@@ -481,6 +518,13 @@
   (let ((code (diy-macro (append '(begin) code))))
 ;    (display code)(newline)
     (eval code)))
+
+;; detach and retain original transform
+(define (detach-parent)
+  (let ((m (get-global-transform)))
+    (parent 1) ;; reparent to root
+    (identity)
+    (concat m)))
 
 ;;---------------------------------------------------------
 ;; jellyfish helpers

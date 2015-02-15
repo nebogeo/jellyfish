@@ -39,7 +39,7 @@ void text_primitive::set_text(const char *str)
     //20,-20,0.018
 	m_text_width=m_char_width*(float)length;
 	m_text_height=m_char_height;
-	int wrapcount=0;	
+	int wrapcount=0;
     u32 vp=0;
     flx_real z=0;
     flx_real zm=0.0001;
@@ -55,7 +55,7 @@ void text_primitive::set_text(const char *str)
 	{
         if (n<m_max_chars)
         {
-            u32 ascii_pos=(u32)str[n];   
+            u32 ascii_pos=(u32)str[n];
             flx_real s=(float)(ascii_pos%m_char_stride)*m_char_width+m_xoff;
             flx_real t=(float)(ascii_pos/m_char_stride)*m_char_height+m_yoff;
             vec3 min(s,t,0);
@@ -74,7 +74,7 @@ void text_primitive::set_text(const char *str)
             m_tex[vp].x=max.x;
             m_tex[vp].y=min.y;
             vp++;
-            
+
             m_positions[vp].x=x+w;
             m_positions[vp].y=y+h;
             m_positions[vp].z=z;
@@ -106,9 +106,9 @@ void text_primitive::set_text(const char *str)
             vp++;
 
             z+=zm;
-            
+
             if (m_wrap_chars) wrapcount++;
-            
+
             if (str[n]=='\n' || (m_wrap_chars && wrapcount>m_wrap_chars))
             {
                 y+=h;
@@ -139,5 +139,3 @@ void text_primitive::render(u32 hints)
 {
 	primitive::render(hints);
 }
-
-

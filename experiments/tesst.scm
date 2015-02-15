@@ -66,3 +66,16 @@
  (colour (vector 1 0 0))
  (hint-unlit)
  (build-cube))
+
+(translate (vector -4 2 0))
+
+(with-state
+ (texture (load-texture "font.png"))
+ (build-text "hello"))
+
+(translate (vector 2 -6 0))
+(texture 0)
+(define a (build-cube))
+(define b (with-state (parent a) (build-cube)))
+(define c (build-cube))
+(with-primitive b (parent c))

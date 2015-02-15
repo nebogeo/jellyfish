@@ -25,6 +25,8 @@ flx_real intersect_line_triangle(const vec3 &start, const vec3 &end,
                                  const vec3 &ta, const vec3 &tb, const vec3 &tc,
                                  vec3 &bary);
 
+bool intersect_point_bb(const vec3 &p, const vec3 &min, const vec3 &max, flx_real threshold);
+
 class intersect_point : public list::node
 {
 public:

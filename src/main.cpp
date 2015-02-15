@@ -138,6 +138,29 @@ void IdleCallback()
 	glutPostRedisplay();
 }
 
+void MouseCallback(int button, int state, int x, int y)
+{
+    char code[256];
+	snprintf(code,256,"(%s %d %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),0,button,-1,state,x,y,0);
+	appEval(code);
+    cerr<<code<<endl;
+}
+
+void MotionCallback(int x, int y)
+{
+    char code[256];
+	snprintf(code,256,"(%s %d %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),0,-1,-1,-1,x,y,0);
+	appEval(code);
+}
+
+void PassiveMotionCallback(int x, int y)
+{
+    char code[256];
+	snprintf(code,256,"(%s %d %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),0,-1,-1,-1,x,y,0);
+	appEval(code);
+}
+
+
 #endif
 
 void KeyboardUpCallback(unsigned char key,int x, int y)
@@ -169,8 +192,8 @@ int main(int argc, char *argv[])
    memset( state, 0, sizeof( *state ) );
    init_ogl_rpi(state);
 #else
-   w=640;
-   h=480;
+   w=800;
+   h=600;
 
    unsigned int flags = GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH;
 
@@ -185,12 +208,13 @@ int main(int argc, char *argv[])
    glutIdleFunc(IdleCallback);
    glutKeyboardFunc(KeyboardCallback);
    glutKeyboardUpFunc(KeyboardUpCallback);
+   glutMouseFunc(MouseCallback);
+   glutMotionFunc(MotionCallback);
+   glutPassiveMotionFunc(PassiveMotionCallback);
 #endif
 
    appInit();
    initGL();
-
-   cerr<<ASSETS_PATH<<endl;
 
    appEval((char*)LoadFile(string(ASSETS_PATH)+"init.scm").c_str());
    appEval((char*)LoadFile(string(ASSETS_PATH)+"boot.scm").c_str());
@@ -208,6 +232,8 @@ int main(int argc, char *argv[])
     appLoadTexture("bg.png",w,h,(char *)tex);
     tex=LoadPNG(string(ASSETS_PATH)+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
+    tex=LoadPNG(string(ASSETS_PATH)+"font.png",w,h);
+    appLoadTexture("font.png",w,h,(char *)tex);
 
     if (argc>1) {
         appEval((char*)LoadFile(string(argv[1])).c_str());

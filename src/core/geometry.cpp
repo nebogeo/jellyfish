@@ -19,8 +19,8 @@
 #include "pdata.h"
 
 // returns the parametric distance along the line, or -1 for no intersection
-flx_real intersect_line_triangle(const vec3 &start, const vec3 &end, 
-                              const vec3 &ta, const vec3 &tb, 
+flx_real intersect_line_triangle(const vec3 &start, const vec3 &end,
+                              const vec3 &ta, const vec3 &tb,
                               const vec3 &tc, vec3 &bary)
 {
     vec3 u = ta-tc;
@@ -28,7 +28,7 @@ flx_real intersect_line_triangle(const vec3 &start, const vec3 &end,
     vec3 n = v.cross(u);
 
     if (n.mag()==0.0f) return -1.0f;
-    
+
     vec3 ray = end-start;
     vec3 w0 = start-tc;
     flx_real a = -n.dot(w0);
@@ -60,6 +60,12 @@ flx_real intersect_line_triangle(const vec3 &start, const vec3 &end,
     return r;
 }
 
+bool intersect_point_bb(const vec3 &p, const vec3 &min, const vec3 &max, flx_real threshold) {
+	return (p.x>min.x-threshold && p.x<max.x+threshold &&
+			p.y>min.y-threshold && p.y<max.y+threshold &&
+			p.z>min.z-threshold && p.z<max.z+threshold);
+}
+
 // need to delete the point
 intersect_point *interpolate_pdata(const list *pdata, float t, const vec3 &bary, u32 i1, u32 i2, u32 i3)
 {
@@ -79,4 +85,4 @@ intersect_point *interpolate_pdata(const list *pdata, float t, const vec3 &bary,
     }
 
 	return p;
-} 
+}

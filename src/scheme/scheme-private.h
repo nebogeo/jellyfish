@@ -73,7 +73,7 @@ int tracing;
 
 
 #define CELL_SEGSIZE    100000      /* # of cells in one segment */
-#define CELL_NSEGMENT   500       /* # of segments for cells */
+#define CELL_NSEGMENT   5000       /* # of segments for cells */
 char *alloc_seg[CELL_NSEGMENT];
 pointer cell_seg[CELL_NSEGMENT];
 int     last_cell_seg;
@@ -156,6 +156,7 @@ enum scheme_opcodes {
   OP_MAXDEFINED
 };
 
+void print_opcode_name(scheme* sc, enum scheme_opcodes op);
 
 #define cons(sc,a,b) _cons(sc,a,b,0)
 #define immutable_cons(sc,a,b) _cons(sc,a,b,1)

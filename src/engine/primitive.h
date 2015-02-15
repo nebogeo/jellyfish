@@ -46,9 +46,13 @@ public:
     void pdata_set(const char* name, int i, vec3 v);
     vec3 *pdata_get(const char* name, int i);
 
+    void recalc_bb();
+
     // delete my list please, see geometry.h:points
     list *intersect(const vec3 &start, const vec3 &end);
     bool intersect_fast(const vec3 &start, const vec3 &end);
+    // p is in object space
+    bool intersect_bb(const vec3 &p, flx_real threshold);
 
 protected:
 
@@ -64,6 +68,10 @@ protected:
     u32 m_type;
     u32 m_size;
     list m_pdata;
+
+    vec3 m_bbmin;
+    vec3 m_bbmax;
+
 };
 
 #endif

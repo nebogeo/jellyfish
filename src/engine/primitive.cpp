@@ -168,6 +168,20 @@ void primitive::apply(const mat44 &m)
     }
 }
 
+void primitive::recalc_bb()
+{
+    for (int i=0; i<m_size; i++)
+    {
+        if (m_bbmin>m_positions[i]) m_bbmin=m_positions[i];
+        if (m_bbmax<m_positions[i]) m_bbmax=m_positions[i];
+    }
+}
+
+bool primitive::intersect_bb(const vec3 &p, flx_real threshold)
+{
+    return intersect_point_bb(p, m_bbmin, m_bbmin, threshold);
+}
+
 list *primitive::intersect(const vec3 &start, const vec3 &end)
 {
     return intersect_tristrip(start,end);

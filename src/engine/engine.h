@@ -83,6 +83,8 @@ public:
     u32 get_texture(const char *filename);
     list *geo_line_intersect(const vec3 &start, const vec3 &end);
     u32 get_line_intersect(const vec3 &start, const vec3 &end);
+    void recalc_bb();
+    bool bb_point_intersect(const vec3 &p, flx_real threshold);
 
     void render();
 
