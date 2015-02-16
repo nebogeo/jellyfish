@@ -183,6 +183,18 @@ void engine::rotate(float x, float y, float z)
     }
 }
 
+void engine::concat(mat44 m)
+{
+    if (grabbed())
+    {
+        grabbed_node()->m_tx*=m;
+    }
+    else
+    {
+        state_top()->m_tx*=m;
+    }
+}
+
 void engine::colour(float r, float g, float b, float a)
 {
     if (grabbed())
@@ -526,7 +538,7 @@ bool engine::bb_point_intersect(const vec3 &p, flx_real threshold)
         scenenode *n = grabbed_node();
         if (n && n->m_primitive!=NULL)
         {
-            vec3 pt=n->m_tx.inverse().transform(p);
+            vec3 pt=m_sg->get_global_transform(n).inverse().transform(p);
             return n->m_primitive->intersect_bb(pt,threshold);
         }
     }

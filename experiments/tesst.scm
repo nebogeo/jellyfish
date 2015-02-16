@@ -79,9 +79,8 @@
 (identity)
 (define a (build-cube))
 (define b (with-state (parent a) (build-cube)))
-(define c (build-cube))
-(with-primitive b (parent c))
 
+;; check intersections
 (with-primitive
  a
  (recalc-bb)
@@ -90,3 +89,13 @@
  (translate (vector 10 0 0))
  (msg "bb/point-intersect? 1=" (bb/point-intersect? (vector 10 0 0) 0))
  )
+
+;; check bb/point intersect works in global coords
+(define c (build-cube))
+(with-primitive b (translate (vector 10 0 0)))
+(with-primitive c (parent b))
+
+(with-primitive
+ c
+ (recalc-bb)
+ (msg "bb/point-intersect? 1=" (bb/point-intersect? (vector 20 0 0) 0)))

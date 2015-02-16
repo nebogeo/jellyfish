@@ -71,6 +71,7 @@
 
 (define (mouse-x) (vector-ref mouse 0))
 (define (mouse-y) (vector-ref mouse 1))
+(define (mouse-wheel) mouse-wheel-v)
 
 ;;(define (mouse-button n)
 ;;  (if _touching
@@ -522,7 +523,7 @@
 ;; detach and retain original transform
 (define (detach-parent)
   (let ((m (get-global-transform)))
-    (parent 1) ;; reparent to root
+    (parent 0) ;; reparent to root
     (identity)
     (concat m)))
 

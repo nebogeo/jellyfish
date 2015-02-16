@@ -4583,6 +4583,28 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                                rvalue(vector_elem(car(sc->args),1)),
                                rvalue(vector_elem(car(sc->args),2)));
          s_return(sc,sc->F);
+     case OP_CONCAT:
+     {
+          mat44 t = mat44(rvalue(vector_elem(car(sc->args),0)),
+                                      rvalue(vector_elem(car(sc->args),1)),
+                                      rvalue(vector_elem(car(sc->args),2)),
+                                      rvalue(vector_elem(car(sc->args),3)),
+                                      rvalue(vector_elem(car(sc->args),4)),
+                                      rvalue(vector_elem(car(sc->args),5)),
+                                      rvalue(vector_elem(car(sc->args),6)),
+                                      rvalue(vector_elem(car(sc->args),7)),
+                                      rvalue(vector_elem(car(sc->args),8)),
+                                      rvalue(vector_elem(car(sc->args),9)),
+                                      rvalue(vector_elem(car(sc->args),10)),
+                                      rvalue(vector_elem(car(sc->args),11)),
+                                      rvalue(vector_elem(car(sc->args),12)),
+                                      rvalue(vector_elem(car(sc->args),13)),
+                                      rvalue(vector_elem(car(sc->args),14)),
+                          rvalue(vector_elem(car(sc->args),15)));
+          t.transpose();
+          engine::get()->concat(t);
+          s_return(sc,sc->F);
+     }
      case OP_COLOUR:
          engine::get()->colour(rvalue(vector_elem(car(sc->args),0)),
                                rvalue(vector_elem(car(sc->args),1)),

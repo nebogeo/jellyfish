@@ -220,6 +220,7 @@
     _OP_DEF(opexe_6, "translate",                      1,  1,       0,                               OP_TRANSLATE        )
     _OP_DEF(opexe_6, "rotate",                         1,  1,       0,                               OP_ROTATE           )
     _OP_DEF(opexe_6, "scale",                          1,  1,       0,                               OP_SCALE            )
+    _OP_DEF(opexe_6, "concat",                         1,  1,       0,                               OP_CONCAT           )
     _OP_DEF(opexe_6, "colour",                         1,  1,       0,                               OP_COLOUR           )
     _OP_DEF(opexe_6, "hint",                           1,  1,       0,                               OP_HINT             )
     _OP_DEF(opexe_6, "line-width",                     1,  1,       0,                               OP_LINE_WIDTH       )

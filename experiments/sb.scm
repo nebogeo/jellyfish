@@ -512,8 +512,8 @@
         (with-primitive
          (brick-id b)
          (recalc-bb)
-         (if (bb/point-intersect? pos 0.1) b #f)
-         #f)
+         (get-global-transform)
+         (if (eqv? (bb/point-intersect? pos 0.1) 1) b #f))
         hit)))
 
 (define (brick-intersect-no-atoms b pos)
@@ -527,8 +527,7 @@
             (with-primitive
              (brick-id b)
              (recalc-bb)
-             (if (bb/point-intersect? pos 0.1) b #f)
-             #f)
+             (if (eqv? (bb/point-intersect? pos 0.1) 1) b #f))
             hit))
       #f))
 
@@ -920,31 +919,33 @@
        b)))
 
 (define (bricks-do-mouse-wheel b pos)
-  (let ((over (bricks-get-over b pos)))
-    (when over
-          (let ((root (bricks-root-search b (brick-id over))))
-            (if (brick-locked root) ;; it's the palette, translate
-                (with-primitive
-                 (brick-id root)
-                 (when (or (< (mouse-wheel) 0) (key-special-pressed 103))
-                       (translate (vector 0 6 0)))
-                 (when (or (> (mouse-wheel) 0) (key-special-pressed 101))
-                       (translate (vector 0 -6 0))))
-                (with-primitive  ;; it's a normal brick, scale
-                 (brick-id root)
-                 (let* ((t (get-transform))
-                        (d (vsub pos (vtransform (vector 0 0 0) (get-transform))))
-                        (d2 (vmul d (/ 1 (vector-ref (get-transform) 0)))))
-                   (when (or (< (mouse-wheel) 0) (key-special-pressed 103))
-                         (translate d2)
-                         (scale (vector 0.9 0.9 0.9))
-                         (translate (vmul d2 -1)))
-                   (when (or (> (mouse-wheel) 0) (key-special-pressed 101))
-                         (translate d2)
-                         (scale (vector 1.1 1.1 1.1))
-                         (translate (vmul d2 -1))
-                         ))))))
-    b))
+  (if (zero? (mouse-wheel))
+      b
+      (let ((over (bricks-get-over b pos)))
+        (when over
+              (let ((root (bricks-root-search b (brick-id over))))
+                (if (brick-locked root) ;; it's the palette, translate
+                    (with-primitive
+                     (brick-id root)
+                     (when (or (< (mouse-wheel) 0) (key-special-pressed 103))
+                           (translate (vector 0 6 0)))
+                     (when (or (> (mouse-wheel) 0) (key-special-pressed 101))
+                           (translate (vector 0 -6 0))))
+                    (with-primitive  ;; it's a normal brick, scale
+                     (brick-id root)
+                     (let* ((t (get-transform))
+                            (d (vsub pos (vtransform (vector 0 0 0) (get-transform))))
+                            (d2 (vmul d (/ 1 (vector-ref (get-transform) 0)))))
+                       (when (or (< (mouse-wheel) 0) (key-special-pressed 103))
+                             (translate d2)
+                             (scale (vector 0.9 0.9 0.9))
+                             (translate (vmul d2 -1)))
+                       (when (or (> (mouse-wheel) 0) (key-special-pressed 101))
+                             (translate d2)
+                             (scale (vector 1.1 1.1 1.1))
+                             (translate (vmul d2 -1))
+                             ))))))
+        b)))
 
 (define (bricks-do-input b pos)
   (bricks-do-mouse-wheel
@@ -1111,7 +1112,7 @@
            ;; keep the children visible
            (with-primitive (brick-id palette)
                            (translate (vector 25 10 0))
-                           (scale 0.7)
+                           ;(scale 0.7)
                            ;(opacity 0)
                            (hint-nozwrite))
            (with-primitive (brick-depth palette)
@@ -1139,13 +1140,18 @@
 (when sound-fac (set! b (bricks-load b "ambstart.scm")))
 ;(set! b (bricks-load b "click.scm"))
 
+(define ttt (with-state (translate (vector 4 4 0)) (build-cube)))
+(with-primitive ttt (apply-transform) (recalc-bb))
 
+(set! b (let ((brick
+               (code->brick '(ONE green (blue 1 2 3) red))))
+          (bricks-add-root b brick)))
 
 (every-frame
  (begin
    (with-primitive pointer
                    (identity)
                    (translate (get-point-from-mouse))
-                   (scale 0.1))
+                   (scale 1))
    (set! b (bricks-update! b))
    (with-primitive t (rotate (vector 1 2 3)))))

@@ -42,6 +42,7 @@ public:
     void scale(float x, float y, float z);
     void rotate(float x, float y, float z);
     void colour(float r, float g, float b, float a);
+    void concat(mat44 m);
     void hint(u32 hint);
     void line_width(u32 w);
     void texture(u32 id);

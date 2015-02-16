@@ -193,6 +193,10 @@ void primitive::recalc_bb()
 
 bool primitive::intersect_bb(const vec3 &p, flx_real threshold)
 {
+//    cerr<<(float)p.x<<" "<<(float)p.y<<" "<<(float)p.z<<endl;
+//    cerr<<(float)m_bbmin.x<<" "<<(float)m_bbmin.y<<" "<<(float)m_bbmin.z<<endl;
+//    cerr<<(float)m_bbmax.x<<" "<<(float)m_bbmax.y<<" "<<(float)m_bbmax.z<<endl;
+
     return intersect_point_bb(p, m_bbmin, m_bbmax, threshold);
 }
 

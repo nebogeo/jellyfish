@@ -143,7 +143,6 @@ void MouseCallback(int button, int state, int x, int y)
     char code[256];
 	snprintf(code,256,"(%s %d %d %d %d %d %d %d)",INPUT_CALLBACK.c_str(),0,button,-1,state,x,y,0);
 	appEval(code);
-    cerr<<code<<endl;
 }
 
 void MotionCallback(int x, int y)
