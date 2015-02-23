@@ -4551,6 +4551,10 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                       rvalue(caddr(sc->args)));
           s_return(sc,sc->F);
      } break;
+     case OP_SLEEP: {
+	  usleep(ivalue(car(sc->args)));
+          s_return(sc,sc->F);
+     } break;
 
 //////////////////// fluxus /////////////////////////////////////////
 

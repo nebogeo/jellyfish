@@ -174,7 +174,7 @@ void KeyboardUpCallback(unsigned char key,int x, int y)
 void repl_loop() {
     char cmd_str[80];
     do {
-        printf("fluxus> ");
+        printf("jellyfish> ");
         fgets( cmd_str, 80, stdin );
         pthread_mutex_lock(render_mutex);
         appEval(cmd_str);
