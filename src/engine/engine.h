@@ -49,6 +49,7 @@ public:
     void clear();
     void destroy(int id);
     void text_set(const char *str);
+    void text_params(char *text, flx_real w, flx_real h, int stride, int wrap, flx_real xoff, flx_real yoff, flx_real crowd, flx_real width, flx_real height, flx_real zoom);
     mat44 *get_transform();
     mat44 get_global_transform();
     mat44 *get_camera_transform() { return &m_camera_tx; }

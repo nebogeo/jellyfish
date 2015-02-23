@@ -109,7 +109,7 @@
         (hint-unlit)
         ;;(hint-depth-sort)
         ;;(texture-params 0 (list 'min 'linear 'mag 'linear))
-        (texture (load-texture "font.png"
+        (texture (load-texture "oolite-font.png"
                                ;;(list 'generate-mipmaps 0 'mip-level 0)
                                ))
         (for-each
@@ -127,9 +127,7 @@
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 (define (set-text text)
-  ;;(text-params text (/ 16 256) (/ 16 256) 16 0 -0.01 0 15 -20 0.005 0.2)
-  0
-  )
+  (text-params text (/ 16 256) (/ 16 256) 16 0 -0.01 0 15 -20 0.005 0.2) )
 
 (define (make-brick text children)
   (let* ((atom (not children))
@@ -141,7 +139,7 @@
                       ;;(hint-depth-sort)
                       (colour 0)
                       ;;(texture-params 0 (list 'min 'linear 'mag 'linear))
-                      (texture (load-texture "font.png"
+                      (texture (load-texture "oolite-font.png"
                                              ;;(list 'generate-mipmaps 0 'mip-level 0)
                                              ))
                       (msg text)

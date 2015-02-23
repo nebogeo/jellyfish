@@ -185,6 +185,10 @@ void repl_loop() {
 
 int main(int argc, char *argv[])
 {
+    bool window=true;
+    if (argc>=2 && !strcmp(argv[1],"-nw")) window=false;
+
+    if (window) {
 #ifdef FLX_RPI
    bcm_host_init();
    // Clear application state
@@ -211,16 +215,21 @@ int main(int argc, char *argv[])
    glutMotionFunc(MotionCallback);
    glutPassiveMotionFunc(PassiveMotionCallback);
 #endif
-
+    }
    appInit();
-   initGL();
+
+   if (window) {
+       initGL();
+   }
+
 
    appEval((char*)LoadFile(string(ASSETS_PATH)+"init.scm").c_str());
-   appEval((char*)LoadFile(string(ASSETS_PATH)+"boot.scm").c_str());
+   if (window) appEval((char*)LoadFile(string(ASSETS_PATH)+"boot.scm").c_str());
    appEval((char*)LoadFile(string(ASSETS_PATH)+"lib.scm").c_str());
    appEval((char*)LoadFile(string(ASSETS_PATH)+"compiler.scm").c_str());
    appEval((char*)LoadFile(string(ASSETS_PATH)+"fluxa.scm").c_str());
 
+   if (window) {
     // preload the textures
     long w=0,h=0;
     unsigned char *tex=LoadPNG(string(ASSETS_PATH)+"raspberrypi.png",w,h);
@@ -231,11 +240,12 @@ int main(int argc, char *argv[])
     appLoadTexture("bg.png",w,h,(char *)tex);
     tex=LoadPNG(string(ASSETS_PATH)+"thread.png",w,h);
     appLoadTexture("thread.png",w,h,(char *)tex);
-    tex=LoadPNG(string(ASSETS_PATH)+"font.png",w,h);
-    appLoadTexture("font.png",w,h,(char *)tex);
+    tex=LoadPNG(string(ASSETS_PATH)+"oolite-font.png",w,h);
+    appLoadTexture("oolite-font.png",w,h,(char *)tex);
+   }
 
     if (argc>1) {
-        appEval((char*)LoadFile(string(argv[1])).c_str());
+        appEval((char*)LoadFile(string(argv[argc-1])).c_str());
     }
 
     // setup the repl thread
@@ -256,10 +266,11 @@ int main(int argc, char *argv[])
 	       KeyboardUpCallback);
 
       //usleep(5*1000);
-     DisplayCallback();
+      if (window) DisplayCallback();
      }
 #else
-	glutMainLoop();
+	if (window) glutMainLoop();
+    else while(true) { sleep(1); }
 #endif
 
 	return 0;

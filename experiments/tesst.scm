@@ -69,9 +69,17 @@
 
 (translate (vector -4 2 0))
 
-(with-state
- (texture (load-texture "font.png"))
- (build-text "hello"))
+(define t (with-state
+ (hint-unlit)
+ (texture (load-texture "oolite-font.png"))
+ (build-text "hello")))
+
+(with-primitive
+ t
+ (set-text "xxxooo")
+ (text-params "world" (/ 16 256) (/ 16 256) 16 0 -0.01 0 15 -20 0.005 0.2)
+ )
+
 
 (translate (vector 2 -6 0))
 (texture 0)

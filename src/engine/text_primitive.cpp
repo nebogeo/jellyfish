@@ -29,12 +29,12 @@ text_primitive::text_primitive(u32 max_chars, flx_real charw, flx_real charh, in
 {
 }
 
-void text_primitive::set_text(const char *str)
+void text_primitive::set_text(const char *str, flx_real width, flx_real height, flx_real zoom)
 {
     unsigned int length=strlen(str);
 	flx_real x=0,y=0;
-	flx_real w=m_char_width*20.0f;
-    flx_real h=m_char_height*-20.0f;
+	flx_real w=m_char_width*width;
+    flx_real h=m_char_height*height;
 
     //20,-20,0.018
 	m_text_width=m_char_width*(float)length;
@@ -43,6 +43,9 @@ void text_primitive::set_text(const char *str)
     u32 vp=0;
     flx_real z=0;
     flx_real zm=0.0001;
+
+    m_text_width-=zoom*50.0f; //??? some constant scaling to covert from texture
+                // coordinates to world space
 
 	for (u32 n=0; n<m_size; n++)
 	{

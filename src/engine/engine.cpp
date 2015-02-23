@@ -362,9 +362,9 @@ int engine::build_obj(obj_reader &reader)
 int engine::build_text(char *str)
 {
 	// 16*16 grid of letters
-	text_primitive *p = new text_primitive(strlen(str),16/256.0f,16/256.0f,16,0);
+	text_primitive *p = new text_primitive(64,16/256.0f,16/256.0f,16,0);
     scenenode *n=new scenenode(p);
-    p->set_text(str);
+    p->set_text(str,20,-20,0);
     setup_state(n);
     return m_sg->add(state_top()->m_parent,n);
 }
@@ -421,7 +421,22 @@ void engine::text_set(const char *str)
         if (n && n->m_primitive!=NULL)
         {
             // todo: check
-            ((text_primitive*)(n->m_primitive))->set_text(str);
+            ((text_primitive*)(n->m_primitive))->set_text(str,20,-20,0);
+        }
+    }
+}
+//                             0              1           2      3            4             5               6              7               8               9                10
+void engine::text_params(char *text, flx_real w, flx_real h, int stride, int wrap, flx_real xoff, flx_real yoff, flx_real crowd, flx_real width, flx_real height, flx_real zoom)
+{
+    if (grabbed())
+    {
+        scenenode *n = grabbed_node();
+        if (n && n->m_primitive!=NULL)
+        {
+            // todo: check
+            ((text_primitive*)(n->m_primitive))->set_text_params(w, h, stride, wrap, xoff, yoff, zoom);
+            ((text_primitive*)(n->m_primitive))->set_text(text, crowd, width, height);
+
         }
     }
 }

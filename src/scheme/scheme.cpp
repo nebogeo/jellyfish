@@ -3516,6 +3516,13 @@ int list_length(scheme *sc, pointer a) {
     }
 }
 
+pointer list_ref(scheme *sc, pointer l, int i) {
+     while (i>0 && l!=sc->NIL) {
+          l=cdr(l);
+     }
+     return car(l);
+}
+
 static pointer opexe_3(scheme *sc, enum scheme_opcodes op) {
      pointer x;
      num v;
@@ -4753,6 +4760,21 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      case OP_SET_TEXT:
      {
           engine::get()->text_set(string_value(car(sc->args)));
+          s_return(sc,sc->F);
+     }
+     case OP_TEXT_PARAMS:
+     {
+          engine::get()->text_params(string_value(list_ref(sc,sc->args,0)),
+                                     rvalue(list_ref(sc,sc->args,1)),
+                                     rvalue(list_ref(sc,sc->args,2)),
+                                     ivalue(list_ref(sc,sc->args,3)),
+                                     ivalue(list_ref(sc,sc->args,4)),
+                                     rvalue(list_ref(sc,sc->args,5)),
+                                     rvalue(list_ref(sc,sc->args,6)),
+                                     rvalue(list_ref(sc,sc->args,7)),
+                                     rvalue(list_ref(sc,sc->args,8)),
+                                     rvalue(list_ref(sc,sc->args,9)),
+                                     rvalue(list_ref(sc,sc->args,10)));
           s_return(sc,sc->F);
      }
      case OP_RECALC_BB:
