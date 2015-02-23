@@ -1,0 +1,8 @@
+(define (loop m)
+  (when (not (zero? m))
+	(play-now (mul (adsr 0 0.1 0 0) (sine 440)) 0)
+	(loop (- m 1))))
+
+
+(loop 100)
+  
