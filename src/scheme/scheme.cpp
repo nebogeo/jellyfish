@@ -42,6 +42,7 @@
 #include "../engine/engine.h"
 #include "../core/geometry.h"
 #include "../fluxa/Graph.h"
+#include "../fluxa/Time.h"
 #include "../audio/alsa.h"
 
 Graph *m_audio_graph = NULL;
@@ -4488,6 +4489,11 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
             s_return(sc,cons(sc,mk_integer(sc,t.tv_sec),
                              cons(sc,mk_integer(sc,t.tv_usec),sc->NIL)));
      }
+     case OP_NTP_TIME: {
+	  Time t;
+	  t.SetToNow();	  
+	  s_return(sc,mk_real(sc,t.Seconds+t.Fraction/(float)UINT_MAX));
+     } 
      case OP_DATETIME: {
           timeval t;
           // stop valgrind complaining
@@ -4546,9 +4552,10 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      } break;
      case OP_SYNTH_PLY: {
           m_audio_graph
-               ->Play(rvalue(car(sc->args)),
-                      ivalue(cadr(sc->args)),
-                      rvalue(caddr(sc->args)));
+               ->Play(ivalue(car(sc->args)),
+		      ivalue(cadr(sc->args)),
+                      ivalue(caddr(sc->args)),
+                      rvalue(cadddr(sc->args)));
           s_return(sc,sc->F);
      } break;
      case OP_SLEEP: {

@@ -15,6 +15,9 @@ SRCS    := src/main.cpp\
           src/fluxa/GraphNode.cpp\
           src/fluxa/Modules.cpp\
           src/fluxa/ModuleNodes.cpp\
+          src/fluxa/Event.cpp\
+          src/fluxa/EventQueue.cpp\
+          src/fluxa/Time.cpp\
 		  src/audio/alsa.cpp \
           src/engine/obj_reader.cpp\
           src/engine/engine.cpp\

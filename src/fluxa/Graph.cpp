@@ -26,7 +26,7 @@ using namespace std;
 pthread_mutex_t* m_Mutex;
 
 Graph::Graph(unsigned int NumNodes, unsigned int SampleRate) :
-m_MaxPlaying(10),
+m_MaxPlaying(5),
 m_NumNodes(NumNodes),
 m_SampleRate(SampleRate)
 {
@@ -34,6 +34,7 @@ m_SampleRate(SampleRate)
     Init();
     m_Mutex = new pthread_mutex_t;
     pthread_mutex_init(m_Mutex,NULL);
+    m_CurrentTime.SetToNow();
 }
 
 Graph::~Graph()
@@ -169,9 +170,9 @@ void Graph::Connect(unsigned int id, unsigned int arg, unsigned int to)
     }
 }
 
-void Graph::Play(float time, unsigned int id, float pan)
+void Graph::_Play(float time, unsigned int id, float pan)
 {
-    pthread_mutex_lock(m_Mutex);
+  //    pthread_mutex_lock(m_Mutex);
     {
 //cerr<<"play id "<<id<<endl;
 	if (m_NodeMap[id]!=NULL)
@@ -184,7 +185,7 @@ void Graph::Play(float time, unsigned int id, float pan)
 			m_RootNodes.erase(m_RootNodes.begin());
 		}
 	}
-    pthread_mutex_unlock(m_Mutex);
+	// pthread_mutex_unlock(m_Mutex);
     }
 }
 
@@ -192,26 +193,75 @@ void Graph::Process(unsigned int bufsize, Sample &left, Sample &right)
 {
     pthread_mutex_lock(m_Mutex);
     {
+      Time LastTime = m_CurrentTime;
+      m_CurrentTime.IncBySample(bufsize,48000);
 
-	for(list<pair<unsigned int, float> >::iterator i=m_RootNodes.begin();
-		i!=m_RootNodes.end(); ++i)
+      // first check the event queue
+      Event e;
+      while (m_EventQueue.Get(LastTime, m_CurrentTime, e)) {
+
+	float t = LastTime.GetDifference(e.TimeStamp);
+	// hack to get round bug with GetDifference throwing big numbers	
+	if (t<=0) {
+	  _Play(t,e.ID,e.Pan);
+	} else {
+	  cerr<<"----------------"<<endl;
+	  cerr<<t<<endl;
+	  LastTime.Print();
+	  e.TimeStamp.Print();
+	}
+      }
+      
+
+      for(list<pair<unsigned int, float> >::iterator i=m_RootNodes.begin();
+	  i!=m_RootNodes.end(); ++i)
 	{
 		if (m_NodeMap[i->first]!=NULL)
 		{
 			m_NodeMap[i->first]->Process(bufsize);
 
-            // do stereo panning
-            float pan = i->second;
-            float leftpan=1,rightpan=1;
-            if (pan<0) leftpan=1-pan;
-            else rightpan=1+pan;
-
+			// do stereo panning
+			float pan = i->second;
+			float leftpan=1,rightpan=1;
+			if (pan<0) leftpan=1-pan;
+			else rightpan=1+pan;
+			
 			left.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*leftpan);
-            right.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*rightpan);
+			right.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*rightpan);
 		}
 	}
-
-    pthread_mutex_unlock(m_Mutex);
+      
+      pthread_mutex_unlock(m_Mutex);
 
     }
+}
+
+
+void Graph::Play(unsigned int seconds, unsigned int fraction, unsigned int id, float pan) {
+  pthread_mutex_lock(m_Mutex);
+  Event e;
+  e.TimeStamp.Seconds=seconds;
+  e.TimeStamp.Fraction=fraction;
+  e.ID=id;
+  e.Pan=pan;
+
+  // play-now (ish)
+  if (e.TimeStamp.Seconds==0 && e.TimeStamp.Fraction==0) {
+    e.TimeStamp=m_CurrentTime;
+    e.TimeStamp+=0.1;
+  }
+  if (e.TimeStamp>=m_CurrentTime) {
+    m_EventQueue.Add(e);
+    
+    if (e.TimeStamp.GetDifference(m_CurrentTime)>30) {
+      cerr<<"Reset clock? Event far in future: "<<e.TimeStamp.GetDifference(m_CurrentTime)<<endl;
+    }
+  } else {
+    cerr<<"Event arrived too late ignoring: "<<m_CurrentTime.GetDifference(e.TimeStamp)<<endl;
+    m_CurrentTime.Print();
+    e.TimeStamp=m_CurrentTime;
+    e.TimeStamp+=0.1;
+    m_EventQueue.Add(e);
+  }
+  pthread_mutex_unlock(m_Mutex);
 }

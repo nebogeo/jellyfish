@@ -200,6 +200,7 @@
     //    _OP_DEF(opexe_6, "db-select-blob",                 5,  5,       TST_NONE,                        OP_SELECT_BLOB_DB   )
     _OP_DEF(opexe_6, "db-status",                      1,  1,       TST_NONE,                        OP_STATUS_DB        )
     _OP_DEF(opexe_6, "time-of-day",                    0,  0,       TST_NONE,                        OP_TIME             )
+    _OP_DEF(opexe_6, "ntp-time",                    0,  0,       TST_NONE,                        OP_NTP_TIME             )
     _OP_DEF(opexe_6, "date-time",                      0,  0,       TST_NONE,                        OP_DATETIME         )
     _OP_DEF(opexe_6, "id-map-add",                     2,  2,       TST_NONE,                        OP_ID_MAP_ADD       )
     _OP_DEF(opexe_6, "id-map-get",                     1,  1,       TST_NONE,                        OP_ID_MAP_GET       )
@@ -207,7 +208,7 @@
     _OP_DEF(opexe_6, "synth-init",                     0,  0,       0,                               OP_SYNTH_INIT             )
     _OP_DEF(opexe_6, "synth-create",                   3,  3,       0,                               OP_SYNTH_CRT             )
     _OP_DEF(opexe_6, "synth-connect",                  3,  3,       0,                               OP_SYNTH_CON             )
-    _OP_DEF(opexe_6, "synth-play",                     3,  3,       0,                               OP_SYNTH_PLY             )
+    _OP_DEF(opexe_6, "synth-play",                     4,  4,       0,                               OP_SYNTH_PLY             )
     _OP_DEF(opexe_6, "sleep",                          1,  1,       0,                               OP_SLEEP             )
 
 

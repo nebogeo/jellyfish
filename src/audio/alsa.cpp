@@ -33,6 +33,7 @@ alsa_device::~alsa_device() {
 
 #define AUDIO_BUFSIZE 4096
 
+
 void audio_loop(void *c) {
 
   alsa_device *a=(alsa_device *)c;
@@ -48,8 +49,6 @@ void audio_loop(void *c) {
     
     g->Process(AUDIO_BUFSIZE, left, right);
     
-
-
     unsigned int pos=0;
     for (unsigned int i=0; i<AUDIO_BUFSIZE*2; i+=2)
       {

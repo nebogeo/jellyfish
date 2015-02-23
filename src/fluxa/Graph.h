@@ -21,6 +21,7 @@
 #include <math.h>
 #include "GraphNode.h"
 #include "ModuleNodes.h"
+#include "EventQueue.h"
 
 #ifndef GRAPH
 #define GRAPH
@@ -39,11 +40,13 @@ public:
 	void Clear();
 	void Create(unsigned int id, Type t, float v);
 	void Connect(unsigned int id, unsigned int arg, unsigned int to);
-	void Play(float time, unsigned int id, float pan);
+	void Play(unsigned int seconds, unsigned int fraction, unsigned int id, float pan);
 	void Process(unsigned int bufsize, Sample &left, Sample &right);
 	void SetMaxPlaying(int s) { m_MaxPlaying=s; }
 
 private:
+	void _Play(float time, unsigned int id, float pan);
+
 	class NodeDesc
 	{
 	public:
@@ -77,6 +80,9 @@ private:
 	map<Type,NodeDescVec*> m_NodeDescMap;
 	unsigned int m_NumNodes;
 	unsigned int m_SampleRate;
+
+	EventQueue m_EventQueue;
+	Time m_CurrentTime;
 };
 
 #endif
