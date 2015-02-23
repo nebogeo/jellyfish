@@ -22,8 +22,9 @@ alsa_device::alsa_device() {
                                 1,
                                 500000)) < 0) { /* 0.5sec */
       printf("Playback open error: %s\n", snd_strerror(err));
-      exit(EXIT_FAILURE);
+      exit(EXIT_FAILURE);      
   }
+  cerr<<"started..."<<endl;
 }
 
 alsa_device::~alsa_device() {
@@ -33,39 +34,43 @@ alsa_device::~alsa_device() {
 #define AUDIO_BUFSIZE 4096
 
 void audio_loop(void *c) {
-    alsa_device *a=(alsa_device *)c;
-    Graph *g = a->m_graph;
 
-    Sample *left = new Sample(AUDIO_BUFSIZE);
-    Sample *right = new Sample(AUDIO_BUFSIZE);
-    short *data = new short(AUDIO_BUFSIZE*2);
+  alsa_device *a=(alsa_device *)c;
+  Graph *g = a->m_graph;
+  short *data = new short(AUDIO_BUFSIZE*2);
+  
+  Sample left(AUDIO_BUFSIZE);
+  Sample right(AUDIO_BUFSIZE);
+  
+  do {
+    left.Zero();
+    right.Zero();
+    
+    g->Process(AUDIO_BUFSIZE, left, right);
+    
 
-    do {
-        left->Zero();
-        right->Zero();
 
-	g->Process(AUDIO_BUFSIZE, *left, *right);
-
-        unsigned int pos=0;
-        for (unsigned int i=0; i<AUDIO_BUFSIZE*2; i+=2)
-        {
-            data[i]=(short)((*left)[pos++]*3276);
-        }
-        pos=0;
-        for (unsigned int i=1; i<AUDIO_BUFSIZE*2; i+=2)
-        {
-            data[i]=(short)((*right)[pos++]*3276);
-        }
-
-        a->play(AUDIO_BUFSIZE, data);
-    } while(1);
+    unsigned int pos=0;
+    for (unsigned int i=0; i<AUDIO_BUFSIZE*2; i+=2)
+      {
+	data[i]=(short)(left[pos++]*3276);
+      }
+	
+    pos=0;
+    for (unsigned int i=1; i<AUDIO_BUFSIZE*2; i+=2)
+      {
+	data[i]=(short)(right[pos++]*3276);
+      }
+    
+    a->play(AUDIO_BUFSIZE, data);
+  } while(1);
 }
 
 
 void alsa_device::start_crank(Graph *g)
 {
     m_graph=g;
-	pthread_t *audio_thread = new pthread_t;
+    pthread_t *audio_thread = new pthread_t;
     pthread_create(audio_thread,NULL,(void*(*)(void*))audio_loop,this);
 }
 

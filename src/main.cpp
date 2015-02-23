@@ -27,7 +27,6 @@
 #include "core/pixels.h"
 #include "core/osc.h"
 #include "app.h"
-#include "audio/alsa.h"
 
 #ifdef FLX_RPI
 #include <assert.h>
@@ -188,13 +187,14 @@ int main(int argc, char *argv[])
     bool window=true;
     if (argc>=2 && !strcmp(argv[1],"-nw")) window=false;
 
-    if (window) {
 #ifdef FLX_RPI
    bcm_host_init();
    // Clear application state
    memset( state, 0, sizeof( *state ) );
+    if (window) {
    init_ogl_rpi(state);
 #else
+    if (window) {
    w=800;
    h=600;
 
