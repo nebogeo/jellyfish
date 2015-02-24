@@ -4572,6 +4572,9 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
 	  usleep(ivalue(car(sc->args)));
           s_return(sc,sc->F);
      } break;
+     case OP_FMOD: {
+          s_return(sc,mk_real(sc,fmod(rvalue(car(sc->args)),rvalue(cadr(sc->args)))));
+     } break;
 
 //////////////////// fluxus /////////////////////////////////////////
 

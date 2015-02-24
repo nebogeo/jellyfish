@@ -211,6 +211,7 @@
     _OP_DEF(opexe_6, "synth-connect",                  3,  3,       0,                               OP_SYNTH_CON             )
     _OP_DEF(opexe_6, "synth-play",                     4,  4,       0,                               OP_SYNTH_PLY             )
     _OP_DEF(opexe_6, "sleep",                          1,  1,       0,                               OP_SLEEP             )
+    _OP_DEF(opexe_6, "fmod",                           2,  2,       0,                               OP_FMOD             )
 
 
     _OP_DEF(opexe_6, "push",                           0,  0,       0,                               OP_PUSH             )

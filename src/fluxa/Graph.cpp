@@ -201,7 +201,7 @@ void Graph::Process(unsigned int bufsize, Sample &left, Sample &right)
       while (m_EventQueue.Get(LastTime, m_CurrentTime, e)) {
 
 	float t = LastTime.GetDifference(e.TimeStamp);
-	// hack to get round bug with GetDifference throwing big numbers	
+	// hack to get round bug with GetDifference throwing big numbers
 	if (t<=0) {
 	  _Play(t,e.ID,e.Pan);
 	} else {
@@ -211,7 +211,7 @@ void Graph::Process(unsigned int bufsize, Sample &left, Sample &right)
 	  e.TimeStamp.Print();
 	}
       }
-      
+
 
       for(list<pair<unsigned int, float> >::iterator i=m_RootNodes.begin();
 	  i!=m_RootNodes.end(); ++i)
@@ -225,12 +225,12 @@ void Graph::Process(unsigned int bufsize, Sample &left, Sample &right)
 			float leftpan=1,rightpan=1;
 			if (pan<0) leftpan=1-pan;
 			else rightpan=1+pan;
-			
+
 			left.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*leftpan);
 			right.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*rightpan);
 		}
 	}
-      
+
       pthread_mutex_unlock(m_Mutex);
 
     }
@@ -252,7 +252,7 @@ void Graph::Play(unsigned int seconds, unsigned int fraction, unsigned int id, f
   }
   if (e.TimeStamp>=m_CurrentTime) {
     m_EventQueue.Add(e);
-    
+
     if (e.TimeStamp.GetDifference(m_CurrentTime)>30) {
       cerr<<"Reset clock? Event far in future: "<<e.TimeStamp.GetDifference(m_CurrentTime)<<endl;
     }
@@ -264,4 +264,5 @@ void Graph::Play(unsigned int seconds, unsigned int fraction, unsigned int id, f
     m_EventQueue.Add(e);
   }
   pthread_mutex_unlock(m_Mutex);
+
 }

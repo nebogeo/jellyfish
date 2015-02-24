@@ -47,8 +47,8 @@
     (map (lambda (l) (apply synth-connect l)) (make-args id operands))
     (node id)))
 
-(define (play-now node pan) (synth-play 0 (node-id node) pan))
-(define (play time node pan) (synth-play time (node-id node) pan))
+(define (play-now node pan) (synth-play 0 0 (node-id node) pan))
+(define (play time node pan) (synth-play (car time) (cadr time) (node-id node) pan))
 
 ;;---------------------------------------------------------------
 ;; operators
@@ -104,6 +104,16 @@
                         14917.2 15804.3 16744 17739.7 18794.5 19912.1 21096.2 22350.6 23679.6 25087.7
                         26579.5 28160 29834.5 31608.5 33488.1 35479.4 37589.1 39824.3 42192.3 44701.2
                         47359.3 50175.4 53159 56320))
+
+(define (pick l c)
+  (list-ref l (modulo c (length l))))
+
+(define (inter l c)
+  (define (_ l c cc a)
+    (cond ((eqv? c cc) a)
+          (else
+           (_ l c (+ cc 1) (+ a (pick l cc))))))
+  (_ l c 0 0))
 
 (define (note n)
   (list-ref scale-lut (modulo (inter flx-scale (abs (inexact->exact (round n)))) (length scale-lut))))
