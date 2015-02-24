@@ -20,7 +20,7 @@
 
 using namespace std;
 
-#define DEFAULT_BUFSIZE 4096
+#define DEFAULT_BUFSIZE 4096*2
 
 ///////////////////////////////////////////
 

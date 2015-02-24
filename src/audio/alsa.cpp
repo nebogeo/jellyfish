@@ -4,7 +4,7 @@
 
 using namespace std;
 
-alsa_device::alsa_device() {
+alsa_device::alsa_device(unsigned int sr) {
   int i;
   int err;
   short buf[128];
@@ -17,9 +17,7 @@ alsa_device::alsa_device() {
   if ((err = snd_pcm_set_params(playback_handle,
                                 SND_PCM_FORMAT_S16_LE,
                                 SND_PCM_ACCESS_RW_INTERLEAVED,
-                                2,
-                                48000,
-                                1,
+                                2,sr,1,
                                 500000)) < 0) { /* 0.5sec */
       printf("Playback open error: %s\n", snd_strerror(err));
       exit(EXIT_FAILURE);      
@@ -31,8 +29,7 @@ alsa_device::~alsa_device() {
   snd_pcm_close (playback_handle);
 }
 
-#define AUDIO_BUFSIZE 4096
-
+#define AUDIO_BUFSIZE 4096*2
 
 void audio_loop(void *c) {
 

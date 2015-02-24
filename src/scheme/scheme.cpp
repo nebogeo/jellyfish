@@ -4541,8 +4541,8 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
 
 //////////////////// fluxa /////////////////////////////////////////
      case OP_SYNTH_INIT: {
-          m_alsa_device = new alsa_device();
-          m_audio_graph = new Graph(20,48000);
+          m_alsa_device = new alsa_device(ivalue(cadr(sc->args)));
+          m_audio_graph = new Graph(ivalue(car(sc->args)),ivalue(cadr(sc->args)));
           m_alsa_device->start_crank(m_audio_graph);
           s_return(sc,sc->F);
      } break;
