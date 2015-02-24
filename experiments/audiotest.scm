@@ -1,4 +1,4 @@
-(synth-init)
+(synth-init 20 44100)
 
 (play-now (mul
            5

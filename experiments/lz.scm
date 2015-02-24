@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init 10 44100)
+(synth-init 50 44100)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -105,7 +105,7 @@
 (define (t) (ntp-time))
 
 (define (build-nz lz sz tk)
-  (make-nz lz '(60) 0 sz (ntp-time-add (t) 5) tk 1.0))
+  (make-nz lz '(40) 0 sz (ntp-time-add (t) 5) tk 1.0))
 
 (define (nz-pop! nz)
   (let ((tmp (car (nz-vals nz))))
@@ -127,9 +127,10 @@
 
 (define (nz-tick nz)
   (when (ntp>? (ntp-time-add (t) (nz-off nz)) (nz-cur-t nz))
-        (set-nz-cur-t! nz (ntp-time-add (nz-cur-t nz) (nz-tk nz)))
         (let ((t (lz-tick (nz-lz nz)))
               (v (car (nz-vals nz))))
+          (when (or (char=? t #\a) (char=? t #\b) (char=? t #\c) (char=? t #\b) (char=? t #\ ))
+                (set-nz-cur-t! nz (ntp-time-add (nz-cur-t nz) (nz-tk nz))))
           (cond
            ((char=? t #\+) (set-nz-vals! nz (cons (+ (car (nz-vals nz)) 1) (cdr (nz-vals nz)))))
            ((char=? t #\-) (set-nz-vals! nz (cons (- (car (nz-vals nz)) 1) (cdr (nz-vals nz)))))
@@ -189,11 +190,8 @@
 		     (add
 		      (saw (add (/ (note v) 4) (mul 1000 (pow (adsr 0.3 0.1 0 0) 3))))
 		      (saw (add (+ 1 (/ (note v) 4)) (mul 1000 (pow (adsr 0.1 0.1 0 0) 3)))))))
-    (lambda (v) (mul (adsr 0 0.02 0 0) (mooglp (white 4) (* v 0.01) 0.45)))))
-  )
+    (lambda (v) (mul (adsr 0 0.02 0 0) (mooglp (white 4) (* v 0.01) 0.45))))
 
-(define ss2
-  (list
    (list
     (lambda (v) (moogbp (mul (adsr 0 0.2 0.1 0.1) (pink 100)) (adsr 0 0.01 0.1 1) 0.3))
     (lambda (v) (mul (adsr 0 0.01 0 1) (white 20)))
@@ -215,11 +213,11 @@
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 140 (* v 20)))))
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (mul (adsr 0 0.1 0 0) (+ 40 (* v 50)))))))
 
-   ))
+
+   )
+  )
 
 
-(define z (build-nz l ss 0.2))
+(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd"))) ss 0.2))
 
 (every-frame (nz-tick z))
-
-
