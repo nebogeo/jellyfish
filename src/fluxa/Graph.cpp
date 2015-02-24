@@ -194,7 +194,7 @@ void Graph::Process(unsigned int bufsize, Sample &left, Sample &right)
     pthread_mutex_lock(m_Mutex);
     {
       Time LastTime = m_CurrentTime;
-      m_CurrentTime.IncBySample(bufsize,48000);
+      m_CurrentTime.IncBySample(bufsize,m_SampleRate);
 
       // first check the event queue
       Event e;
@@ -226,8 +226,8 @@ void Graph::Process(unsigned int bufsize, Sample &left, Sample &right)
 			if (pan<0) leftpan=1-pan;
 			else rightpan=1+pan;
 
-			left.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*leftpan);
-			right.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*rightpan);
+			left.MulMix(m_NodeMap[i->first]->GetOutput(),0.5*leftpan);
+			right.MulMix(m_NodeMap[i->first]->GetOutput(),0.5*rightpan);
 		}
 	}
 
@@ -258,10 +258,10 @@ void Graph::Play(unsigned int seconds, unsigned int fraction, unsigned int id, f
     }
   } else {
     cerr<<"Event arrived too late ignoring: "<<m_CurrentTime.GetDifference(e.TimeStamp)<<endl;
-    m_CurrentTime.Print();
-    e.TimeStamp=m_CurrentTime;
-    e.TimeStamp+=0.1;
-    m_EventQueue.Add(e);
+    //m_CurrentTime.Print();
+    //e.TimeStamp=m_CurrentTime;
+    //e.TimeStamp+=0.1;
+    //m_EventQueue.Add(e);
   }
   pthread_mutex_unlock(m_Mutex);
 

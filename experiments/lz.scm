@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init)
+(synth-init 10 44100)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -30,10 +30,10 @@
 
 (define (lz-pop! lz)
   (when (> (lz-d lz) 0)
-    (set-lz-d! lz (- (lz-d lz) 1)))
+	(set-lz-d! lz (- (lz-d lz) 1)))
   (let ((tmp (car (lz-stk lz))))
-    (when (not (eq? (length (lz-stk lz)) 1))
-      (set-lz-stk! lz (cdr (lz-stk lz))))
+    (when (not (eqv? (length (lz-stk lz)) 1))
+	  (set-lz-stk! lz (cdr (lz-stk lz))))
     tmp))
 
 (define (lz-push! lz item)
@@ -54,7 +54,7 @@
   (lz-inc-pos lz)
   (when (>= (car (lz-top lz)) 8)
        (cond
-         ((eq? (length (lz-stk lz)) 1)
+         ((eqv? (length (lz-stk lz)) 1)
           (set-lz-top! lz (list 0 0)))
          (else
            (lz-pop! lz))))
@@ -66,7 +66,7 @@
     (cond
       ((char=? data #\ )
        (cond
-         ((eq? (length (lz-stk lz)) 1)
+         ((eqv? (length (lz-stk lz)) 1)
           (set-lz-top! lz (list 0 0)))
          (else
            (lz-pop! lz))))
@@ -105,11 +105,11 @@
 (define (t) (ntp-time))
 
 (define (build-nz lz sz tk)
-  (make-nz lz '(60) 0 sz (ntp-time-add (t) 1) tk 1.0))
+  (make-nz lz '(60) 0 sz (ntp-time-add (t) 5) tk 1.0))
 
 (define (nz-pop! nz)
   (let ((tmp (car (nz-vals nz))))
-    (when (not (eq? (length (nz-vals nz)) 1))
+    (when (not (eqv? (length (nz-vals nz)) 1))
       (set-nz-vals! nz (cdr (nz-vals nz))))
     tmp))
 
@@ -147,53 +147,79 @@
 
 (define l (build-lz 9 8 3))
 
-(lz-prog l 0 "cCBca-aa")
-(lz-prog l 1 "c-d-c<.d")
-(lz-prog l 2 "b++b+ACd")
+;(lz-prog l 0 "cCBca-aa")
+;(lz-prog l 1 "c-d-c<.d")
+;(lz-prog l 2 "b++b+ACd")
 
-;(lz-prog l 0 "ccddddcd")
-;(lz-prog l 1 "->d-AC-A")
+;(lz-prog l 0 "aB")
+;(lz-prog l 1 "-d>-AC-A")
 ;(lz-prog l 2 "b+b--bAB")
 
-(define z (build-nz l
-                    (list
-                     (list
-                      (lambda (v) (mul (adsr 0 0.01 0.1 1) (sine (add (mul 20 (sine 4)) (note v)))))
-                      (lambda (v) (mul (adsr 0 0.1 0 0) (mul 0.2 (add (saw (* 1.5 (note v)))
-                                                                      (saw (note v))))))
-                      (lambda (v) (mul (adsr 0 0.1 0 0)
-                                       (moogbp (squ (add 10 (mul 1000 (pow (adsr 0 0.2 0 0) 10))))
-                                               (* v 0.1) 0.1)))
-                      (lambda (v) (mul (adsr 0 0.02 0 0) (moogbp (white 4) (* v 0.01) 0.45))))
-                     (list
-                      (lambda (v) (mul (adsr 0 0.03 0.1 1) (mooghp (saw (* (note v) 0.5))
-                                                                   (mul 0.2 (adsr 0.5 0 0 0)) 0.45)))
-                      (lambda (v) (mul (adsr 0 0.1 0.1 1) (mooglp (add (saw (* 1.5 (note v))) (saw (note v)))
-                                                                (* v 0.12) 0.4)))
-                      (lambda (v) (mul (adsr 0 0.1 0 0) (sine (add
-                                                               (fmod (* v 50) 300)
-                                                               (mul 1000 (pow (adsr 0 0.2 0 0) 10))))))
-                      (lambda (v) (mul (adsr 0.04 0.02 0 0) (mooglp (white 4) (* v 0.01) 0.45))))
-                     (list
-                      (lambda (v) (mul (adsr 0 0.03 0.1 1) (crush (sine (* (note v) 0.5))
-                                                                   0.1 0.3)))
-                      (lambda (v) (mul (adsr 0 0.03 0.1 1) (mooglp (white (* 0.125 (note v)))
-                                                                   (fmod (* v 0.04) 1) 0.4)))
-                      (lambda (v) (mul (adsr 0 0.1 0.1 0.5)
-                                       (add
-                                        (saw (add (/ (note v) 4) (mul 1000 (pow (adsr 0.3 0.1 0 0) 3))))
-                                        (saw (add (+ 1 (/ (note v) 4)) (mul 1000 (pow (adsr 0.1 0.1 0 0) 3)))))))
-                      (lambda (v) (mul (adsr 0 0.02 0 0) (mooglp (white 4) (* v 0.01) 0.45)))))
-                    0.1))
+(lz-prog l 0 " B C")
+(lz-prog l 1 "abCcb")
+(lz-prog l 2 "ccBdb")
 
 
 
+(define ss
+  (list
+   (list
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (sine (add (mul 20 (sine 4)) (note v)))))
+    (lambda (v) (mul (adsr 0 0.1 0 0) (mul 0.2 (add (saw (* 1.5 (note v)))
+						    (saw (note v))))))
+    (lambda (v) (mul (adsr 0 0.1 0 0)
+		     (moogbp (squ (add 10 (mul 1000 (pow (adsr 0 0.2 0 0) 10))))
+			     (* v 0.1) 0.1)))
+    (lambda (v) (mul (adsr 0 0.02 0 0) (moogbp (white 4) (* v 0.01) 0.45))))
+   (list
+    (lambda (v) (mul (adsr 0 0.03 0.1 1) (mooghp (saw (* (note v) 0.5))
+						 (mul 0.2 (adsr 0.5 0 0 0)) 0.45)))
+    (lambda (v) (mul (adsr 0 0.1 0.1 1) (mooglp (add (saw (* 1.5 (note v))) (saw (note v)))
+						(* v 0.12) 0.4)))
+    (lambda (v) (mul (adsr 0 0.1 0 0) (sine (add
+					     (fmod (* v 50) 300)
+					     (mul 1000 (pow (adsr 0 0.2 0 0) 10))))))
+    (lambda (v) (mul (adsr 0.04 0.02 0 0) (mooglp (white 4) (* v 0.01) 0.45))))
+   (list
+    (lambda (v) (mul (adsr 0.5 0.03 0.1 1) (crush (sine (* (note v) 0.5))
+						0.1 0.3)))
+    (lambda (v) (mul (adsr 0 0.03 0.1 1) (mooglp (white (* 0.125 (note v)))
+						 (fmod (* v 0.04) 1) 0.4)))
+    (lambda (v) (mul (adsr 0 0.1 0.1 0.5)
+		     (add
+		      (saw (add (/ (note v) 4) (mul 1000 (pow (adsr 0.3 0.1 0 0) 3))))
+		      (saw (add (+ 1 (/ (note v) 4)) (mul 1000 (pow (adsr 0.1 0.1 0 0) 3)))))))
+    (lambda (v) (mul (adsr 0 0.02 0 0) (mooglp (white 4) (* v 0.01) 0.45)))))
+  )
 
-(define (loop)
-  (nz-tick z)
-  (sleep 100)
-  (loop))
+(define ss2
+  (list
+   (list
+    (lambda (v) (moogbp (mul (adsr 0 0.2 0.1 0.1) (pink 100)) (adsr 0 0.01 0.1 1) 0.3))
+    (lambda (v) (mul (adsr 0 0.01 0 1) (white 20)))
+    (lambda (v) (mul (adsr 0 0.1 0.1 1) (pink 50)))
+    (lambda (v) (mul (adsr 0 0.1 0.1 1) (sine (mul (adsr 0 0.1 0 0) 150)))))
+   (list
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (white (+ 440 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (white (+ 240 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (white (+ 140 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (white (mul (adsr 0 0.1 0 0) (+ 40 (* v 50)))))))
+   (list
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (saw (+ 440 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (saw (+ 240 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (saw (+ 140 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (saw (mul (adsr 0 0.1 0 0) (+ 40 (* v 50)))))))
+   (list
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 440 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 240 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 140 (* v 20)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (mul (adsr 0 0.1 0 0) (+ 40 (* v 50)))))))
 
-;(play-now (sine 400) 0)
+   ))
 
-(loop)
+
+(define z (build-nz l ss 0.2))
+
+(every-frame (nz-tick z))
+
+

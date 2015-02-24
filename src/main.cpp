@@ -224,7 +224,8 @@ int main(int argc, char *argv[])
 
 
    appEval((char*)LoadFile(string(ASSETS_PATH)+"init.scm").c_str());
-   if (window) appEval((char*)LoadFile(string(ASSETS_PATH)+"boot.scm").c_str());
+   appEval((char*)LoadFile(string(ASSETS_PATH)+"boot.scm").c_str());
+   if (window) appEval((char*)LoadFile(string(ASSETS_PATH)+"fluxus.scm").c_str());
    appEval((char*)LoadFile(string(ASSETS_PATH)+"lib.scm").c_str());
    appEval((char*)LoadFile(string(ASSETS_PATH)+"compiler.scm").c_str());
    appEval((char*)LoadFile(string(ASSETS_PATH)+"fluxa.scm").c_str());
@@ -267,10 +268,21 @@ int main(int argc, char *argv[])
 
       //usleep(5*1000);
       if (window) DisplayCallback();
+      else {
+	if (!pthread_mutex_trylock(render_mutex)) {
+	appEval("(frame-hook)");
+	pthread_mutex_unlock(render_mutex);
+	}
+      }
+      usleep(1000);
      }
 #else
 	if (window) glutMainLoop();
-    else while(true) { sleep(1); }
+	else while(true) 
+	       { 
+		 appEval("(frame-hook)");		 
+		 usleep(1000); 
+	       }
 #endif
 
 	return 0;

@@ -7,7 +7,7 @@
 
 class alsa_device {
 public:
-  alsa_device();
+  alsa_device(unsigned int sr);
   ~alsa_device();
 
   void start_crank(Graph *g);
