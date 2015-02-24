@@ -226,8 +226,8 @@ void Graph::Process(unsigned int bufsize, Sample &left, Sample &right)
 			if (pan<0) leftpan=1-pan;
 			else rightpan=1+pan;
 
-			left.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*leftpan);
-			right.MulMix(m_NodeMap[i->first]->GetOutput(),0.1*rightpan);
+			left.MulMix(m_NodeMap[i->first]->GetOutput(),0.5*leftpan);
+			right.MulMix(m_NodeMap[i->first]->GetOutput(),0.5*rightpan);
 		}
 	}
 
