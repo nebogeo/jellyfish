@@ -269,20 +269,26 @@ int main(int argc, char *argv[])
       //usleep(5*1000);
       if (window) DisplayCallback();
       else {
-	if (!pthread_mutex_trylock(render_mutex)) {
-	appEval("(frame-hook)");
-	pthread_mutex_unlock(render_mutex);
-	}
+          if (!pthread_mutex_trylock(render_mutex)) {
+              appEval("(frame-hook)");
+              pthread_mutex_unlock(render_mutex);
+          }
       }
       usleep(1000);
      }
 #else
 	if (window) glutMainLoop();
-	else while(true) 
-	       { 
-		 appEval("(frame-hook)");		 
-		 usleep(1000); 
-	       }
+	else
+    {
+        while(true)
+        {
+            if (!pthread_mutex_trylock(render_mutex)) {
+                appEval("(frame-hook)");
+                usleep(1000);
+                pthread_mutex_unlock(render_mutex);
+            }
+        }
+    }
 #endif
 
 	return 0;
