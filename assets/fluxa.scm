@@ -47,8 +47,8 @@
     (map (lambda (l) (apply synth-connect l)) (make-args id operands))
     (node id)))
 
-(define (play-now node pan) (synth-play 0 0 (node-id node) pan))
-(define (play time node pan) (synth-play (car time) (cadr time) (node-id node) pan))
+(define (play-now node pan) (synth-play 0 (node-id node) pan))
+(define (play time node pan) (synth-play time (node-id node) pan))
 
 ;;---------------------------------------------------------------
 ;; operators

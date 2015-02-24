@@ -4491,9 +4491,19 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      }
      case OP_NTP_TIME: {
 	  Time t;
-	  t.SetToNow();	  
-	  s_return(sc,mk_real(sc,t.Seconds+t.Fraction/(float)UINT_MAX));
-     } 
+	  t.SetToNow();
+	  s_return(sc,cons(sc,mk_integer(sc,t.Seconds),
+                       cons(sc,mk_integer(sc,t.Fraction),sc->NIL)));
+     }
+     case OP_NTP_TIME_ADD: {
+          Time t(ivalue(car(car(sc->args))),
+                 ivalue(cadr(car(sc->args))));
+
+          t+=rvalue(cadr(sc->args));
+
+          s_return(sc,cons(sc,mk_integer(sc,t.Seconds),
+                           cons(sc,mk_integer(sc,t.Fraction),sc->NIL)));
+     }
      case OP_DATETIME: {
           timeval t;
           // stop valgrind complaining
@@ -4553,7 +4563,7 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      case OP_SYNTH_PLY: {
           m_audio_graph
                ->Play(ivalue(car(sc->args)),
-		      ivalue(cadr(sc->args)),
+                      ivalue(cadr(sc->args)),
                       ivalue(caddr(sc->args)),
                       rvalue(cadddr(sc->args)));
           s_return(sc,sc->F);
