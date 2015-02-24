@@ -105,7 +105,7 @@
 (define (t) (ntp-time))
 
 (define (build-nz lz sz tk)
-  (make-nz lz '(60) 0 sz (ntp-time-add (t) 5) tk 1.0))
+  (make-nz lz '(40) 0 sz (ntp-time-add (t) 5) tk 1.0))
 
 (define (nz-pop! nz)
   (let ((tmp (car (nz-vals nz))))
@@ -218,6 +218,6 @@
   )
 
 
-(define z (build-nz l ss 0.2))
+(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd"))) ss 0.2))
 
 (every-frame (nz-tick z))
