@@ -78,7 +78,7 @@
   (lz-step lz)
   (let ((r (lz-read lz)))
     (lz-inc-pos lz)
-    (dbg r)))
+    r))
 
 (define (lz-prog lz pat str)
   (let ((c 0))
@@ -258,8 +258,8 @@
    )
   )
 
-;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd"))) ss 0.2))
+(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
 
-(define z (build-nz l ss 0.2))
+;(define z (build-nz l ss 0.2))
 
 (every-frame (nz-tick z))

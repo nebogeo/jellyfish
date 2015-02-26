@@ -1,4 +1,4 @@
-(synth-init)
+(synth-init 20 44100)
 
 (define time (ntp-time-add (ntp-time) 2))
 
