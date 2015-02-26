@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init 50 22050)
+(synth-init 50 44100)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -15,6 +15,7 @@
 (define (set-lz-stk! l v) (vector-set! l 2 v))
 (define (set-lz-mem! l v) (vector-set! l 5 v))
 
+;; md=max depth, w h - rule size * rule count
 (define (build-lz md w h)
   (make-lz md 0 '((0 0)) w h (make-vector (* w h) #\ )))
 
@@ -50,30 +51,34 @@
 (define (lz-inc-pos lz)
   (set-lz-top! lz (list (+ (car (lz-top lz)) 1) (cadr (lz-top lz)))))
 
-(define (lz-tick lz)
-  (lz-inc-pos lz)
-  (when (>= (car (lz-top lz)) 8)
-       (cond
-         ((eqv? (length (lz-stk lz)) 1)
-          (set-lz-top! lz (list 0 0)))
-         (else
-           (lz-pop! lz))))
-
+;; recursively step until no more jump/return stuff is happening
+(define (lz-step lz)
   (let ((pos (car (lz-top lz)))
         (pat (cadr (lz-top lz)))
         (data (lz-read lz)))
-   ; (printf "~a ~a ~a ~a~n" pos pat data (lz-stk lz))
+    ;;(msg pos pat data (lz-stk lz))
     (cond
-      ((char=? data #\ )
-       (cond
-         ((eqv? (length (lz-stk lz)) 1)
-          (set-lz-top! lz (list 0 0)))
-         (else
-           (lz-pop! lz))))
-      ((char=? data #\A) (lz-inc-pos lz) (lz-push! lz (list 0 0)))
-      ((char=? data #\B) (lz-inc-pos lz) (lz-push! lz (list 0 1)))
-      ((char=? data #\C) (lz-inc-pos lz) (lz-push! lz (list 0 2))))
-    (lz-read lz)))
+     ;; space is the end of a rule, so now pop or reset (also check bound)
+     ((or (char=? data #\ ) (>= (car (lz-top lz)) 8))
+      (cond
+       ;; no more on the stack, goto 0
+       ((eqv? (length (lz-stk lz)) 1)
+        (set-lz-top! lz (list 0 0)))
+       (else
+        (lz-pop! lz)))
+      (lz-step lz))
+
+     ;; step to the next for return, then push new rule position
+     ((char=? data #\A) (lz-inc-pos lz) (lz-push! lz (list 0 0)) (lz-step lz))
+     ((char=? data #\B) (lz-inc-pos lz) (lz-push! lz (list 0 1)) (lz-step lz))
+     ((char=? data #\C) (lz-inc-pos lz) (lz-push! lz (list 0 2)) (lz-step lz))
+     ((char=? data #\D) (lz-inc-pos lz) (lz-push! lz (list 0 3)) (lz-step lz)))))
+
+(define (lz-tick lz)
+  (lz-step lz)
+  (let ((r (lz-read lz)))
+    (lz-inc-pos lz)
+    (dbg r)))
 
 (define (lz-prog lz pat str)
   (let ((c 0))
@@ -82,6 +87,41 @@
        (lz-poke lz c pat item)
        (set! c (+ c 1)))
      (string->list str))))
+
+(define (lz-tests)
+  (msg "testing lz")
+  (let ((l (build-lz 9 8 4)))
+    (lz-prog l 0 "a")
+    (when (not (equal? (lz-tick l) #\a)) (msg "lz test 1 fail"))
+    (when (not (equal? (lz-tick l) #\a)) (msg "lz test 2 fail"))
+    (lz-prog l 0 "ab")
+    (when (not (equal? (lz-tick l) #\b)) (msg "lz test 3 fail"))
+    (when (not (equal? (lz-tick l) #\a)) (msg "lz test 4 fail"))
+    (lz-prog l 0 "BB")
+    (lz-prog l 1 "ab")
+    (when (not (equal? (lz-tick l) #\a)) (msg "lz test 5 fail"))
+    (when (not (equal? (lz-tick l) #\b)) (msg "lz test 6 fail"))
+    (when (not (equal? (lz-tick l) #\a)) (msg "lz test 5 fail"))
+    (when (not (equal? (lz-tick l) #\b)) (msg "lz test 6 fail"))
+    (lz-prog l 0 "BCD")
+    (lz-prog l 1 "a ")
+    (lz-prog l 2 "b ")
+    (lz-prog l 3 "c ")
+    (lz-tick l)
+    (lz-tick l)
+    (when (not (equal? (lz-tick l) #\a)) (msg "lz test 7 fail"))
+    (when (not (equal? (lz-tick l) #\b)) (msg "lz test 8 fail"))
+    (when (not (equal? (lz-tick l) #\c)) (msg "lz test 9 fail"))
+    (lz-prog l 0 "B       ")
+    (lz-prog l 1 "aC ")
+    (lz-prog l 2 "bD ")
+    (lz-prog l 3 "cA ")
+    (when (not (equal? (lz-tick l) #\a)) (msg "lz test 7 fail"))
+    (when (not (equal? (lz-tick l) #\b)) (msg "lz test 8 fail"))
+    (when (not (equal? (lz-tick l) #\c)) (msg "lz test 9 fail"))
+    ))
+
+(lz-tests)
 
 ; nz
 
@@ -129,7 +169,9 @@
   (when (ntp>? (ntp-time-add (t) (nz-off nz)) (nz-cur-t nz))
         (let ((t (lz-tick (nz-lz nz)))
               (v (car (nz-vals nz))))
-          (when (or (char=? t #\a) (char=? t #\b) (char=? t #\c) (char=? t #\b) (char=? t #\ ))
+          (when (or (char=? t #\a) (char=? t #\b)
+                    (char=? t #\c) (char=? t #\d)
+                    (char=? t #\.))
                 (set-nz-cur-t! nz (ntp-time-add (nz-cur-t nz) (nz-tk nz))))
           (cond
            ((char=? t #\+) (set-nz-vals! nz (cons (+ (car (nz-vals nz)) 1) (cdr (nz-vals nz)))))
@@ -212,7 +254,6 @@
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 240 (* v 20)))))
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 140 (* v 20)))))
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (mul (adsr 0 0.1 0 0) (+ 40 (* v 50)))))))
-
 
    )
   )

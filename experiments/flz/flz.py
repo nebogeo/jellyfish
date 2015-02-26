@@ -22,7 +22,7 @@ def lookup(code):
     if code==12: return "D"
     if code==13: return "["
     if code==14: return "]"
-    if code==15: return " "
+    if code==15: return "."
 
 
 def send_lz(blocks,last):
@@ -32,7 +32,7 @@ def send_lz(blocks,last):
 
     if last!=conv:
         last=conv
-        print conv 
+        print conv
         osc.Message("/eval",["(lz-prog l 0 \""+conv+"\")"]).sendlocal(8000)
     return last
 
