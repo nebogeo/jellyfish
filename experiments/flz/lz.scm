@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init 50 44100)
+(synth-init 50 22050)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -198,7 +198,7 @@
 ;(lz-prog l 1 "-d>-AC-A")
 ;(lz-prog l 2 "b+b--bAB")
 
-(lz-prog l 0 ".       ")
+(lz-prog l 0 "a       ")
 (lz-prog l 1 "        ")
 (lz-prog l 2 "        ")
 (lz-prog l 3 "        ")
