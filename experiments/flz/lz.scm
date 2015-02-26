@@ -188,7 +188,7 @@
 
 ; --
 
-(define l (build-lz 9 8 3))
+(define l (build-lz 9 8 4))
 
 ;(lz-prog l 0 "cCBca-aa")
 ;(lz-prog l 1 "c-d-c<.d")
@@ -198,9 +198,10 @@
 ;(lz-prog l 1 "-d>-AC-A")
 ;(lz-prog l 2 "b+b--bAB")
 
-(lz-prog l 0 "        ")
+(lz-prog l 0 ".       ")
 (lz-prog l 1 "        ")
 (lz-prog l 2 "        ")
+(lz-prog l 3 "        ")
 
 
 
@@ -258,8 +259,8 @@
    )
   )
 
-(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
+;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
 
-;(define z (build-nz l ss 0.2))
+(define z (build-nz l ss 0.2))
 
 (every-frame (nz-tick z))
