@@ -252,27 +252,27 @@ int main(int argc, char *argv[])
     // setup the repl thread
     render_mutex = new pthread_mutex_t;
     pthread_mutex_init(render_mutex,NULL);
-    pthread_t *repl_thread = new pthread_t;
-    pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);
+    /*pthread_t *repl_thread = new pthread_t;
+      pthread_create(repl_thread,NULL,(void*(*)(void*))repl_loop,NULL);*/
     setup_osc_repl();
 
 #ifdef FLX_RPI
-    getMouse();
-    getKeys();
+    //    getMouse();
+    //getKeys();
 
    while (!terminate_prog)
    {
-      doEvents(state->screen_width, state->screen_height,
-	       KeyboardCallback,
-	       KeyboardUpCallback);
+     //doEvents(state->screen_width, state->screen_height,
+     //	       KeyboardCallback,
+     //	       KeyboardUpCallback);
 
       //usleep(5*1000);
       if (window) DisplayCallback();
       else {
-          if (!pthread_mutex_trylock(render_mutex)) {
-              appEval("(frame-hook)");
-              pthread_mutex_unlock(render_mutex);
-          }
+	if (!pthread_mutex_trylock(render_mutex)) {
+	  appEval("(frame-hook)");
+	  pthread_mutex_unlock(render_mutex);
+	}
       }
       usleep(1000);
      }
@@ -280,14 +280,14 @@ int main(int argc, char *argv[])
 	if (window) glutMainLoop();
 	else
     {
-        while(true)
+      while(true)
         {
             if (!pthread_mutex_trylock(render_mutex)) {
                 appEval("(frame-hook)");
                 usleep(1000);
                 pthread_mutex_unlock(render_mutex);
             }
-        }
+	}
     }
 #endif
 

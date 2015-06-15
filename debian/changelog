@@ -1,3 +1,9 @@
+jellyfish-engine (0.0.4-1~raspberrypi) unstable; urgency=low
+
+  * explicit link to libGL
+
+ -- Dave Griffiths <dave@fo.am>  Thu, 13 Feb 2015 15:33:51 +0000
+
 jellyfish-engine (0.0.2-7~utopic) utopic; urgency=low
 
   * explicit link to libGL
