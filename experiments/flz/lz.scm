@@ -165,6 +165,11 @@
       (and (eqv? (car a) (car b))
            (> (cadr a) (cadr b)))))
 
+(define (nz-dump nz c)
+  (when (not (zero? c))
+        (display (lz-tick (nz-lz nz)))
+        (nz-dump nz (- c 1))))
+
 (define (nz-tick nz)
   (when (ntp>? (ntp-time-add (t) (nz-off nz)) (nz-cur-t nz))
         (let ((t (lz-tick (nz-lz nz)))
@@ -198,11 +203,15 @@
 ;(lz-prog l 1 "-d>-AC-A")
 ;(lz-prog l 2 "b+b--bAB")
 
-(lz-prog l 0 ".       ")
+;(lz-prog l 0 ".       ")
+;(lz-prog l 1 "        ")
+;(lz-prog l 2 "        ")
+;(lz-prog l 3 "        ")
+
+(lz-prog l 0 "+bA-cA  ")
 (lz-prog l 1 "        ")
 (lz-prog l 2 "        ")
 (lz-prog l 3 "        ")
-
 
 
 (define ss
@@ -262,5 +271,7 @@
 ;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
 
 (define z (build-nz l ss 0.2))
+
+(nz-dump z 100)
 
 (every-frame (nz-tick z))

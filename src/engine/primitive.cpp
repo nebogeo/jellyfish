@@ -268,6 +268,7 @@ void primitive::render(u32 hints)
     ps2_renderer::get()->render(0,m_size,&m_positions[0].x,&m_normals[0].x,&m_colours[0].x);
 #else
 #ifdef FLX_LINUX
+
     float *fltpos=new float[m_size*3];
     float *fltnrm=new float[m_size*3];
     float *fltcol=new float[m_size*3];
