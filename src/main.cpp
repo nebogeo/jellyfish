@@ -90,12 +90,13 @@ int main(int argc, char *argv[])
 
     if (argc>1) interpreter::eval_file(argv[argc-1]);
 
+
     interpreter::start_repl(graphics::m_render_mutex);
     network_osc::start_osc_repl(graphics::m_render_mutex);
 
 #ifdef FLX_RPI
-    getMouse();
-    getKeys();
+    //    getMouse();
+    //getKeys();
 
     while (!terminate_prog)
     {
@@ -117,14 +118,14 @@ int main(int argc, char *argv[])
 	if (window) glutMainLoop();
 	else
     {
-        while(true)
+      while(true)
         {
             if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
                 interpreter::eval("(frame-hook)");
                 usleep(1000);
                 pthread_mutex_unlock(graphics::m_render_mutex);
             }
-        }
+	}
     }
 #endif
 

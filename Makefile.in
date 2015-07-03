@@ -1,6 +1,9 @@
 TARGET  := jellyfish
 
 SRCS    := src/main.cpp\
+	       src/graphics.cpp\
+		   src/audio.cpp\
+		   src/interpreter.cpp\
 	      src/core/fixed.cpp\
           src/core/list.cpp\
           src/core/idmap.cpp\
@@ -18,7 +21,8 @@ SRCS    := src/main.cpp\
           src/fluxa/Event.cpp\
           src/fluxa/EventQueue.cpp\
           src/fluxa/Time.cpp\
-		  src/audio/alsa.cpp \
+		  src/audio.cpp \
+		  src/audio/PortAudioClient.cpp \
           src/engine/obj_reader.cpp\
           src/engine/engine.cpp\
           src/engine/primitive.cpp\

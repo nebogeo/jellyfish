@@ -30,10 +30,10 @@ namespace spiralcore
 {
 //#define DEBUG
 
-inline float Linear(float bot,float top,float pos,float val1,float val2) 
-{ 
-    float t=(pos-bot)/(top-bot); 
-    return val1*t + val2*(1.0f-t); 
+inline float Linear(float bot,float top,float pos,float val1,float val2)
+{
+    float t=(pos-bot)/(top-bot);
+    return val1*t + val2*(1.0f-t);
 }
 
 inline bool feq(float a, float b, float tol)
@@ -45,7 +45,7 @@ class Sample
 {
 public:
 	enum SampleType {AUDIO=0, IMAGE, MIDI};
-	
+
 	Sample(unsigned int Len=0);
 	Sample(const Sample &rhs);
 	Sample(const AudioType *S, unsigned int Len);
@@ -61,7 +61,7 @@ public:
 	void Insert(const Sample &S, unsigned int Pos);
 	void Add(const Sample &S);
 	void Mix(const Sample &S, unsigned int Pos=0);
-	void MulMix(const Sample &S, float m);  
+	void MulMix(const Sample &S, float m);
 	void MulClipMix(const Sample &S, float m);
 	void Remove(unsigned int Start, unsigned int End);
 	void Reverse(unsigned int Start, unsigned int End);
@@ -76,50 +76,50 @@ public:
 	void CropTo(unsigned int NewLength);
 
 	AudioType &operator[](unsigned int i) const
-	{		
+	{
 		#ifdef DEBUG
         assert(i<m_Length);
 		#endif
         return m_Data[i%m_Length];
 	}
-	
+
 	// Linear interpolated
 	inline AudioType operator[](float i) const
-	{		
+	{
 		unsigned int ii=(unsigned int)i;
-		
+
 		#ifdef DEBUG
         if (ii>=m_Length) cerr<<m_Length<<" "<<ii<<endl;
         assert(ii<m_Length);
 		#endif
-		
-        if (ii==m_Length-1) return m_Data[ii%m_Length];	
-		AudioType t=i-ii;		
+
+        if (ii==m_Length-1) return m_Data[ii%m_Length];
+		AudioType t=i-ii;
 		return ((m_Data[ii%m_Length]*(1-t))+
                 (m_Data[(ii+1)%m_Length])*t);
 	}
 
 
 	void Set(unsigned int i, AudioType v)
-	{	
+	{
 		#ifdef DEBUG
         if (i>=m_Length) cerr<<m_Length<<" "<<i<<endl;
         assert(i<m_Length);
-		#endif							
+		#endif
 		m_Data[i%m_Length]=v;
-	}	
-	
+	}
+
 	Sample &operator=(const Sample &rhs)
 	{
-		if (GetLength()!=rhs.GetLength()) Allocate(rhs.GetLength());		
+		if (GetLength()!=rhs.GetLength()) Allocate(rhs.GetLength());
 		memcpy(m_Data,rhs.GetBuffer(),GetLengthInBytes());
 		return *this;
 	}
-		
+
 private:
 	AudioType *m_Data;
 	unsigned int m_Length;
-	
+
     SampleType m_SampleType;
 	static Allocator *m_Allocator;
 };

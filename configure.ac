@@ -7,6 +7,8 @@ dnl FIXME: GLESv2 of RPi depends on EGL... WTF!
 AC_CHECK_LIB([bcm_host], [bcm_host_init], [
 
 CFLAGS="$CFLAGS -DFLX_RPI -I/opt/vc/include/interface/vcos/pthreads/ -I/opt/vc/include/interface/vmcs_host/linux/"
+
+AC_CHECK_LIB(bcm_host, main)
 AC_CHECK_LIB(X11, main)
 AC_CHECK_LIB(GLESv1_CM, main)
 AC_CHECK_LIB(EGL, eglCopyBuffers)
@@ -21,7 +23,7 @@ AC_CHECK_LIB(pthread, main)
 AC_CHECK_LIB(dl, main)
 AC_CHECK_LIB(lo, main)
 AC_CHECK_LIB(jpeg, main)
-AC_CHECK_LIB(asound, main)
+AC_CHECK_LIB(portaudio, main)
 
 AC_PROG_CXX
 AC_LANG(C++)

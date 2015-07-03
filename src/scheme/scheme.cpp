@@ -39,14 +39,14 @@
 #include <android/log.h>
 #endif
 
-#include "../engine/engine.h"
-#include "../core/geometry.h"
-#include "../fluxa/Graph.h"
-#include "../fluxa/Time.h"
-#include "../audio/alsa.h"
+#include "engine/engine.h"
+#include "core/geometry.h"
+#include "fluxa/Graph.h"
+#include "fluxa/Time.h"
+#include "audio.h"
 
 Graph *m_audio_graph = NULL;
-alsa_device *m_alsa_device = NULL;
+audio_device *m_audio_device = NULL;
 
 char *starwisp_data = NULL;
 
@@ -4541,9 +4541,12 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
 
 //////////////////// fluxa /////////////////////////////////////////
      case OP_SYNTH_INIT: {
-          m_alsa_device = new alsa_device(ivalue(cadr(sc->args)));
-          m_audio_graph = new Graph(ivalue(car(sc->args)),ivalue(cadr(sc->args)));
-          m_alsa_device->start_crank(m_audio_graph);
+          // name,buf,sr,synths
+          m_audio_device = new audio_device(string_value(car(sc->args)),
+                                            ivalue(cadr(sc->args)),
+                                            ivalue(caddr(sc->args)));
+          m_audio_graph = new Graph(ivalue(cadddr(sc->args)),ivalue(cadr(sc->args)));
+          m_audio_device->start_graph(m_audio_graph);
           s_return(sc,sc->F);
      } break;
      case OP_SYNTH_CRT: {

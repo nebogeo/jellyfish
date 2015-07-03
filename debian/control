@@ -2,7 +2,8 @@ Source: jellyfish-engine
 Section: devel
 Priority: extra
 Maintainer: Dave Griffiths <dave@fo.am>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev, freeglut3-dev, libasound-dev, libgl-dev, libjpeg-dev, liblo-dev, libpng-dev
+#Build-Depends: debhelper (>= 8.0.0), autotools-dev, freeglut3-dev, libasound-dev, libgl-dev, libjpeg-dev, liblo-dev, libpng-dev
+Build-Depends: debhelper (>= 8.0.0), autotools-dev, libasound-dev, libjpeg-dev, liblo-dev, libpng-dev
 Standards-Version: 3.9.2
 Homepage: https://github.com/nebogeo/jellyfish
 #Vcs-Git: git://git.debian.org/collab-maint/jellyfish.git

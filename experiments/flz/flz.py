@@ -27,7 +27,7 @@ def lookup(code):
 
 def send_lz(blocks,last):
     conv = ""
-    for block in blocks[0:24]:
+    for block in blocks:
         conv += lookup(block)
 
     if last!=conv:
