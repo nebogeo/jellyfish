@@ -14,27 +14,51 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-namespace spiralcore
+#include "allocator.h"
+
+char *malloc_allocator::anew(unsigned int size)
 {
+	return new char[size];
+}
 
-typedef signed long int64;
-typedef signed int int32;
-typedef signed short int16;
-typedef signed char int8;
+void malloc_allocator::adelete(char *mem)
+{
+	delete[] mem;
+}
 
-typedef unsigned long uint64;
-typedef unsigned int uint32;
-typedef unsigned short uint16;
-typedef unsigned char uint8;
+///////////////////////////////////////////////////////////
 
-typedef float float32;
-typedef double float64;
+realtime_allocator::realtime_allocator(unsigned int size) :
+m_position(0),
+m_size(size)
+{
+	m_buffer = new char[m_size];
+}
 
-typedef uint32 SampleID;
-typedef uint32 EffectID;
-typedef uint32 EventID;
-typedef uint32 PatternID;
+void realtime_allocator::reset()
+{
+	m_position=0;
+}
 
-typedef float32 AudioType;
+char *realtime_allocator::anew(unsigned int size)
+{
+	//cerr<<"new "<<size<<endl;
+	char *ret = m_buffer+m_position;
+	m_position+=size;
 
+
+	if (m_position>m_size)
+	{
+//		cerr<<"out of realtime buffer mem, here we go!!! :("<<endl;
+		m_position=0;
+		ret = m_buffer;
+	}
+
+	return ret;
+}
+
+void realtime_allocator::adelete(char *mem)
+{
+	//cerr<<"delete"<<endl;
+	// we don't need no stinking delete!
 }

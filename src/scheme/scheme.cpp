@@ -41,11 +41,11 @@
 
 #include "engine/engine.h"
 #include "core/geometry.h"
-#include "fluxa/Graph.h"
-#include "fluxa/Time.h"
+#include "fluxa/graph.h"
+#include "fluxa/time.h"
 #include "audio.h"
 
-Graph *m_audio_graph = NULL;
+graph *m_audio_graph = NULL;
 audio_device *m_audio_device = NULL;
 
 char *starwisp_data = NULL;
@@ -4490,19 +4490,19 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                              cons(sc,mk_integer(sc,t.tv_usec),sc->NIL)));
      }
      case OP_NTP_TIME: {
-	  Time t;
-	  t.SetToNow();
-	  s_return(sc,cons(sc,mk_integer(sc,t.Seconds),
-                       cons(sc,mk_integer(sc,t.Fraction),sc->NIL)));
+          spiralcore::time t;
+	  t.set_to_now();
+	  s_return(sc,cons(sc,mk_integer(sc,t.seconds),
+                       cons(sc,mk_integer(sc,t.fraction),sc->NIL)));
      }
      case OP_NTP_TIME_ADD: {
-          Time t(ivalue(car(car(sc->args))),
+          spiralcore::time t(ivalue(car(car(sc->args))),
                  ivalue(cadr(car(sc->args))));
 
           t+=rvalue(cadr(sc->args));
 
-          s_return(sc,cons(sc,mk_integer(sc,t.Seconds),
-                           cons(sc,mk_integer(sc,t.Fraction),sc->NIL)));
+          s_return(sc,cons(sc,mk_integer(sc,t.seconds),
+                           cons(sc,mk_integer(sc,t.fraction),sc->NIL)));
      }
      case OP_DATETIME: {
           timeval t;
@@ -4545,27 +4545,27 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
           m_audio_device = new audio_device(string_value(car(sc->args)),
                                             ivalue(cadr(sc->args)),
                                             ivalue(caddr(sc->args)));
-          m_audio_graph = new Graph(ivalue(cadddr(sc->args)),ivalue(cadr(sc->args)));
+          m_audio_graph = new graph(ivalue(cadddr(sc->args)),ivalue(cadr(sc->args)));
           m_audio_device->start_graph(m_audio_graph);
           s_return(sc,sc->F);
      } break;
      case OP_SYNTH_CRT: {
           m_audio_graph
-               ->Create(ivalue(car(sc->args)),
-                        (Graph::Type)(ivalue(cadr(sc->args))),
+               ->create(ivalue(car(sc->args)),
+                        (graph::type)(ivalue(cadr(sc->args))),
                         rvalue(caddr(sc->args)));
           s_return(sc,sc->F);
      } break;
      case OP_SYNTH_CON: {
           m_audio_graph
-               ->Connect(ivalue(car(sc->args)),
+               ->connect(ivalue(car(sc->args)),
                          ivalue(cadr(sc->args)),
                          ivalue(caddr(sc->args)));
           s_return(sc,sc->F);
      } break;
      case OP_SYNTH_PLY: {
           m_audio_graph
-               ->Play(ivalue(car(sc->args)),
+               ->play(ivalue(car(sc->args)),
                       ivalue(cadr(sc->args)),
                       ivalue(caddr(sc->args)),
                       rvalue(cadddr(sc->args)));

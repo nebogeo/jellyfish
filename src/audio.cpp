@@ -25,27 +25,27 @@ audio_device::audio_device(const string &clientname, u32 samplerate, u32 buffer_
     left_in(buffer_size),
     right_in(buffer_size)
 {
-    PortAudioClient::DeviceOptions opt;
-    opt.BufferSize = buffer_size;
-    opt.NumBuffers = 2;
-    opt.Samplerate = samplerate;
-    opt.InChannels = 2;
-    opt.OutChannels = 2;
+    portaudio_client::device_options opt;
+    opt.buffer_size = buffer_size;
+    opt.num_buffers = 2;
+    opt.samplerate = samplerate;
+    opt.in_channels = 2;
+    opt.out_channels = 2;
 
-    m_client.Attach(clientname,opt);
-    m_client.SetOutputs(left_out.GetBuffer(), right_out.GetBuffer());
-    m_client.SetInputs(left_in.GetBuffer(), right_in.GetBuffer());
+    m_client.attach(clientname,opt);
+    m_client.set_outputs(left_out.get_buffer(), right_out.get_buffer());
+    m_client.set_inputs(left_in.get_buffer(), right_in.get_buffer());
 
 }
 
 void run_graph(void *c, unsigned int size) {
     audio_device *a=(audio_device *)c;
-    a->left_out.Zero();
-    a->right_out.Zero();
-    a->m_graph->Process(size, a->left_out, a->right_out);
+    a->left_out.zero();
+    a->right_out.zero();
+    a->m_graph->process(size, a->left_out, a->right_out);
 }
 
-void audio_device::start_graph(Graph *graph) {
+void audio_device::start_graph(graph *graph) {
     m_graph = graph;
-    m_client.SetCallback(run_graph,this);
+    m_client.set_callback(run_graph,this);
 }

@@ -15,22 +15,22 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "core/types.h"
-#include "fluxa/Graph.h"
-#include "audio/PortAudioClient.h"
+#include "fluxa/graph.h"
+#include "audio/portaudio_client.h"
 
 class audio_device {
 public:
     audio_device(const string &clientname, u32 samplerate, u32 buffer_size);
-    void start_graph(Graph *graph);
+    void start_graph(graph *graph);
 
-    Sample left_out;
-    Sample right_out;
-    Sample left_in;
-    Sample right_in;
-    Graph *m_graph;
+    sample left_out;
+    sample right_out;
+    sample left_in;
+    sample right_in;
+    graph *m_graph;
 
 private:
-    PortAudioClient m_client;
+    portaudio_client m_client;
 
 
 };
