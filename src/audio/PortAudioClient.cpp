@@ -70,15 +70,25 @@ bool PortAudioClient::Attach(const string &ClientName, const DeviceOptions &dopt
     output_parameters.suggestedLatency = Pa_GetDeviceInfo( output_parameters.device )->defaultLowOutputLatency;
     output_parameters.hostApiSpecificStreamInfo = NULL;
 
+    PaStreamParameters input_parameters;
+    input_parameters.device = Pa_GetDefaultInputDevice(); /* default output device */
+    if (input_parameters.device == paNoDevice) {
+		cerr<<"Error: No default input device."<<endl;
+    }
+    input_parameters.channelCount = 2;       /* stereo output */
+    input_parameters.sampleFormat = paFloat32; /* 32 bit floating point output */
+    input_parameters.suggestedLatency = Pa_GetDeviceInfo( input_parameters.device )->defaultLowInputLatency;
+    input_parameters.hostApiSpecificStreamInfo = NULL;
+
     PaStream *stream;
 
     err = Pa_OpenStream(
               &stream,
-              NULL, /* no input */
+              &input_parameters,
               &output_parameters,
               dopt.Samplerate,
               dopt.BufferSize,
-              paClipOff,  /* we won't output out of range samples so don't bother clipping them */
+              paClipOff,
               Process,
               NULL);
 

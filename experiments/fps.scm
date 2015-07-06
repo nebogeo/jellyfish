@@ -1,7 +1,7 @@
 (define player
   (list
    (vector 0 6 0)
-   0
+   45
    (with-state
     (translate (vector 0 6 0))
     (build-cube))))
@@ -48,12 +48,12 @@
   (with-state
    (texture (load-texture "bg.png"))
    (scale (vector 5 5 5))
-   (load-obj "assets/testlevel.obj")))
+   (load-obj "../assets/testlevel.obj")))
 
 (with-primitive
  level
  (pdata-map!
-  (lambda (t) (vmul t 5)) "t"))
+  (lambda (t) (vmul t 15)) "t"))
 
 (lock-camera (player-root player))
 

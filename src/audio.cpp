@@ -34,7 +34,7 @@ audio_device::audio_device(const string &clientname, u32 samplerate, u32 buffer_
 
     m_client.Attach(clientname,opt);
     m_client.SetOutputs(left_out.GetBuffer(), right_out.GetBuffer());
-//    m_client.SetInputs(left_in.GetBuffer(), right_in.GetBuffer());
+    m_client.SetInputs(left_in.GetBuffer(), right_in.GetBuffer());
 
 }
 

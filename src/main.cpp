@@ -90,7 +90,6 @@ int main(int argc, char *argv[])
 
     if (argc>1) interpreter::eval_file(argv[argc-1]);
 
-
     interpreter::start_repl(graphics::m_render_mutex);
     network_osc::start_osc_repl(graphics::m_render_mutex);
 

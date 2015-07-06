@@ -622,4 +622,9 @@ void engine::render()
 //    glMultMatrixf(&m_camera_tx.m[0][0]);
 #endif
     m_sg->render();
+
+    // turn these off after primitive rendering
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
