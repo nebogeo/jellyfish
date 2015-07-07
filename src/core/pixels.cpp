@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-GLubyte *GetScreenBuffer(int x, int y, unsigned int width, unsigned int height, int super)
+GLubyte *get_screen_buffer(int x, int y, unsigned int width, unsigned int height, int super)
 {
 	// get the raw image
 	GLubyte *image = (GLubyte *) malloc(width * height * sizeof(GLubyte) * 3);
@@ -52,7 +52,7 @@ GLubyte *GetScreenBuffer(int x, int y, unsigned int width, unsigned int height, 
 }
 
 
-unsigned char* LoadPNG(const string filename,long &width, long &height)
+unsigned char* load_png(const string filename,long &width, long &height)
 {
 	unsigned char *data = NULL;
 	FILE *fp=fopen(filename.c_str(),"rb");
@@ -118,7 +118,7 @@ unsigned char* LoadPNG(const string filename,long &width, long &height)
 
 #ifdef HAVE_LIBJPEG
 
-int WriteJPG(GLubyte *image, const char *filename, const char *description, int x, int y, int width, int height, int quality, int super)
+int write_jpg(GLubyte *image, const char *filename, const char *description, int x, int y, int width, int height, int quality, int super)
 {
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;

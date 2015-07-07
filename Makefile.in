@@ -1,6 +1,9 @@
 TARGET  := jellyfish
+TARGET_LIB := libjellyfish.a
 
-SRCS    := src/main.cpp\
+SRCS :=    src/graphics.cpp\
+		   src/audio.cpp\
+		   src/interpreter.cpp\
 	      src/core/fixed.cpp\
           src/core/list.cpp\
           src/core/idmap.cpp\
@@ -18,7 +21,8 @@ SRCS    := src/main.cpp\
           src/fluxa/Event.cpp\
           src/fluxa/EventQueue.cpp\
           src/fluxa/Time.cpp\
-		  src/audio/alsa.cpp \
+		  src/audio.cpp \
+		  src/audio/PortAudioClient.cpp \
           src/engine/obj_reader.cpp\
           src/engine/engine.cpp\
           src/engine/primitive.cpp\
@@ -33,12 +37,15 @@ SRCS    := src/main.cpp\
 	  src/rpi/graphics.cpp\
 	  src/rpi/input.cpp
 
+TARGET_SRCS    := src/main.cpp
+
 # for the minute, go out and up to link to the vision lib
 CCFLAGS = @CFLAGS@ -ggdb -O3 -fpermissive -ffast-math -Wno-unused -Isrc -Wno-write-strings -DASSETS_PATH=\"@prefix@/lib/jellyfish/\"
 LDFLAGS = @LDFLAGS@
 LIBS    = @LIBS@
 
 CC = @CXX@
+AR = ar
 OBJS    := ${SRCS:.cpp=.o}
 DEPS    := ${SRCS:.cpp=.dep}
 XDEPS   := $(wildcard ${DEPS})
@@ -57,6 +64,9 @@ ${OBJS}: %.o: %.cpp %.dep
 
 ${DEPS}: %.dep: %.cpp Makefile
 	${CC} ${CCFLAGS} -MM $< > $@
+
+library: ${OBJS} ${COBJS}
+	$(AR) $(ARFLAGS) ${TARGET_LIB} ${OBJS} ${COBJS}
 
 clean:: cleandeps
 	-rm -f *~ src/*.o src/*/*.o ${TARGET}

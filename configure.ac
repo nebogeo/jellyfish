@@ -23,7 +23,7 @@ AC_CHECK_LIB(pthread, main)
 AC_CHECK_LIB(dl, main)
 AC_CHECK_LIB(lo, main)
 AC_CHECK_LIB(jpeg, main)
-AC_CHECK_LIB(asound, main)
+AC_CHECK_LIB(portaudio, main)
 
 AC_PROG_CXX
 AC_LANG(C++)

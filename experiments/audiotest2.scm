@@ -1,4 +1,4 @@
-(synth-init 20 44100)
+(synth-init "fluxa" 44100 2048 20)
 
 (play-now (mul
            5

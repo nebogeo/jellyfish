@@ -19,46 +19,46 @@
 
 using namespace std;
 
-class Allocator
+class base_allocator
 {
 public:
-	virtual ~Allocator() {}
-	virtual void Reset() {}
-	virtual char *New(unsigned int size)=0;
-	virtual void Delete(char *mem)=0;
+	virtual ~base_allocator() {}
+	virtual void reset() {}
+	virtual char *anew(unsigned int size)=0;
+	virtual void adelete(char *mem)=0;
 };
 
 ///////////////////////////////////////////////////
 
-class MallocAllocator : public Allocator
+class malloc_allocator : public base_allocator
 {
 public:
-	MallocAllocator() {}
-	virtual ~MallocAllocator() {}
+	malloc_allocator() {}
+	virtual ~malloc_allocator() {}
 
-	virtual char *New(unsigned int size);
-	virtual void Delete(char *mem);
-	
+	virtual char *anew(unsigned int size);
+	virtual void adelete(char *mem);
+
 protected:
 };
 
 /////////////////////////////////////////////////////
 
-class RealtimeAllocator : public Allocator
+class realtime_allocator : public base_allocator
 {
 public:
-	RealtimeAllocator(unsigned int size);
-	virtual ~RealtimeAllocator() {}
-	
-	virtual void Reset();
-	virtual char *New(unsigned int size);
-	virtual void Delete(char *mem);
+	realtime_allocator(unsigned int size);
+	virtual ~realtime_allocator() {}
+
+	virtual void reset();
+	virtual char *anew(unsigned int size);
+	virtual void adelete(char *mem);
 
 protected:
-	
-	char *m_Buffer;	
-	unsigned int m_Position;
-	unsigned int m_Size;
+
+	char *m_buffer;
+	unsigned int m_position;
+	unsigned int m_size;
 };
 
 #endif

@@ -1,4 +1,4 @@
-// Copyright (C) 2003 David Griffiths <dave@pawfal.org>
+// Copyright (C) 2015 Dave Griffiths
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,6 +14,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include "Event.h"
+#include <stdlib.h>
+#include <string>
+#include "core/types.h"
+#include "scheme/scheme.h"
 
-using namespace spiralcore;
+class interpreter {
+public:
+    ~interpreter();
+    static void initialise();
+    static void eval(const std::string &code);
+    static void eval_file(const std::string &filename);
+    static std::string load_file(const std::string &filename);
+
+    static void start_repl(pthread_mutex_t *render_mutex);
+
+private:
+    static void repl_loop();
+    static scheme *m_sc;
+    static FILE *m_log_file;
+    static pthread_mutex_t *m_render_mutex;
+};

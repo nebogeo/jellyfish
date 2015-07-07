@@ -1,4 +1,4 @@
-// Copyright (C) 2003 David Griffiths <dave@pawfal.org>
+// Copyright (C) 2015 David Griffiths <dave@pawfal.org>
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,27 +14,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-namespace spiralcore
-{
+#include "core/types.h"
+#include "fluxa/graph.h"
+#include "audio/portaudio_client.h"
 
-typedef signed long int64;
-typedef signed int int32;
-typedef signed short int16;
-typedef signed char int8;
+class audio_device {
+public:
+    audio_device(const string &clientname, u32 samplerate, u32 buffer_size);
+    void start_graph(graph *graph);
 
-typedef unsigned long uint64;
-typedef unsigned int uint32;
-typedef unsigned short uint16;
-typedef unsigned char uint8;
+    sample left_out;
+    sample right_out;
+    sample left_in;
+    sample right_in;
+    graph *m_graph;
 
-typedef float float32;
-typedef double float64;
+private:
+    portaudio_client m_client;
 
-typedef uint32 SampleID;
-typedef uint32 EffectID;
-typedef uint32 EventID;
-typedef uint32 PatternID;
 
-typedef float32 AudioType;
-
-}
+};

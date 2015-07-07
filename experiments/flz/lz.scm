@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init 50 22050)
+(synth-init 20 44100)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -145,7 +145,7 @@
 (define (t) (ntp-time))
 
 (define (build-nz lz sz tk)
-  (make-nz lz '(40) 0 sz (ntp-time-add (t) 5) tk 1.0))
+  (make-nz lz '(20) 0 sz (ntp-time-add (t) 5) tk 1.0))
 
 (define (nz-pop! nz)
   (let ((tmp (car (nz-vals nz))))
@@ -164,6 +164,11 @@
   (or (> (car a) (car b))
       (and (eqv? (car a) (car b))
            (> (cadr a) (cadr b)))))
+
+(define (nz-dump nz c)
+  (when (not (zero? c))
+        (display (lz-tick (nz-lz nz)))
+        (nz-dump nz (- c 1))))
 
 (define (nz-tick nz)
   (when (ntp>? (ntp-time-add (t) (nz-off nz)) (nz-cur-t nz))
@@ -187,22 +192,6 @@
           )))
 
 ; --
-
-(define l (build-lz 9 8 4))
-
-;(lz-prog l 0 "cCBca-aa")
-;(lz-prog l 1 "c-d-c<.d")
-;(lz-prog l 2 "b++b+ACd")
-
-;(lz-prog l 0 "aB")
-;(lz-prog l 1 "-d>-AC-A")
-;(lz-prog l 2 "b+b--bAB")
-
-(lz-prog l 0 "a       ")
-(lz-prog l 1 "        ")
-(lz-prog l 2 "        ")
-(lz-prog l 3 "        ")
-
 
 
 (define ss
@@ -259,8 +248,60 @@
    )
   )
 
+(define (sample n) (mul (adsr 0.4 0.2 0 0) (sine n)))
+(define (get-sample n samples) (note n))
+(define samples 0)
+
+(define voices
+  (list
+   (list
+    (lambda (n) (mul 1 (sample (get-sample n samples) 440)))
+    (lambda (n) (mul (adsr 0 0.1 0 0) (moogbp
+                                       (add (saw (note n)) (saw (* 0.333333 (note n))))
+                                       (adsr 0 0.1 0 0) 0.3)))
+    (lambda (n) (mul (adsr 0 0.1 0 0) (mooglp (squ (* 0.25 (note n)))
+                                              (adsr 0.1 0 0 0) 0.4)))
+    (lambda (n) (mul (adsr 0 0.1 0.05 1) (sine
+                                          (add (mul 100 (sine (* 0.3333 (note n)))) (note n))))))
+   (list
+    (lambda (n) (mul 1 (sample (get-sample n samples) 440)))
+    (lambda (n) (mul (adsr 0 0.1 0 0)
+                     (mul (saw (note n)) (sine (mul (mul 0.1 (adsr 0.4 0.3 0 0)) (note n))))))
+    (lambda (n) (mul (adsr 0 0.1 0.05 1) (sine
+                                          (add (mul (mul 1000 (adsr 0 0.1 0.3 1))
+                                                    (sine (* 0.3333 (note n)))) (note n)))))
+    (lambda (n) (mul (adsr 0 0.1 0.05 1) (moogbp
+                                          (add (saw (note n)) (saw (* 0.333333 (note n))))
+                                          (* 0.1 (random 10)) 0.48))))
+   (list
+    (lambda (n) (mul 1 (sample (get-sample n samples) 440)))
+    (lambda (n) (mul (adsr 0 0.1 0.1 1)
+                     (crush (sine (add (mul 100 (sine 0.3)) (note n))) 5 0.6)))
+    (lambda (n) (mul (adsr 0 0.1 0 0) (moogbp
+                                       (add (saw (note n)) (saw (* 0.333333 (note n))))
+                                       (* 0.1 (random 10)) 0.48)))
+    (lambda (n) (mul (adsr 0 0.1 0.05 1) (sine
+                                          (add (mul 1000 (sine (* 0.3333 (note n)))) (note n))))))))
+
+(define l (build-lz 9 8 4))
+
+(lz-prog l 0 "B++B--BB")
+(lz-prog l 1 "C+D--C-D")
+(lz-prog l 2 "a+b--c+d")
+(lz-prog l 3 "c++b--")
+
+;(lz-prog l 0 "a       ")
+;(lz-prog l 1 "        ")
+;(lz-prog l 2 "        ")
+;,(lz-prog l 3 "        ")
+
+
 ;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
 
-(define z (build-nz l ss 0.2))
+(define z (build-nz l voices 0.2))
+
+(set-scale '(2 2 2 2 1 1 1))
+
+(nz-dump z 100)
 
 (every-frame (nz-tick z))

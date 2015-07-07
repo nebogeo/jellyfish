@@ -14,42 +14,51 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include "Types.h"
-#include "Time.h"
+#include "allocator.h"
 
-#ifndef NE_EVENT
-#define NE_EVENT
-
-namespace spiralcore
+char *malloc_allocator::anew(unsigned int size)
 {
-
-class Event
-{
-public:
-	Event() :
-	ID(0),
-	Frequency(440.0f),
-	SlideFrequency(0.0f),
-	Volume(1.0f),
-	Pan(0.0f),
-	Position(0),
-	Channel(0),
-	NoteNum(0),
-	Message(0)
-	{}
-	
-	int ID;            // the currently playing sample, or voice
-	float32 Frequency; // freq
-	float32 SlideFrequency; // slide dest freq
-	float32 Volume;    // or velocity
-	float32 Pan;       // stereo pan
-	float32 Position;  // sample position start->end 0->1
-	int Channel;       // output channel for this event
-	int NoteNum;
-	char Message;      // used for charscore message passing
-	Time TimeStamp;    // when to do this event
-};
-
+	return new char[size];
 }
 
-#endif
+void malloc_allocator::adelete(char *mem)
+{
+	delete[] mem;
+}
+
+///////////////////////////////////////////////////////////
+
+realtime_allocator::realtime_allocator(unsigned int size) :
+m_position(0),
+m_size(size)
+{
+	m_buffer = new char[m_size];
+}
+
+void realtime_allocator::reset()
+{
+	m_position=0;
+}
+
+char *realtime_allocator::anew(unsigned int size)
+{
+	//cerr<<"new "<<size<<endl;
+	char *ret = m_buffer+m_position;
+	m_position+=size;
+
+
+	if (m_position>m_size)
+	{
+//		cerr<<"out of realtime buffer mem, here we go!!! :("<<endl;
+		m_position=0;
+		ret = m_buffer;
+	}
+
+	return ret;
+}
+
+void realtime_allocator::adelete(char *mem)
+{
+	//cerr<<"delete"<<endl;
+	// we don't need no stinking delete!
+}
