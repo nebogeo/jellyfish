@@ -40,7 +40,7 @@ SRCS :=    src/graphics.cpp\
 TARGET_SRCS    := src/main.cpp
 
 # for the minute, go out and up to link to the vision lib
-CCFLAGS = @CFLAGS@ -ggdb -O3 -fpermissive -ffast-math -Wno-unused -Isrc -Wno-write-strings -DASSETS_PATH=\"@prefix@/lib/jellyfish/\"
+CCFLAGS = @CFLAGS@ -ffast-math -Wno-unused -Isrc -Wno-write-strings -DASSETS_PATH=\"@prefix@/lib/jellyfish/\"
 LDFLAGS = @LDFLAGS@
 LIBS    = @LIBS@
 
