@@ -8,6 +8,7 @@ EditorDialog::EditorDialog() {
     font.setFamily("Courier New");
     font.setFixedPitch(true);
     font.setPointSize(20);
+    m_font_size=20;
 
     setStyleSheet("background: rgba(255,255,255,10%); color: white;");
 
@@ -31,8 +32,16 @@ EditorDialog::EditorDialog() {
     QPushButton *run_button = new QPushButton(tr("Run"));
     connect(run_button, SIGNAL (released()), this, SLOT (run_me()));
 
-    QVBoxLayout *button_layout = new QVBoxLayout;
+    QPushButton *bigger_button = new QPushButton(tr("+"));
+    connect(bigger_button, SIGNAL (released()), this, SLOT (bigger()));
+
+    QPushButton *smaller_button = new QPushButton(tr("-"));
+    connect(smaller_button, SIGNAL (released()), this, SLOT (smaller()));
+
+    QHBoxLayout *button_layout = new QHBoxLayout;
     button_layout->addWidget(run_button);
+    button_layout->addWidget(bigger_button);
+    button_layout->addWidget(smaller_button);
 
 
     QVBoxLayout *main_layout = new QVBoxLayout;
@@ -48,6 +57,25 @@ EditorDialog::EditorDialog() {
 //    setWindowOpacity(0.8);
 }
 
+
+
+
 void EditorDialog::run_me() {
     interpreter::eval(m_text_editor->toPlainText().toUtf8().constData());
+}
+
+void EditorDialog::bigger() {
+    QFont font;
+    font.setFamily("Courier New");
+    font.setFixedPitch(true);
+    font.setPointSize(m_font_size++);
+    m_text_editor->setFont(font);
+}
+
+void EditorDialog::smaller() {
+    QFont font;
+    font.setFamily("Courier New");
+    font.setFixedPitch(true);
+    font.setPointSize(m_font_size--);
+    m_text_editor->setFont(font);
 }

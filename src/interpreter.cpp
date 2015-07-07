@@ -20,8 +20,8 @@
 
 using namespace std;
 
-static scheme *interpreter::m_sc = NULL;
-static FILE *interpreter::m_log_file = NULL;
+scheme *interpreter::m_sc = NULL;
+FILE *interpreter::m_log_file = NULL;
 pthread_mutex_t *interpreter::m_render_mutex=NULL;
 
 interpreter::~interpreter() {

@@ -12,5 +12,10 @@ public:
 
 private slots:
     void run_me();
+    void bigger();
+    void smaller();
+
+private:
+    int m_font_size;
 
 };

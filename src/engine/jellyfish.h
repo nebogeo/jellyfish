@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include "../core/types.h"
 #include "../core/vec3.h"
-#include "../fluxa/Graph.h"
 
 // instruction set
 #define NOP 0
@@ -118,7 +117,6 @@ private:
 	vec3 *m_heap;
     u32 m_heap_size;
 	bool *m_instruction;
-    Graph *m_audio_graph;
 };
 
 #endif

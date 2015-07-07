@@ -12,8 +12,8 @@ GLGraphicsScene::GLGraphicsScene() {
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(frame_tick()));
-    timer->start(1000);
-    timer->setInterval(10);
+    //timer->start(1000);
+    //timer->setInterval(10);
 
 }
 

@@ -34,7 +34,7 @@ audio_device::audio_device(const string &clientname, u32 samplerate, u32 buffer_
 
     m_client.attach(clientname,opt);
     m_client.set_outputs(left_out.get_buffer(), right_out.get_buffer());
-    m_client.set_inputs(left_in.get_buffer(), right_in.get_buffer());
+    m_client.set_inputs(left_in.get_non_const_buffer(), right_in.get_non_const_buffer());
 
 }
 
