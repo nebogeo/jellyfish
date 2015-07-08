@@ -2,42 +2,42 @@ TARGET  := jellyfish
 TARGET_LIB := libjellyfish.a
 
 SRCS :=    src/graphics.cpp\
-		   src/audio.cpp\
-		   src/interpreter.cpp\
-	      src/core/fixed.cpp\
-          src/core/list.cpp\
-          src/core/idmap.cpp\
-          src/scheme/scheme.cpp\
-          src/core/geometry.cpp\
-          src/core/noise.cpp\
-          src/core/pixels.cpp\
-          src/core/osc.cpp\
-          src/fluxa/Sample.cpp\
-          src/fluxa/Allocator.cpp\
-          src/fluxa/Graph.cpp\
-          src/fluxa/GraphNode.cpp\
-          src/fluxa/Modules.cpp\
-          src/fluxa/ModuleNodes.cpp\
-          src/fluxa/Event.cpp\
-          src/fluxa/EventQueue.cpp\
-          src/fluxa/Time.cpp\
-		  src/audio.cpp \
-		  src/audio/PortAudioClient.cpp \
-          src/engine/obj_reader.cpp\
-          src/engine/engine.cpp\
-          src/engine/primitive.cpp\
-          src/engine/text_primitive.cpp\
-          src/engine/scenegraph.cpp\
-          src/engine/scenenode.cpp\
-          src/engine/texture.cpp\
-          src/engine/nomadic.cpp\
-          src/engine/jellyfish_primitive.cpp\
-          src/engine/jellyfish.cpp\
-	  src/linux/glut_graphics.cpp\
-	  src/rpi/graphics.cpp\
-	  src/rpi/input.cpp
+	   src/audio.cpp\
+	   src/interpreter.cpp\
+	   src/core/fixed.cpp\
+           src/core/list.cpp\
+           src/core/idmap.cpp\
+           src/scheme/scheme.cpp\
+           src/core/geometry.cpp\
+           src/core/noise.cpp\
+           src/core/pixels.cpp\
+           src/core/osc.cpp\
+           src/fluxa/sample.cpp\
+           src/fluxa/allocator.cpp\
+           src/fluxa/graph.cpp\
+           src/fluxa/graph_node.cpp\
+           src/fluxa/modules.cpp\
+           src/fluxa/module_nodes.cpp\
+           src/fluxa/event.cpp\
+           src/fluxa/event_queue.cpp\
+           src/fluxa/time.cpp\
+	   src/audio.cpp \
+	   src/audio/portaudio_client.cpp \
+	   src/engine/obj_reader.cpp\
+           src/engine/engine.cpp\
+           src/engine/primitive.cpp\
+           src/engine/text_primitive.cpp\
+           src/engine/scenegraph.cpp\
+           src/engine/scenenode.cpp\
+           src/engine/texture.cpp\
+           src/engine/nomadic.cpp\
+           src/engine/jellyfish_primitive.cpp\
+           src/engine/jellyfish.cpp\
+	   src/linux/glut_graphics.cpp\
+	   src/rpi/graphics.cpp\
+	   src/rpi/input.cpp
 
-TARGET_SRCS    := src/main.cpp
+MAIN_SRCS    := src/main.cpp
 
 # for the minute, go out and up to link to the vision lib
 CCFLAGS = @CFLAGS@ -ffast-math -Wno-unused -Isrc -Wno-write-strings -DASSETS_PATH=\"@prefix@/lib/jellyfish/\"
@@ -46,9 +46,11 @@ LIBS    = @LIBS@
 
 CC = @CXX@
 AR = ar
-OBJS    := ${SRCS:.cpp=.o}
-DEPS    := ${SRCS:.cpp=.dep}
-XDEPS   := $(wildcard ${DEPS})
+OBJS      := ${SRCS:.cpp=.o}
+MAIN_OBJS := ${MAIN_SRCS:.cpp=.o}
+DEPS      := ${SRCS:.cpp=.dep}
+MAIN_DEPS := ${MAIN_SRCS:.cpp=.dep}
+XDEPS     := $(wildcard ${DEPS})
 .PHONY: all clean distclean
 all:: ${TARGET}
 
@@ -56,13 +58,19 @@ ifneq (${XDEPS},)
 include ${XDEPS}
 endif
 
-${TARGET}: ${OBJS} ${COBJS}
+${TARGET}: ${MAIN_OBJS} ${OBJS} ${COBJS}
 	${CC} ${LDFLAGS} -o $@ $^ ${LIBS}
 
 ${OBJS}: %.o: %.cpp %.dep
 	${CC} ${CCFLAGS} -o $@ -c $<
 
+${MAIN_OBJS}: %.o: %.cpp %.dep
+	${CC} ${CCFLAGS} -o $@ -c $<
+
 ${DEPS}: %.dep: %.cpp Makefile
+	${CC} ${CCFLAGS} -MM $< > $@
+
+${MAIN_DEPS}: %.dep: %.cpp Makefile
 	${CC} ${CCFLAGS} -MM $< > $@
 
 library: ${OBJS} ${COBJS}

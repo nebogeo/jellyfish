@@ -24,8 +24,18 @@ SOURCES += GLGraphicsScene.cpp \
 # jellyfish stuff
 INCLUDEPATH += ../src
 LIBS += -L../ -ljellyfish
-LIBS += -lportaudio -ljpeg -llo -ldl -lpthread -lpng -lGL -lglut -lm
+LIBS += -lportaudio -ljpeg -llo -ldl -lpthread -lpng -lGL -lm
+# linux only
+#LIBS +=  -lglut
 
+#rpi stuff
+DEFINES += FLX_RPI
+INCLUDEPATH += /opt/vc/include/ 
+INCLUDEPATH += /opt/vc/include/interface/vcos/pthreads/ 
+INCLUDEPATH += /opt/vc/include/interface/vmcs_host/linux/
+LIBS += -L/opt/vc/lib -lEGL -lGLESv1_CM -lbcm_host
+
+
+# assets
 DEFINES += ASSETS_PATH=\\\"../assets/\\\"
-
 RESOURCES     = application.qrc

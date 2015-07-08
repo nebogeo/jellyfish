@@ -83,7 +83,7 @@ bool portaudio_client::attach(const string &client_name, const device_options &d
 
     err = Pa_OpenStream(
               &stream,
-              &input_parameters,
+              NULL, //&input_parameters,
               &output_parameters,
               dopt.samplerate,
               dopt.buffer_size,
@@ -149,7 +149,7 @@ int portaudio_client::process(const void *input_buffer, void *output_buffer,
 		}
 	}
 
-	if (m_right_in_data && m_left_in_data)
+	/*	if (m_right_in_data && m_left_in_data)
 	{
 		float *in = (float*)input_buffer;
 		for (unsigned int n=0; n<m_buffer_size; n++)
@@ -159,6 +159,6 @@ int portaudio_client::process(const void *input_buffer, void *output_buffer,
 			m_right_in_data[n]=*in;
 			in++;
 		}
-	}
+		}*/
 	return 0;
 }

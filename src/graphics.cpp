@@ -15,6 +15,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <string>
+#include <iostream>
 
 #include "engine/importgl.h"
 #include "engine/engine.h"
@@ -24,6 +25,7 @@
 #include "graphics.h"
 #include "interpreter.h"
 
+
 using namespace std;
 
 const string graphics::INPUT_CALLBACK="fluxus-input-callback";
@@ -32,6 +34,7 @@ int graphics::m_frame_num = 0;
 pthread_mutex_t* graphics::m_render_mutex = NULL;
 int graphics::m_w = 0;
 int graphics::m_h = 0;
+RPI_STATE_T* graphics::rpi_state;
 
 void graphics::initialise()
 {
@@ -77,10 +80,10 @@ void graphics::prepare_frame(int width, int height)
 
     engine::get()->set_screensize(width,height);
 
-//    glClearColorx((GLfixed)(engine::get()->m_clear_r * 65536),
-//                  (GLfixed)(engine::get()->m_clear_g * 65536),
-//                  (GLfixed)(engine::get()->m_clear_b * 65536),
-//                  (GLfixed)(0.5 * 65536));
+    //glClearColorx((GLfixed)(engine::get()->m_clear_r * 65536),
+    //              (GLfixed)(engine::get()->m_clear_g * 65536),
+    //              (GLfixed)(engine::get()->m_clear_b * 65536),
+    //              (GLfixed)(0.5 * 65536));
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
@@ -117,17 +120,17 @@ void graphics::configure_light_and_material()
 
 void graphics::render(int width, int height)
 {
-    // Prepare OpenGL ES for rendering of the frame.
-    prepare_frame(width, height);
+  // Prepare OpenGL ES for rendering of the frame.
+  prepare_frame(width, height);
+  
+  // Configure environment.
+  configure_light_and_material();
 
-    // Configure environment.
-    configure_light_and_material();
+  interpreter::eval("(frame-hook)");
 
-    interpreter::eval("(frame-hook)");
-
-    glPushMatrix();
-    engine::get()->render();
-    glPopMatrix();
+  glPushMatrix();
+  engine::get()->render();
+  glPopMatrix();
 }
 
 u32 graphics::load_texture_from_file(const string &path, const string &filename) {
@@ -148,8 +151,10 @@ void graphics::display_callback() {
     if (!pthread_mutex_trylock(m_render_mutex)) {
 
 #ifdef FLX_RPI
-        appRender(state->screen_width, state->screen_height);
-        eglSwapBuffers(state->display, state->surface);
+        graphics::render(rpi_state->screen_width, 
+			 rpi_state->screen_height);
+	eglSwapBuffers(rpi_state->display, 
+		       rpi_state->surface);
 #else
         graphics::render(m_w, m_h);
         glutSwapBuffers();
