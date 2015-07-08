@@ -2,6 +2,9 @@
 
 #ifdef FLX_RPI
 
+#ifndef RPI_GRAPHICS
+#define RPI_GRAPHICS
+
 typedef struct
 {
    uint32_t screen_width;
@@ -12,9 +15,9 @@ typedef struct
    EGLContext context;
 } RPI_STATE_T;
 
-static volatile int terminate_prog;
-static RPI_STATE_T _state, *state=&_state;
 
 void init_ogl_rpi(RPI_STATE_T *state);
+
+#endif
 
 #endif

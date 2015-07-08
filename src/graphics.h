@@ -17,9 +17,16 @@
 #include <string>
 #include "engine/importgl.h"
 
+#ifdef FLX_RPI
+#include "rpi/graphics.h"
+#endif
 
 class graphics {
 public:
+
+    #ifdef FLX_RPI
+    static RPI_STATE_T *rpi_state;
+    #endif
 
     static pthread_mutex_t* m_render_mutex;
 

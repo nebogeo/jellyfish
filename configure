@@ -2907,6 +2907,8 @@ _ACEOF
 
   LIBS="-lbcm_host $LIBS"
 
+else
+  as_fn_error $? "could not find bcm_host" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lX11" >&5
@@ -2985,6 +2987,8 @@ _ACEOF
 
   LIBS="-lGLESv1_CM $LIBS"
 
+else
+  as_fn_error $? "could not find GLES" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for eglCopyBuffers in -lEGL" >&5
@@ -3030,6 +3034,8 @@ _ACEOF
 
   LIBS="-lEGL $LIBS"
 
+else
+  as_fn_error $? "could not find EGL" "$LINENO" 5
 fi
 
 
@@ -3080,6 +3086,8 @@ _ACEOF
 
   LIBS="-lm $LIBS"
 
+else
+  as_fn_error $? "could not find libm" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lglut" >&5
@@ -3120,8 +3128,7 @@ _ACEOF
   LIBS="-lglut $LIBS"
 
 fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lGL" >&5
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lGL" >&5
 $as_echo_n "checking for main in -lGL... " >&6; }
 if ${ac_cv_lib_GL_main+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -3159,8 +3166,7 @@ _ACEOF
   LIBS="-lGL $LIBS"
 
 fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpng" >&5
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpng" >&5
 $as_echo_n "checking for main in -lpng... " >&6; }
 if ${ac_cv_lib_png_main+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -3197,6 +3203,8 @@ _ACEOF
 
   LIBS="-lpng $LIBS"
 
+else
+  as_fn_error $? "libpng not found" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpthread" >&5
@@ -3236,6 +3244,8 @@ _ACEOF
 
   LIBS="-lpthread $LIBS"
 
+else
+  as_fn_error $? "libpthread not found" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -ldl" >&5
@@ -3275,6 +3285,8 @@ _ACEOF
 
   LIBS="-ldl $LIBS"
 
+else
+  as_fn_error $? "libdl was not found" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -llo" >&5
@@ -3314,6 +3326,8 @@ _ACEOF
 
   LIBS="-llo $LIBS"
 
+else
+  as_fn_error $? "liblo was not found" "$LINENO" 5
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -ljpeg" >&5
@@ -3392,6 +3406,8 @@ _ACEOF
 
   LIBS="-lportaudio $LIBS"
 
+else
+  as_fn_error $? "libportaudio not found" "$LINENO" 5
 fi
 
 
