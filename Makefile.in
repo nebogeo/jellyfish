@@ -4,38 +4,38 @@ TARGET_LIB := libjellyfish.a
 SRCS :=    src/graphics.cpp\
 		   src/audio.cpp\
 		   src/interpreter.cpp\
-	      src/core/fixed.cpp\
-          src/core/list.cpp\
-          src/core/idmap.cpp\
-          src/scheme/scheme.cpp\
-          src/core/geometry.cpp\
-          src/core/noise.cpp\
-          src/core/pixels.cpp\
-          src/core/osc.cpp\
-          src/fluxa/Sample.cpp\
-          src/fluxa/Allocator.cpp\
-          src/fluxa/Graph.cpp\
-          src/fluxa/GraphNode.cpp\
-          src/fluxa/Modules.cpp\
-          src/fluxa/ModuleNodes.cpp\
-          src/fluxa/Event.cpp\
-          src/fluxa/EventQueue.cpp\
-          src/fluxa/Time.cpp\
-		  src/audio.cpp \
-		  src/audio/PortAudioClient.cpp \
-          src/engine/obj_reader.cpp\
-          src/engine/engine.cpp\
-          src/engine/primitive.cpp\
-          src/engine/text_primitive.cpp\
-          src/engine/scenegraph.cpp\
-          src/engine/scenenode.cpp\
-          src/engine/texture.cpp\
-          src/engine/nomadic.cpp\
-          src/engine/jellyfish_primitive.cpp\
-          src/engine/jellyfish.cpp\
-	  src/linux/glut_graphics.cpp\
-	  src/rpi/graphics.cpp\
-	  src/rpi/input.cpp
+	 	   src/core/fixed.cpp\
+           src/core/list.cpp\
+           src/core/idmap.cpp\
+           src/scheme/scheme.cpp\
+           src/core/geometry.cpp\
+           src/core/noise.cpp\
+           src/core/pixels.cpp\
+           src/core/osc.cpp\
+           src/fluxa/sample.cpp\
+           src/fluxa/allocator.cpp\
+           src/fluxa/graph.cpp\
+           src/fluxa/graph_node.cpp\
+           src/fluxa/modules.cpp\
+           src/fluxa/module_nodes.cpp\
+           src/fluxa/event.cpp\
+           src/fluxa/event_queue.cpp\
+           src/fluxa/time.cpp\
+		   src/audio.cpp \
+		   src/audio/portaudio_client.cpp \
+           src/engine/obj_reader.cpp\
+           src/engine/engine.cpp\
+           src/engine/primitive.cpp\
+           src/engine/text_primitive.cpp\
+           src/engine/scenegraph.cpp\
+           src/engine/scenenode.cpp\
+           src/engine/texture.cpp\
+           src/engine/nomadic.cpp\
+           src/engine/jellyfish_primitive.cpp\
+           src/engine/jellyfish.cpp\
+	  	   src/linux/glut_graphics.cpp\
+	       src/rpi/graphics.cpp\
+	       src/rpi/input.cpp
 
 TARGET_SRCS    := src/main.cpp
 
@@ -46,9 +46,11 @@ LIBS    = @LIBS@
 
 CC = @CXX@
 AR = ar
-OBJS    := ${SRCS:.cpp=.o}
-DEPS    := ${SRCS:.cpp=.dep}
-XDEPS   := $(wildcard ${DEPS})
+OBJS      := ${SRCS:.cpp=.o}
+MAIN_OBJS := ${MAIN_SRCS:.cpp=.o}
+DEPS      := ${SRCS:.cpp=.dep}
+MAIN_DEPS := ${MAIN_SRCS:.cpp=.dep}
+XDEPS     := $(wildcard ${DEPS})
 .PHONY: all clean distclean
 all:: ${TARGET}
 
@@ -65,6 +67,12 @@ ${OBJS}: %.o: %.cpp %.dep
 ${DEPS}: %.dep: %.cpp Makefile
 	${CC} ${CCFLAGS} -MM $< > $@
 
+${MAIN_OBJS}: %.o: %.cpp %.dep
+	${CC} ${CCFLAGS} -o $@ -c $<
+
+${MAIN_DEPS}: %.dep: %.cpp Makefile
+	${CC} ${CCFLAGS} -MM $< > $@
+
 library: ${OBJS} ${COBJS}
 	$(AR) $(ARFLAGS) ${TARGET_LIB} ${OBJS} ${COBJS}
 
@@ -79,6 +87,21 @@ install:: ${TARGET}
 	install jellyfish $(DESTDIR)@prefix@/bin/
 	install -d $(DESTDIR)@prefix@/lib/jellyfish/
 	install assets/* $(DESTDIR)@prefix@/lib/jellyfish/
+
+install_library:: library
+	install -d $(DESTDIR)@prefix@/lib/
+	install $(TARGET_LIB) $(DESTDIR)@prefix@/lib/
+	install -d $(DESTDIR)@prefix@/include/jellyfish/
+	install src/*.h $(DESTDIR)@prefix@/include/jellyfish/
+	install -d $(DESTDIR)@prefix@/include/jellyfish/core/
+	install src/core/*.h $(DESTDIR)@prefix@/include/jellyfish/core/
+	install -d $(DESTDIR)@prefix@/include/jellyfish/engine/
+	install src/engine/*.h $(DESTDIR)@prefix@/include/jellyfish/engine/
+	install -d $(DESTDIR)@prefix@/include/jellyfish/audio/
+	install src/audio/*.h $(DESTDIR)@prefix@/include/jellyfish/audio/
+	install -d $(DESTDIR)@prefix@/include/jellyfish/fluxa/
+	install src/fluxa/*.h $(DESTDIR)@prefix@/include/jellyfish/fluxa/
+
 
 distclean:: clean
 	-rm -rf config.status autom4te.cache config.log Makefile
