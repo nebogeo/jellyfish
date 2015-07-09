@@ -152,15 +152,16 @@ void sample::mix(const sample &s, unsigned int pos)
 	}
 }
 
-void sample::mul_mix(const sample &s, float m)
+void sample::mul_mix(const sample &s, unsigned int pos, float m)
 {
-	unsigned int to_pos=0;
+	// do some checking
+	assert(pos<get_length());
+
+	unsigned int to_pos=pos;
 
 	for (unsigned int from_pos=0; from_pos<s.get_length(); from_pos++)
 	{
-		float t=s[from_pos]*m;
-
-		m_data[to_pos]=m_data[to_pos]+t;
+		m_data[to_pos]=m_data[to_pos]+s[from_pos]*m;
 
 		if (to_pos>get_length()) to_pos=0;
 		to_pos++;

@@ -61,7 +61,7 @@ public:
 	void insert(const sample &s, unsigned int pos);
 	void add(const sample &s);
 	void mix(const sample &s, unsigned int pos=0);
-	void mul_mix(const sample &s, float m);
+    void mul_mix(const sample &s, unsigned int pos, float m);
 	void mul_clip_mix(const sample &s, float m);
 	void remove(unsigned int start, unsigned int end);
 	void reverse(unsigned int start, unsigned int end);
