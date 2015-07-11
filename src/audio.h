@@ -29,7 +29,7 @@ public:
     sample right_in;
     graph *m_graph;
 
-private:
+
     portaudio_client m_client;
 
 
