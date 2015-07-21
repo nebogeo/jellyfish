@@ -5477,7 +5477,7 @@ static void dump_stack_print(scheme *sc, char *str)
 
      putstr(sc, "======= stack follows ======\n");
 
-     while (nframes>=0) {
+     while (nframes>0) {
           frame = (struct dump_stack_frame *)sc->dump_base + nframes;
           op_code_info *pcd=dispatch_table+frame->op;
 

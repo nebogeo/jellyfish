@@ -22,6 +22,7 @@ AC_CHECK_LIB(png, main, [], [AC_MSG_ERROR([libpng not found])])
 AC_CHECK_LIB(pthread, main, [], [AC_MSG_ERROR([libpthread not found])])
 AC_CHECK_LIB(dl, main, [], [AC_MSG_ERROR([libdl was not found])])
 AC_CHECK_LIB(lo, main, [], [AC_MSG_ERROR([liblo was not found])])
+AC_CHECK_LIB(sndfile, main, [], [AC_MSG_ERROR([sndfile was not found])])
 AC_CHECK_LIB(jpeg, main)
 AC_CHECK_LIB(portaudio, main, [], [AC_MSG_ERROR([libportaudio not found])])
 
