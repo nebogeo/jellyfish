@@ -25,6 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef FLX_FIXED
 #define FLX_FIXED
 
+namespace spiralcore {
+
 class Fixed {
 
 private:
@@ -183,6 +185,8 @@ inline double& operator +=(double& a, const Fixed& b) { a = a + b; return a; }
 inline double& operator -=(double& a, const Fixed& b) { a = a - b; return a; }
 inline double& operator *=(double& a, const Fixed& b) { a = a * b; return a; }
 inline double& operator /=(double& a, const Fixed& b) { a = a / b; return a; }
+
+}
 
 #endif
 

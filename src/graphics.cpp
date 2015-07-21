@@ -25,6 +25,7 @@
 #include "graphics.h"
 #include "interpreter.h"
 
+#define NO_GLUT
 
 using namespace std;
 
@@ -148,6 +149,7 @@ u32 graphics::load_texture_raw(const string &texname,int width, int height, char
 
 
 // GLUT stuff follows
+#ifndef NO_GLUT
 
 void graphics::display_callback() {
     if (!pthread_mutex_trylock(m_render_mutex)) {
@@ -195,6 +197,8 @@ void graphics::keyboard_callback(unsigned char key, int x, int y)
 #endif
 }
 
+#endif // NO_GLUT
+
 void graphics::keyboard_up_callback(unsigned char key,int x, int y) {
   char code[256];
   if (key > 0 && key<0x80) {
@@ -212,7 +216,9 @@ void graphics::reshape_callback(int width, int height) {
 }
 
 void graphics::idle_callback() {
+#ifndef NO_GLUT
 	glutPostRedisplay();
+#endif
 }
 
 void graphics::mouse_callback(int button, int state, int x, int y) {
