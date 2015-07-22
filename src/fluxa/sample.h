@@ -28,7 +28,7 @@
 
 namespace spiralcore
 {
-#define DEBUG
+//#define DEBUG
 
 inline float linear(float bot,float top,float pos,float val1,float val2)
 {
@@ -36,7 +36,7 @@ inline float linear(float bot,float top,float pos,float val1,float val2)
     return val1*t + val2*(1.0f-t);
 }
 
-inline bool feq(float a, float b, float tol)
+inline bool feq(float a, float b, float tol=0.00001)
 {
 	return (a>b-tol && a<b+tol);
 }
