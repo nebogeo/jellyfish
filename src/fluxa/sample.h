@@ -22,6 +22,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 #include "types.h"
 #include "allocator.h"
@@ -78,6 +79,7 @@ public:
 	audio_type &operator[](unsigned int i) const
 	{
 		#ifdef DEBUG
+        cerr<<"debug..."<<endl;
         assert(i<m_length);
 		#endif
         return m_data[i%m_length];
