@@ -25,7 +25,7 @@
 #include "graphics.h"
 #include "interpreter.h"
 
-#define NO_GLUT
+//#define NO_GLUT
 
 using namespace std;
 

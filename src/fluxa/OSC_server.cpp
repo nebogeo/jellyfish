@@ -42,12 +42,13 @@ m_command_ring_buffer(262144)
 
 OSC_server::~OSC_server()
 {
-        m_exit=true;
+    m_exit=true;
+    lo_server_thread_stop(m_server);
 }
 
 void OSC_server::run()
 {
-        lo_server_thread_start(m_server);
+    lo_server_thread_start(m_server);
 //    while (!m_exit) usleep(1000);
 }
 
