@@ -1,18 +1,18 @@
-// _copyright (_c) 2003 _david _griffiths <dave@pawfal.org>
+// Copyright (C) 2003 Dave Griffiths
 //
-// _this program is free software; you can redistribute it and/or modify
-// it under the terms of the _g_n_u _general _public _license as published by
-// the _free _software _foundation; either version 2 of the _license, or
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// _this program is distributed in the hope that it will be useful,
-// but _w_i_t_h_o_u_t _a_n_y _w_a_r_r_a_n_t_y; without even the implied warranty of
-// _m_e_r_c_h_a_n_t_a_b_i_l_i_t_y or _f_i_t_n_e_s_s _f_o_r _a _p_a_r_t_i_c_u_l_a_r _p_u_r_p_o_s_e.  _see the
-// _g_n_u _general _public _license for more details.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 //
-// _you should have received a copy of the _g_n_u _general _public _license
-// along with this program; if not, write to the _free _software
-// _foundation, _inc., 59 _temple _place - _suite 330, _boston, _m_a 02111-1307, _u_s_a.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #ifndef SAMPLE
 #define SAMPLE
@@ -26,6 +26,7 @@
 
 #include "types.h"
 #include "allocator.h"
+#include "../core/stream.h"
 
 namespace spiralcore
 {
@@ -116,6 +117,8 @@ public:
 		return *this;
 	}
 
+    friend ios &operator||(ios &s, sample &sa);
+
 private:
 	audio_type *m_data;
 	unsigned int m_length;
@@ -123,5 +126,8 @@ private:
     sample_type m_sample_type;
 	static base_allocator *m_allocator;
 };
+
+ios &operator||(ios &s, sample &sa);
+
 }
 #endif

@@ -12,6 +12,7 @@ SRCS :=    src/graphics.cpp\
            src/core/noise.cpp\
            src/core/pixels.cpp\
            src/core/osc.cpp\
+	       src/core/stream.cpp\
            src/fluxa/sample.cpp\
            src/fluxa/allocator.cpp\
            src/fluxa/graph.cpp\
@@ -24,7 +25,6 @@ SRCS :=    src/graphics.cpp\
 		   src/fluxa/ring_buffer.cpp\
 		   src/fluxa/command_ring_buffer.cpp\
 		   src/fluxa/OSC_server.cpp \
-		   src/audio.cpp \
 		   src/audio/portaudio_client.cpp \
            src/engine/obj_reader.cpp\
            src/engine/engine.cpp\

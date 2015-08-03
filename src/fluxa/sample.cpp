@@ -338,3 +338,17 @@ void sample::shrink(unsigned int length)
 	m_data=temp;
 	m_length=new_length;
 }
+
+ios &spiralcore::operator||(ios &s, sample &sa) {
+    unsigned int version=1;
+    string id("sample");
+    s||id||version;
+
+    if (dynamic_cast<std::ofstream*>(&s)==NULL) {
+        sa.clear();
+    }
+
+    stream_array(s,sa.m_data,sa.m_length);
+    s||sa.m_sample_type;
+    return s;
+}
