@@ -343,12 +343,27 @@ ios &spiralcore::operator||(ios &s, sample &sa) {
     unsigned int version=1;
     string id("sample");
     s||id||version;
-
-    if (dynamic_cast<std::ofstream*>(&s)==NULL) {
-        sa.clear();
-    }
-
-    stream_array(s,sa.m_data,sa.m_length);
     s||sa.m_sample_type;
-    return s;
+
+    ofstream *pos=dynamic_cast<ofstream*>(&s);
+    if (pos!=NULL) {
+        ofstream &os = *pos;
+        size_t len = sa.m_length;
+        os.write((char*)&len,sizeof(size_t));
+        os.write((char*)sa.m_data,sa.m_length*sizeof(audio_type));
+        return os;
+    }
+    else
+    {
+        ifstream *pis=dynamic_cast<ifstream*>(&s);
+        assert(pis!=NULL);
+        ifstream &is = *pis;
+        size_t len=0;
+        is.read((char *)&len,sizeof(size_t));
+        float *data = new float[len];
+        is.read((char*)data,len*sizeof(audio_type));
+        sa.m_data = data;
+        sa.m_length = len;
+        return is;
+    }
 }

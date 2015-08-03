@@ -47,23 +47,26 @@ template<typename T>std::ios &operator||(std::ios &s, T &v) {
 
 template<>std::ios &operator||(std::ios &s, std::string &v);
 
-template<typename T, typename U>std::ios &stream_array(std::ios &s, T *&v, U &len) {
+/*
+template<typename T, typename U>T *stream_array(std::ios &s, T *v, U &len) {
     std::ofstream *pos=dynamic_cast<std::ofstream*>(&s);
     if (pos!=NULL) {
         std::ofstream &os = *pos;
         os||len;
         os.write((char*)v,sizeof(T)*len);
-        return os;
+        return v;
     } else  {
         std::ifstream *pis=dynamic_cast<std::ifstream*>(&s);
         assert(pis);
         std::ifstream &is = *pis;
         is||len;
-        v = new T[len];
-        is.read((char *)v,sizeof(T)*len);
-        return is;
+        if (v!=NULL) delete[] v;
+        T* t = new T[len];
+        is.read((char *)t,sizeof(T)*len);
+        return t;
     }
 }
+*/
 
 template<typename T>std::ios &stream_vector(std::ios &s, std::vector<T> &v) {
     std::ofstream *pos=dynamic_cast<std::ofstream*>(&s);
@@ -83,9 +86,12 @@ template<typename T>std::ios &stream_vector(std::ios &s, std::vector<T> &v) {
         std::ifstream &is = *pis;
         size_t len=0;
         is||len;
-        v.reserve(len);
+        //v.reserve(len);
+        v.clear();
         for (size_t i=0; i<len; ++i) {
-            is||v[i];
+            T t;
+            is||t;
+            v.push_back(t);
         }
         return is;
     }
