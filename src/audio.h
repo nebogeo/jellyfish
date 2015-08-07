@@ -23,6 +23,8 @@
 
 namespace spiralcore {
 
+class graph;
+
 class audio_device {
 public:
     audio_device(const string &clientname, u32 samplerate, u32 buffer_size);
