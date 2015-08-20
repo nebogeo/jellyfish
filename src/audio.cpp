@@ -82,6 +82,7 @@ void audio_device::maybe_record() {
     }
 }
 
+#ifndef DONT_USE_FLUXA_GRAPH
 void run_graph(void *c, unsigned int size) {
 #ifndef DONT_USE_FLUXA_GRAPH
     audio_device *a=(audio_device *)c;
@@ -91,6 +92,7 @@ void run_graph(void *c, unsigned int size) {
     a->maybe_record();
 #endif
 }
+#endif
 
 void audio_device::start_graph(graph *graph) {
 #ifndef DONT_USE_FLUXA_GRAPH
