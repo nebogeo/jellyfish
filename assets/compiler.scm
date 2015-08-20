@@ -495,6 +495,12 @@
                   (_ (cdr l))))))
   (_ (cdr x)))
 
+
+
+(define (preprocess-map x)
+  (pre-process x)
+  )
+
 ;; basically diy-macro from the main tinyscheme stuff
 (define (pre-process s)
   (cond
@@ -512,8 +518,8 @@
              ((eq? (car i) '--!)
               (let ((v (pre-process (cadr i))))
                 (list 'set! v (list '- v 1))))
-             ((eq? (car i) 'cond)
-              (preprocess-cond-to-if i))
+             ((eq? (car i) 'cond) (preprocess-cond-to-if i))
+             ((eq? (car i) 'map!) (preprocess-map i))
              (else (pre-process i)))
             (pre-process i)))
       s))

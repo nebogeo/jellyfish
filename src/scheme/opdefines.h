@@ -207,6 +207,7 @@
     _OP_DEF(opexe_6, "id-map-get",                     1,  1,       TST_NONE,                        OP_ID_MAP_GET       )
 
     _OP_DEF(opexe_6, "synth-init",                     4,  4,       0,                               OP_SYNTH_INIT             )
+    _OP_DEF(opexe_6, "synth-record",                   1,  1,       0,                               OP_SYNTH_RECORD          )
     _OP_DEF(opexe_6, "synth-create",                   3,  3,       0,                               OP_SYNTH_CRT             )
     _OP_DEF(opexe_6, "synth-connect",                  3,  3,       0,                               OP_SYNTH_CON             )
     _OP_DEF(opexe_6, "synth-play",                     4,  4,       0,                               OP_SYNTH_PLY             )

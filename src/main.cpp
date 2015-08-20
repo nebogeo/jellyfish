@@ -76,17 +76,17 @@ int main(int argc, char *argv[])
 #endif
 
     cerr<<"window="<<window<<endl;
-    
+
     interpreter::initialise();
     if (window) graphics::initialise();
-    
+
     interpreter::eval_file(string(ASSETS_PATH)+"init.scm");
     interpreter::eval_file(string(ASSETS_PATH)+"boot.scm");
     if (window) interpreter::eval_file(string(ASSETS_PATH)+"fluxus.scm");
     interpreter::eval_file(string(ASSETS_PATH)+"lib.scm");
     interpreter::eval_file(string(ASSETS_PATH)+"compiler.scm");
     interpreter::eval_file(string(ASSETS_PATH)+"fluxa.scm");
-    
+
     if (window) {
       // preload the textures
       long w=0,h=0;
@@ -96,12 +96,12 @@ int main(int argc, char *argv[])
       graphics::load_texture_from_file(string(ASSETS_PATH),"thread.png");
       graphics::load_texture_from_file(string(ASSETS_PATH),"oolite-font.png");
     }
-    
+
     if (argc>1) interpreter::eval_file(argv[argc-1]);
-    
+
     interpreter::start_repl(graphics::m_render_mutex);
     network_osc::start_osc_repl(graphics::m_render_mutex);
-    
+
 #ifdef FLX_RPI
     //    getMouse();
     //getKeys();
@@ -128,11 +128,11 @@ int main(int argc, char *argv[])
     {
       while(true)
         {
-            if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
+            //if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
                 interpreter::eval("(frame-hook)");
-                usleep(1000);
-                pthread_mutex_unlock(graphics::m_render_mutex);
-            }
+                usleep(10);
+                //    pthread_mutex_unlock(graphics::m_render_mutex);
+                //}
 	}
     }
 #endif

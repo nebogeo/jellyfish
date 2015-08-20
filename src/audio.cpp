@@ -18,6 +18,7 @@
 #include "audio.h"
 #include <sndfile.h>
 
+
 using namespace std;
 
 audio_device::audio_device(const string &clientname, u32 samplerate, u32 buffer_size) :
@@ -82,13 +83,18 @@ void audio_device::maybe_record() {
 }
 
 void run_graph(void *c, unsigned int size) {
+#ifndef DONT_USE_FLUXA_GRAPH
     audio_device *a=(audio_device *)c;
     a->left_out.zero();
     a->right_out.zero();
     a->m_graph->process(size, a->left_out, a->right_out);
+    a->maybe_record();
+#endif
 }
 
 void audio_device::start_graph(graph *graph) {
+#ifndef DONT_USE_FLUXA_GRAPH
     m_graph = graph;
     m_client.set_callback(run_graph,this);
+#endif
 }

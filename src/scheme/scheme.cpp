@@ -4549,6 +4549,10 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
           m_audio_device->start_graph(m_audio_graph);
           s_return(sc,sc->F);
      } break;
+     case OP_SYNTH_RECORD: {
+          m_audio_device->start_recording(string_value(car(sc->args)));
+          s_return(sc,sc->F);
+     } break;
      case OP_SYNTH_CRT: {
           m_audio_graph
                ->create(ivalue(car(sc->args)),
