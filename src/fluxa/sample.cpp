@@ -193,7 +193,8 @@ void sample::remove(unsigned int start, unsigned int end)
 
 	// check the range
 	if (end>get_length()) end=get_length();
-	if (start<0) start=0;
+        // unsigned, impossible
+	//if (start<0) start=0;
 
 	// calc lengths and allocate memory
 	unsigned int cut_len = end - start;
@@ -262,7 +263,8 @@ void sample::move(unsigned int dist)
 	unsigned int to_pos=0;
 	unsigned int from_pos=dist;
 
-	if (from_pos<0) from_pos+=length;
+        // unsigned - impossible
+	//if (from_pos<0) from_pos+=length;
 	if (from_pos>length) from_pos-=length;
 
 	// get the offset sample

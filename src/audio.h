@@ -21,9 +21,9 @@
 
 #include <string>
 
-namespace spiralcore {
-
 class graph;
+
+namespace spiralcore {
 
 class audio_device {
 public:

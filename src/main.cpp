@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "core/osc.h"
 #include "interpreter.h"

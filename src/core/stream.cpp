@@ -17,6 +17,7 @@
 #include <fstream>
 #include "stream.h"
 #include <iostream>
+#include "types.h"
 
 using namespace spiralcore;
 using namespace std;
@@ -110,11 +111,11 @@ void spiralcore::stream_unit_test() {
     float o_b(0.2);
     string o_c("hello");
     string o_d("there");
-    unsigned int size=10;
+    s32 size=10;
     int *o_e = new int[size];
     vector<int> o_f;
 
-    for(int i=0; i<size; i++) {
+    for(s32 i=0; i<size; i++) {
         o_e[i]=i;
         o_f.push_back(i);
     }
@@ -141,7 +142,7 @@ void spiralcore::stream_unit_test() {
     assert(i_c=="hello");
     assert(i_d=="there");
 
-    for(int i=0; i<size; i++) {
+    for(s32 i=0; i<size; i++) {
 //        assert(i_e[i]==i);
         assert(i_f[i]==i);
     }
