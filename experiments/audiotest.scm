@@ -10,4 +10,4 @@
   0.05)
  0)
 
-(play-now (mul (sine (add (mul (add (sine 1.3) (sine 1)) 100) 100)) 1) 0)
+(play-now (sine (add 100 (mul (add (sine 1.3) (sine 1)) 100))) 0)

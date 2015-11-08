@@ -538,8 +538,8 @@
      (set! addr (+ addr 1)))
    code))
 
-(define (program-jelly speed prim-type code)
-  (let ((c (compile-program speed prim-type 1 code)))
+(define (program-jelly speed prim-type hints code)
+  (let ((c (compile-program speed prim-type hints code)))
     ;;(disassemble c)
     (jelly-compiled c)))
 
@@ -547,4 +547,3 @@
   (let ((c (compile-program 50 'triangles 1 code)))
     (disassemble c))
   code)
-

@@ -195,8 +195,8 @@ void scenegraph::render_node_walk(scenenode *node, int depth)
     ps2_renderer::get()->mult_matrix(node->m_tx.arr());
 #else
 	glPushMatrix();
-    glMultMatrixx((GLfixed*)&node->m_tx.m[0][0]);
-//    glMultMatrixf(&node->m_tx.m[0][0]);
+    //    glMultMatrixx((GLfixed*)&node->m_tx.m[0][0]);
+    glMultMatrixf(&node->m_tx.m[0][0]);
 #endif
 
 #ifndef _EE

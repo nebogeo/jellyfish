@@ -97,6 +97,17 @@ template<typename T>std::ios &stream_vector(std::ios &s, std::vector<T> &v) {
     }
 }
 
+// skip a vector when loading
+template<typename T>std::ios &skip_vector(std::ifstream &is) {
+  size_t len=0;
+  is||len;
+  for (size_t i=0; i<len; ++i) {
+    T t;
+    is||t;
+  }
+  return is;
+}
+
 
 template<typename T>std::ios &stream_list(std::ios &s, std::list<T> &v) {
     std::ofstream *pos=dynamic_cast<std::ofstream*>(&s);
@@ -123,6 +134,16 @@ template<typename T>std::ios &stream_list(std::ios &s, std::list<T> &v) {
         }
         return is;
     }
+}
+
+template<typename T>std::ios &skip_list(std::istream &is) {
+  size_t len=0;
+  is||len;
+  for (size_t i=0; i<len; ++i) {
+    T t;
+    is||t;
+  }
+  return is;
 }
 
 void stream_unit_test();

@@ -49,7 +49,8 @@ using namespace bb;
 #ifdef FLX_LINUX
 //-Linux/RPI---------------------------
 // use the fixed point version here
-#define flx_real x32
+//#define flx_real x32
+#define flx_real float
 
 #else
 #ifdef _EE
@@ -61,7 +62,6 @@ using namespace bb;
 #else
 //-Android------------------------------
 #define flx_real x32
-
 #endif
 #endif
 

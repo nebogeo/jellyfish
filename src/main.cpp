@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
 {
     bool window=true;
     if (argc>=2 && !strcmp(argv[1],"-nw")) window=false;
+    if (argc>=2 && !strcmp(argv[1],"-r")) graphics::m_record=true;
 
 #ifdef FLX_RPI
    bcm_host_init();

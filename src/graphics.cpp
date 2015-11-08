@@ -19,7 +19,6 @@
 
 #include "engine/importgl.h"
 #include "engine/engine.h"
-#include "core/fixed.h"
 #include "core/pixels.h"
 
 #include "graphics.h"
@@ -35,6 +34,7 @@ int graphics::m_frame_num = 0;
 pthread_mutex_t* graphics::m_render_mutex = NULL;
 int graphics::m_w = 0;
 int graphics::m_h = 0;
+bool graphics::m_record = false;
 #ifdef FLX_RPI
 RPI_STATE_T* graphics::rpi_state;
 #endif
@@ -66,15 +66,18 @@ void graphics::glu_perspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfl
 {
     GLfloat xmin, xmax, ymin, ymax;
 
-    ymax = zNear * (GLfloat)tan(fovy * 3.141 / 360);
+    ymax = zNear * (GLfloat)tan(fovy * 3.141 / 360.0);
     ymin = -ymax;
     xmin = ymin * aspect;
     xmax = ymax * aspect;
-
-    glFrustumx((GLfixed)(xmin * 65536), (GLfixed)(xmax * 65536),
+    /*    glFrustumx((GLfixed)(xmin * 65536), (GLfixed)(xmax * 65536),
                (GLfixed)(ymin * 65536), (GLfixed)(ymax * 65536),
-               (GLfixed)(zNear * 65536), (GLfixed)(zFar * 65536));
+               (GLfixed)(zNear * 65536), (GLfixed)(zFar * 65536));*/
+    glFrustum(xmin, xmax,
+               ymin, ymax,
+               zNear, zFar);
 }
+
 
 
 void graphics::prepare_frame(int width, int height)
@@ -101,7 +104,7 @@ void graphics::prepare_frame(int width, int height)
 
 void graphics::configure_light_and_material()
 {
-    static GLfixed light0Position[] = { -0x40000, 0x100000, 0x00000, 0 };
+  /*    static GLfixed light0Position[] = { -0x40000, 0x100000, 0x00000, 0 };
     static GLfixed light0Diffuse[] = { 0x10000, 0x10000, 0x10000, 0x10000 };
     static GLfixed light1Position[] = { 0x10000, -0x20000, -0x10000, 0 };
     static GLfixed light1Diffuse[] = { 0x11eb, 0x23d7, 0x5999, 0x10000 };
@@ -115,6 +118,8 @@ void graphics::configure_light_and_material()
     glLightxv(GL_LIGHT1, GL_DIFFUSE, light1Diffuse);
     glLightxv(GL_LIGHT2, GL_POSITION, light2Position);
     glLightxv(GL_LIGHT2, GL_DIFFUSE, light2Diffuse);
+
+  */
 //    glMaterialxv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
 
 //    glMaterialx(GL_FRONT_AND_BACK, GL_SHININESS, 60 << 16);
@@ -127,13 +132,13 @@ void graphics::render(int width, int height)
   prepare_frame(width, height);
 
   // Configure environment.
-  configure_light_and_material();
+  //  configure_light_and_material();
 
   interpreter::eval("(frame-hook)");
 
-  glPushMatrix();
+  //glPushMatrix();
   engine::get()->render();
-  glPopMatrix();
+  //glPopMatrix();
 }
 
 u32 graphics::load_texture_from_file(const string &path, const string &filename) {
@@ -164,13 +169,13 @@ void graphics::display_callback() {
         glutSwapBuffers();
 #endif
 
-#ifdef USE_JPGLIB
-        static char fn[256];
-        sprintf(fn,"shot-%0.4d.jpg",m_frame_num);
-        cerr<<fn<<endl;
-        WriteJPG(GetScreenBuffer(0, 0, m_w, m_h, 1),fn,"",0,0,m_w,m_h,95,1);
-        m_frame_num++;
-#endif
+        if (m_record) {
+          static char fn[256];
+          sprintf(fn,"shot-%0.4d.jpg",m_frame_num);
+          cerr<<fn<<endl;
+          write_jpg(get_screen_buffer(0, 0, m_w, m_h, 1),fn,"",0,0,m_w,m_h,95,1);
+          m_frame_num++;
+        }
 
         pthread_mutex_unlock(m_render_mutex);
     } //else { printf("locked\n"); }

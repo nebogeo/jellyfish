@@ -40,9 +40,9 @@ public:
 #endif
     const static int BP2= BP*2;  // how many low bits are right of Binary Point
     const static int BPhalf= BP/2;  // how many low bits are right of Binary Point
-    
+
     static double STEP() { return 1.0 / (1<<BP); }  // smallest step we can represent
-    
+
 
 
 	// for private construction via guts
@@ -189,4 +189,3 @@ inline double& operator /=(double& a, const Fixed& b) { a = a / b; return a; }
 }
 
 #endif
-

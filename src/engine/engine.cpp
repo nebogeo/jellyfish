@@ -601,7 +601,7 @@ void engine::render()
 #ifdef _EE
     ps2_renderer::get()->set_camera(m_camera_tx.arr());
 #else
-
+    /*
     flx_real buf[4];
 	glEnable(GL_LIGHT0);
     buf[0]=0.1f; buf[1]=0.1f; buf[2]=0.1f;  buf[3]=1.f;
@@ -613,11 +613,44 @@ void engine::render()
     buf[0]=0.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.1f;
     glLightxv(GL_LIGHT0, GL_POSITION, (GLfixed *)buf);
 
-   glMultMatrixx((GLfixed*)&m_camera_tx.m[0][0]);
+    glMultMatrixx((GLfixed*)&m_camera_tx.m[0][0]);
 
    if (m_attached_prim!=NULL) {
        glMultMatrixx((GLfixed*)&m_attached_prim->m_tx.inverse().m[0][0]);
    }
+    */
+
+
+    glMultMatrixf((flx_real*)&m_camera_tx.m[0][0]);
+
+   if (m_attached_prim!=NULL) {
+       glMultMatrixf((flx_real*)&m_attached_prim->m_tx.inverse().m[0][0]);
+   }
+
+
+    flx_real buf[4];
+
+	glEnable(GL_LIGHT0);
+    buf[0]=0.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
+	glLightfv(GL_LIGHT0, GL_AMBIENT, (flx_real*)buf);
+    buf[0]=0.2f; buf[1]=0.2f; buf[2]=0.2f;  buf[3]=1.0f;
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, (flx_real*)buf);
+    buf[0]=1.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
+	glLightfv(GL_LIGHT0, GL_SPECULAR, (flx_real*)buf);
+    buf[0]=0.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
+    glLightfv(GL_LIGHT0, GL_POSITION, (flx_real*)buf);
+
+
+	glEnable(GL_LIGHT1);
+    buf[0]=0.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
+	glLightfv(GL_LIGHT1, GL_AMBIENT, (flx_real*)buf);
+    buf[0]=0.7f; buf[1]=0.7f; buf[2]=1.0f;  buf[3]=1.0f;
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, (flx_real*)buf);
+    buf[0]=1.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
+	glLightfv(GL_LIGHT1, GL_SPECULAR, (flx_real*)buf);
+    buf[0]=0.0f; buf[1]=0.5f; buf[2]=0.5f;  buf[3]=0.0f;
+    glLightfv(GL_LIGHT1, GL_POSITION, (flx_real*)buf);
+
 
 //    glMultMatrixf(&m_camera_tx.m[0][0]);
 #endif

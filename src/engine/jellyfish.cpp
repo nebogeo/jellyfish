@@ -24,7 +24,8 @@
 
 jellyfish::jellyfish(vec3 *heap_ptr, u32 heap_size) :
     m_heap(heap_ptr),
-    m_heap_size(heap_size)
+    m_heap_size(heap_size),
+    m_stack_base(heap_size-1)
 {
     m_instruction = new bool[m_heap_size];
 
@@ -77,7 +78,7 @@ void jellyfish::push(const vec3 &data)
 //           (float)(data.y),
 //           (float)(data.z));
     s32 stak=peekiz(REG_CONTROL);
-    poke(REG_STK-stak,data);
+    poke(m_stack_base-stak,data);
     pokez(REG_CONTROL,stak+1);
 }
 
@@ -85,7 +86,7 @@ vec3 jellyfish::pop()
 {
     s32 stak=peekiz(REG_CONTROL);
     pokez(REG_CONTROL,stak-1);
-    vec3 data=peek(REG_STK-peekiz(REG_CONTROL));
+    vec3 data=peek(m_stack_base-peekiz(REG_CONTROL));
 
 ///    printf("pop %f %f %f\n",(float)data.x,
 //           (float)data.y,
@@ -300,6 +301,33 @@ void jellyfish::run()
                       fmod((float)t.y,(float)m.y),
                       fmod((float)t.z,(float)m.z)));
           } break;
+    case MULM:
+      {
+        //u32 a_addr = argiy;
+        //u32 b_addr = argiz;
+        u32 dest_addr = (int)pop().x;
+        u32 b_addr = (int)pop().x;
+        u32 a_addr = (int)pop().x;
+        vec3 row1=peek(a_addr);
+        vec3 row2=peek(a_addr+1);
+        vec3 row3=peek(a_addr+2);
+        mat44 a;
+        a.m[0][0]=row1.x; a.m[0][1]=row1.y; a.m[0][2]=row1.z;
+        a.m[1][0]=row2.x; a.m[1][1]=row2.y; a.m[1][2]=row2.z;
+        a.m[2][0]=row3.x; a.m[2][1]=row3.y; a.m[2][2]=row3.z;
+        row1=peek(b_addr);
+        row2=peek(b_addr+1);
+        row3=peek(b_addr+2);
+        mat44 b;
+        b.m[0][0]=row1.x; b.m[0][1]=row1.y; b.m[0][2]=row1.z;
+        b.m[1][0]=row2.x; b.m[1][1]=row2.y; b.m[1][2]=row2.z;
+        b.m[2][0]=row3.x; b.m[2][1]=row3.y; b.m[2][2]=row3.z;
+        mat44 c=a*b;
+        poke(dest_addr,vec3(c.m[0][0],c.m[0][1],c.m[0][2]));
+        poke(dest_addr+1,vec3(c.m[1][0],c.m[1][1],c.m[1][2]));
+        poke(dest_addr+2,vec3(c.m[2][0],c.m[2][1],c.m[2][2]));
+      } break;
+
 
     default: set_instr(pc,false);
    	};
@@ -360,10 +388,10 @@ void jellyfish::pretty_dump() const
 	}
 
     printf("-- stk -- stk:%d\n",stop);
-	for (u32 n=(REG_STK-stop)-2; n<(REG_STK-stop)+5; n++)
+	for (u32 n=(m_stack_base-stop)-2; n<(m_stack_base-stop)+5; n++)
 	{
         char txt[2048];
-        if (n==REG_STK-stop)
+        if (n==m_stack_base-stop)
         {
             sprintf(txt,"%s","> %f %f %f : %d\n");
         }

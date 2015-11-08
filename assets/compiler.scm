@@ -14,7 +14,7 @@
 (define jfsh-op-swp 32) (define jfsh-op-rnd 33) (define jfsh-op-mull 34) (define jfsh-op-jmr 35) (define jfsh-op-ldlv 36)
 (define jfsh-op-lensq 37) (define jfsh-op-noise 38) (define jfsh-op-lds 39) (define jfsh-op-sts 40) (define jfsh-op-mulv 41)
 (define jfsh-op-synth-crt 42) (define jfsh-op-synth-con 43) (define jfsh-op-synth-ply 44) (define jfsh-op-flr 45)
-(define jfsh-op-mod 46)
+(define jfsh-op-mod 46) (define jfsh-op-mulm 47)
 
 (define instr
   '(nop jmp jmz jlt jgt ldl lda ldi sta sti
@@ -68,9 +68,7 @@
     addr))
 
 ;; segments are data areas, positions, normals, colours etc
-(define segment-size prim-size)
-
-(define (memseg n) (* segment-size n))
+(define (memseg n) (* prim-size n))
 
 (define (get-segment name)
   (cond
@@ -100,6 +98,7 @@
      ((eq? name 'reg-tx-rotateb) (emit (vector jfsh-op-ldl reg-tx-rotateb 0)))
      ((eq? name 'reg-tx-rotatec) (emit (vector jfsh-op-ldl reg-tx-rotatec 0)))
      ((eq? name 'reg-fling) (emit (vector jfsh-op-ldl reg-fling 0)))
+     ((eq? name 'prim-size) (emit (vector jfsh-op-ldl prim-size 0)))
      ;; load variable
      (else
       (emit (vector jfsh-op-lda (variable-address name) 0))))))
@@ -286,6 +285,29 @@
    (emit (vector jfsh-op-jmr 2 0))
    (emit (vector jfsh-op-ldl 1 0))))
 
+(define (emit-and x)
+  (append
+   (emit-expr (cadr x))
+   (emit-expr (caddr x))
+   (emit (vector jfsh-op-jmz 4 0)) ;; if first is zero skip to load 0
+   (emit (vector jfsh-op-jmz 3 0)) ;; second zero load 0
+   (emit (vector jfsh-op-ldl 1 0)) ;; load 1
+   (emit (vector jfsh-op-jmr 2 0)) ;; skip
+   (emit (vector jfsh-op-ldl 0 0)))) ;; load 0
+
+(define (emit-or x)
+  (append
+   (emit-expr (cadr x))
+   (emit-expr (caddr x))
+   (emit (vector jfsh-op-jmz 4 0)) ;; zero, check next
+   (emit (vector jfsh-op-drp 0 0)) ;; otherwise drop other
+   (emit (vector jfsh-op-ldl 1 0)) ;; load 1
+   (emit (vector jfsh-op-jmr 5 0)) ;; exit
+   (emit (vector jfsh-op-jmz 3 0)) ;; if also zero jump to load 0
+   (emit (vector jfsh-op-ldl 1 0)) ;; load 1
+   (emit (vector jfsh-op-jmr 2 0)) ;; skip
+   (emit (vector jfsh-op-ldl 0 0)))) ;; load 0
+
 ;(loop pred block)
 (define (emit-loop x)
   (let ((block
@@ -300,15 +322,22 @@
      (emit (vector jfsh-op-ldl 0 0))
      )))
 
+(define (unary-procedure proc x)
+  (append
+   (emit-expr (cadr x))
+   (emit (vector proc 0 0))))
+
 (define (binary-procedure proc x)
   (append
    (emit-expr (cadr x))
    (emit-expr (caddr x))
    (emit (vector proc 0 0))))
 
-(define (unary-procedure proc x)
+(define (trinary-procedure proc x)
   (append
    (emit-expr (cadr x))
+   (emit-expr (caddr x))
+   (emit-expr (cadddr x))
    (emit (vector proc 0 0))))
 
 (define (emit-eq? x)
@@ -371,7 +400,7 @@
     ((eq? (cadr x) 'zzx) (emit (vector 2 2 0)))
     ((eq? (cadr x) 'zzy) (emit (vector 2 2 1)))
     ((eq? (cadr x) 'zzz) (emit (vector 2 2 2))))
-   (emit (vector shf 0 0))))
+   (emit (vector jfsh-op-shf 0 0))))
 
 (define (emit-procedure x)
   (cond
@@ -380,6 +409,7 @@
     ((eq? (car x) '*) (binary-procedure jfsh-op-mul x))
     ((eq? (car x) '/) (binary-procedure jfsh-op-div x))
     ((eq? (car x) '*v) (binary-procedure jfsh-op-mulv x))
+    ((eq? (car x) '*m) (trinary-procedure jfsh-op-mulm x))
     ((eq? (car x) 'cross) (binary-procedure jfsh-op-crs x))
     ((eq? (car x) 'dot) (binary-procedure jfsh-op-dot x))
     ((eq? (car x) 'modulo) (binary-procedure jfsh-op-mod x))
@@ -397,6 +427,8 @@
     ((eq? (car x) 'read) (emit-read x))
     ((eq? (car x) 'addr) (emit-addr x))
     ((eq? (car x) 'not) (emit-not x))
+    ((eq? (car x) 'and) (emit-and x))
+    ((eq? (car x) 'or) (emit-or x))
     ((eq? (car x) 'mag) (unary-procedure jfsh-op-len x))
     ((eq? (car x) 'magsq) (unary-procedure jfsh-op-lensq x))
     ((eq? (car x) 'noise) (unary-procedure jfsh-op-noise x))

@@ -1,5 +1,8 @@
+#include <iostream>
 #include "engine/importgl.h"
 #include "linux/glut_graphics.h"
+
+using namespace std;
 
 #ifndef FLX_RPI
 
@@ -10,9 +13,9 @@ void glTranslatex(GLfixed x, GLfixed y, GLfixed z)
 
 void glFrustumx(GLfixed xmin, GLfixed xmax, GLfixed ymin, GLfixed ymax, GLfixed zNear, GLfixed zFar)
 {
-    glFrustum(xmin/65536.0, xmax/65536.0,
-              ymin/65536.0, ymax/65536.0,
-              zNear/65536.0, zFar/65536.0);
+   glFrustum(xmin/65536.0, xmax/65536.0,
+            ymin/65536.0, ymax/65536.0,
+            zNear/65536.0, zFar/65536.0);
 }
 
 void glClearColorx(GLfixed r, GLfixed g, GLfixed b, GLfixed a)

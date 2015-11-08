@@ -60,6 +60,7 @@ public:
 
     static int m_w;
     static int m_h;
+    static bool m_record;
 
 private:
 

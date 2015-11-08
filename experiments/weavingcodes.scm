@@ -9,7 +9,7 @@
 (with-primitive
  weft
  (program-jelly
-  30 prim-triangles
+  30 prim-triangles 1
   '(let ((vertex positions-start)
          (t 0)
          (v 0)
@@ -149,7 +149,7 @@
 (with-primitive
  warp
   (program-jelly
-   800 prim-triangles
+   800 prim-triangles 1
    '(let ((vertex positions-start)
           (warp-end 0)
           (warp-position (vector 0 0 0))

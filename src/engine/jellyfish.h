@@ -71,6 +71,8 @@
 #define SYNTH_PLY 44
 #define FLR 45
 #define MOD 46
+#define MULM 47
+
 
 // registers
 #define REG_CONTROL 0   // pc, cycles, stack
@@ -81,9 +83,6 @@
 #define REG_TX_ROTATEC 5
 #define REG_SENSOR_ADDR 6
 #define CODE_START 7
-
-// 4096
-#define REG_STK 4095 // oops hardcoded :/
 
 class jellyfish {
 
@@ -117,6 +116,7 @@ private:
 	vec3 *m_heap;
     u32 m_heap_size;
 	bool *m_instruction;
+    u32 m_stack_base;
 };
 
 #endif

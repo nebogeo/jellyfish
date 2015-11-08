@@ -267,9 +267,10 @@ void primitive::render(u32 hints)
 #ifdef _EE
     ps2_renderer::get()->render(0,m_size,&m_positions[0].x,&m_normals[0].x,&m_colours[0].x);
 #else
+
 #ifdef FLX_LINUX
 
-    float *fltpos=new float[m_size*3];
+    /*    float *fltpos=new float[m_size*3];
     float *fltnrm=new float[m_size*3];
     float *fltcol=new float[m_size*3];
     float *flttex=new float[m_size*3];
@@ -289,11 +290,11 @@ void primitive::render(u32 hints)
         fltnrm[pos]=m_normals[i].z;
         fltcol[pos]=m_colours[i].z;
         flttex[pos++]=m_tex[i].z;
-    }
-    glVertexPointer(3, GL_FLOAT, 0, fltpos);
-    glNormalPointer(GL_FLOAT, 0, fltnrm);
-    glColorPointer(3, GL_FLOAT, 0, fltcol);
-    glTexCoordPointer(3, GL_FLOAT, 0, flttex);
+        }*/
+    glVertexPointer(3, GL_FLOAT, 0, &m_positions[0]);
+    glNormalPointer(GL_FLOAT, 0, &m_normals[0]);
+    glColorPointer(3, GL_FLOAT, 0, &m_colours[0]);
+    glTexCoordPointer(3, GL_FLOAT, 0, &m_tex[0]);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -307,16 +308,17 @@ void primitive::render(u32 hints)
 
     if (hints&HINT_WIRE)
     {
-//        glDisableClientState(GL_COLOR_ARRAY);
-//        glColor3f(0,0,0);
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisable(GL_LIGHTING);
+        glColor3f(0,0,0);
         glDrawArrays(GL_LINE_STRIP, 0, m_size);
     }
-
+    /*
     delete[] fltpos;
     delete[] fltnrm;
     delete[] fltcol;
     delete[] flttex;
-
+    */
 #else
 
     glVertexPointer(3, GL_FIXED, 0, &m_positions[0]);
@@ -366,8 +368,9 @@ void primitive::render(u32 hints)
 
     if (hints&HINT_WIRE)
     {
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDrawArrays(GL_LINE_STRIP, 0, m_size);
+      glDisable(GL_LIGHTING);
+      glDisableClientState(GL_COLOR_ARRAY);
+      glDrawArrays(GL_LINE_STRIP, 0, m_size);
     }
 #endif
 #endif // _EE
