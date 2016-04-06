@@ -20,6 +20,7 @@
 #define FLX_ENGINE
 
 class obj_reader;
+class shader;
 
 class engine
 {
@@ -46,6 +47,8 @@ public:
     void hint(u32 hint);
     void line_width(u32 w);
     void texture(u32 id);
+    void set_shader(const string &vertex, const string &fragment);
+    shader *get_current_shader();
     void clear();
     void destroy(int id);
     void text_set(const char *str);
@@ -109,6 +112,7 @@ private:
         u32 m_hints;
         u32 m_line_width;
         u32 m_texture;
+        shader *m_shader;
     };
 
     class grab_stack_item : public list::node

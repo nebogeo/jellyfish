@@ -10,10 +10,11 @@ using namespace std;
 
 GLGraphicsScene::GLGraphicsScene() {
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(frame_tick()));
-    //timer->start(1000);
-    //timer->setInterval(10);
+
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(frame_tick()));
+  timer->start(16); // 60fps
+  timer->setInterval(1000);
 
 }
 

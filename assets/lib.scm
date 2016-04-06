@@ -147,6 +147,19 @@
 (define (choose l)
   (list-ref l (abs (random (length l)))))
 
+(define (slurp filename)
+  (let ((f (open-input-file filename)))
+    (let ((r (read-all f)))
+      (close-input-port f)
+      r)))
+
+(define (read-all port)
+  (let loop ((accum '()))
+    (let ((c (read-char port)))
+      (if (eof-object? c)
+          (apply string (reverse accum))
+          (loop (cons c accum))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; time
 

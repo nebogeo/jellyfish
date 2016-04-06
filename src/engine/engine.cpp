@@ -18,6 +18,7 @@
 #include "text_primitive.h"
 #include "jellyfish_primitive.h"
 #include "obj_reader.h"
+//#include "shader.h"
 
 #ifdef _EE
 #include "ee/ps2-renderer.h"
@@ -31,6 +32,7 @@ engine::state_stack_item::state_stack_item()
     m_hints=HINT_SOLID;
     m_line_width=1;
     m_texture=0;
+    //    m_shader=NULL;
 }
 
 engine::state_stack_item::state_stack_item(const state_stack_item &other)
@@ -44,6 +46,7 @@ engine::state_stack_item::state_stack_item(const state_stack_item &other)
    m_hints=other.m_hints;
    m_line_width=other.m_line_width;
    m_texture=other.m_texture;
+   //  m_shader=NULL;
  }
 
 engine::engine()
@@ -257,6 +260,39 @@ void engine::texture(u32 id)
         state_top()->m_texture=id;
     }
 }
+
+/*
+void engine::set_shader(const string &vertex,
+                    const string &fragment)
+{
+    if (grabbed())
+    {
+        scenenode *n = grabbed_node();
+        if (n) {
+          if (n->m_shader!=NULL) delete n->m_shader;
+
+          cerr<<"hello"<<endl;
+          n->m_shader = new shader(shader_pair(false,vertex,fragment));
+        }
+    }
+    else
+    {
+        if (state_top()->m_shader!=NULL) delete state_top()->m_shader;
+        state_top()->m_shader = new shader(shader_pair(false,vertex,fragment));
+    }
+}
+
+shader *engine::get_current_shader()
+{
+  if (grabbed()) {
+    scenenode *n = grabbed_node();
+    if (n) return n->m_shader;
+  } else {
+    return state_top()->m_shader;
+  }
+}
+
+*/
 
 void engine::parent(int p)
 {
@@ -633,7 +669,7 @@ void engine::render()
 	glEnable(GL_LIGHT0);
     buf[0]=0.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
 	glLightfv(GL_LIGHT0, GL_AMBIENT, (flx_real*)buf);
-    buf[0]=0.2f; buf[1]=0.2f; buf[2]=0.2f;  buf[3]=1.0f;
+    buf[0]=0.4f; buf[1]=0.4f; buf[2]=0.4f;  buf[3]=1.0f;
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, (flx_real*)buf);
     buf[0]=1.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
 	glLightfv(GL_LIGHT0, GL_SPECULAR, (flx_real*)buf);
@@ -644,7 +680,7 @@ void engine::render()
 	glEnable(GL_LIGHT1);
     buf[0]=0.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
 	glLightfv(GL_LIGHT1, GL_AMBIENT, (flx_real*)buf);
-    buf[0]=0.7f; buf[1]=0.7f; buf[2]=1.0f;  buf[3]=1.0f;
+    buf[0]=1.0f; buf[1]=0.7f; buf[2]=0.4f;  buf[3]=1.0f;
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, (flx_real*)buf);
     buf[0]=1.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.0f;
 	glLightfv(GL_LIGHT1, GL_SPECULAR, (flx_real*)buf);

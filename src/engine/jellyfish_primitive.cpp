@@ -87,7 +87,8 @@ void jellyfish_primitive::render(u32 hints)
     m_internal_tx.m[2][2]=t.z;
 
     // wheee!
-    glMultMatrixx((GLfixed*)&m_internal_tx.m[0][0]);
+    //glMultMatrixx((GLfixed*)&m_internal_tx.m[0][0]);
+    glMultMatrixf(&m_internal_tx.m[0][0]);
 
     switch (m_machine->peekiy(REG_GRAPHICS))
     {

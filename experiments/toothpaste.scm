@@ -24,17 +24,21 @@
 ;; setup and build the primitive
 (define squeeze
   (with-state
-   (scale (vector 0.08 0.08 0.08))
-   (rotate (vector 0 0 90))
-   (translate (vector -30 0 0))
+   (scale (vector 0.1 0.1 0.1))
+   (rotate (vector 90 0 0))
+   (translate (vector -45 0 20))
+
+   ;(scale (vector 0.2 0.2 0.2))
    (build-jellyfish prim-size)))
 
 ;; addresses into the jellyfish VM code
-(define addr-profile-size 28)
+(define addr-profile-scale 28)
+(define addr-profile-size 29)
 (define addr-seq-size 21)
+(define addr-t-normal-offset 512)
 
-;; build a circular profile shape
-(define (write-profile size)
+; build a circular profile shape
+(define (write-circular-profile size)
   (define (_ n addr)
     (when (<= n size) ;; overflow one at the end
           (pdata-set!
@@ -47,6 +51,23 @@
           (_ (+ n 1) (+ addr 1))))
   (pdata-set! "x" addr-profile-size (vector size 0 0))
   (_ 0 (+ addr-profile-size 1)))
+
+; build a circular profile shape
+(define (write-rect-profile)
+  (let ((l 1.5))
+    (pdata-set! "x" addr-profile-size (vector 4 0 0))
+    (pdata-set! "x" (+ addr-profile-size 1) (vector 0 l l))
+    (pdata-set! "x" (+ addr-profile-size 2) (vector 0 l (- l)))
+    (pdata-set! "x" (+ addr-profile-size 3) (vector 0 (- l) (- l)))
+    (pdata-set! "x" (+ addr-profile-size 4) (vector 0 (- l) 0))
+
+    (pdata-set! "t" (+ addr-t-normal-offset 0) (vector 0 1 0))
+    (pdata-set! "t" (+ addr-t-normal-offset 1) (vector 0 0 -1))
+    (pdata-set! "t" (+ addr-t-normal-offset 2) (vector 0 -1 0))
+    (pdata-set! "t" (+ addr-t-normal-offset 3) (vector 0 0 1))
+    (pdata-set! "t" (+ addr-t-normal-offset 4) (vector 0 1 0))
+
+    ))
 
 ;; write sequence data to (otherwise unused) texture coordinates
 ;; 0 = pull
@@ -63,11 +84,7 @@
      (set! addr (+ addr 1)))
    seq))
 
-;; program the primitive
-(with-primitive
- squeeze
- (program-jelly
-  5000 prim-triangles 1
+(define extruder
   ;; jellyfish code starts here
   '(let ((vertex positions-start)     ;; current vertex
          (pos (vector 0 0 0))         ;; current position (centre of profile)
@@ -93,6 +110,7 @@
          (seq-next 0)                 ;; next sequence instruction
          (seq-last 0)                 ;; last sequence instruction
          (profile-pos 0)              ;; current profile position
+         (profile-scale 1)
          (profile-size 3)             ;; size of profile
          (profile-start (vector 0 0 1)) ;; profile data starts here
          (profile-b (vector 0 1 0))  ;; some space for extra follows
@@ -115,8 +133,9 @@
          )
 
 
-     (trace (addr profile-size))
-     (trace (addr seq-size))
+     (trace (addr profile-scale))
+
+
 
 
      ;; set working matrix to identity
@@ -153,8 +172,6 @@
       (loop (< vertex positions-end)
 
             ;; build a new segment
-            (set! pos (+ pos dir))
-
             ;; read current, next and last sequence instructions
             (set! seq-cur (read (+ seq-pos texture-start)))
             (set! seq-next (read (+ (+ seq-pos 1) texture-start)))
@@ -179,6 +196,31 @@
               (rotate-mat-y (/ -90 segments))
               (set! pos (+ pos (* dir -0.2))))
 
+
+             ;; ((eq? seq-cur 3) ;; over
+             ;;  (when
+             ;;   ;; check next and last, either skip beginning or end
+             ;;   ;; so we join smoothly with the last segment
+             ;;   (and
+             ;;    (or (not (eq? seq-last 3)) (> t (/ segments 2)))
+             ;;    (or (not (eq? seq-next 3)) (< t (- (/ segments 2) 1))))
+             ;;   ;; use a cosine to make the curve
+             ;;   (set! pos
+             ;;         (+ pos (*v (sincos (* (/ t (- segments 1)) 180))
+             ;;                    (vector 0 2 0))))))
+             ;;  ((eq? seq-cur 4)
+             ;;   (when
+             ;;    ;; check next and last, either skip beginning or end
+             ;;    ;; so we join smoothly with the last segment
+             ;;    (and
+             ;;     (or (not (eq? seq-last 4)) (> t (/ segments 2)))
+             ;;     (or (not (eq? seq-next 4)) (< t (- (/ segments 2) 1))))
+             ;;    ;; use a cosine to make the curve
+             ;;    (set! pos
+             ;;          (+ pos (*v (sincos (* (/ t (- segments 1)) 180))
+             ;;                     (vector 0 -2 0)))))))
+
+
              ((eq? seq-cur 3) ;; over
               (when
                ;; check next and last, either skip beginning or end
@@ -186,10 +228,20 @@
                (and
                 (or (not (eq? seq-last 3)) (> t (/ segments 2)))
                 (or (not (eq? seq-next 3)) (< t (- (/ segments 2) 1))))
-               ;; use a cosine to make the curve
-               (set! pos
-                     (+ pos (*v (sincos (* (/ t (- segments 1)) 180))
-                                (vector 0 2 0))))))
+
+               (set! pos (+ pos (* dir -0.25)))
+
+               (when (eq? t 0) (rotate-mat-z -45))
+               (when (eq? t 1)
+                     ;; move a bit more up and down
+                     (set! pos (+ pos (* dir 1)))
+                     (rotate-mat-z 45))
+               (when (eq? t 2)
+                     (rotate-mat-z 45))
+               (when (eq? t 3)
+                     (set! pos (+ pos (* dir 1)))
+                     (rotate-mat-z -45))))
+
               ((eq? seq-cur 4)
                (when
                 ;; check next and last, either skip beginning or end
@@ -197,29 +249,43 @@
                 (and
                  (or (not (eq? seq-last 4)) (> t (/ segments 2)))
                  (or (not (eq? seq-next 4)) (< t (- (/ segments 2) 1))))
-                ;; use a cosine to make the curve
-                (set! pos
-                      (+ pos (*v (sincos (* (/ t (- segments 1)) 180))
-                                 (vector 0 -2 0)))))))
+
+                (set! pos (+ pos (* dir -0.25)))
+
+                (when (eq? t 0) (rotate-mat-z 45))
+                (when (eq? t 1)
+                      ;; move a bit more up and down
+                      (set! pos (+ pos (* dir 1)))
+                      (rotate-mat-z -45))
+                (when (eq? t 2)
+                      (rotate-mat-z -45))
+                (when (eq? t 3)
+                      (set! pos (+ pos (* dir 1)))
+                      (rotate-mat-z 45)))))
 
             ;; apply working matrix to the to current one
             (*m (addr tx-a) (addr cur-tx-a) (addr cur-tx-a))
 
+            ;; smooth by moving a bit here...
+            (set! pos (+ pos (* dir 0.5)))
             ;; update direction with current rotation matrix
             (set! dir (tx-proj (addr cur-tx-a) (vector 1 0 0)))
+            ;; and the rest post update here...
+            (set! pos (+ pos (* dir 0.5)))
+
 
             ;; setup for constructing a new profile
             (set! profile-pos (addr profile-start))
             (loop (< profile-pos (+ (addr profile-start) profile-size))
                   ;; stitch with last rotation matrix and position
                   (write! vertex
-                          (+ pos (tx-proj (addr cur-tx-a) (read (+ profile-pos 1))))
-                          (+ pos (tx-proj (addr cur-tx-a) (read profile-pos)))
-                          (+ last-pos (tx-proj (addr last-tx-a) (read profile-pos)))
+                          (+ pos (tx-proj (addr cur-tx-a) (* (read (+ profile-pos 1)) profile-scale)))
+                          (+ pos (tx-proj (addr cur-tx-a) (* (read profile-pos) profile-scale)))
+                          (+ last-pos (tx-proj (addr last-tx-a) (* (read profile-pos) profile-scale)))
 
-                          (+ last-pos (tx-proj (addr last-tx-a) (read profile-pos)))
-                          (+ last-pos (tx-proj (addr last-tx-a) (read (+ profile-pos 1))))
-                          (+ pos (tx-proj (addr cur-tx-a) (read (+ profile-pos 1)))))
+                          (+ last-pos (tx-proj (addr last-tx-a) (* (read profile-pos) profile-scale)))
+                          (+ last-pos (tx-proj (addr last-tx-a) (* (read (+ profile-pos 1)) profile-scale)))
+                          (+ pos (tx-proj (addr cur-tx-a) (* (read (+ profile-pos 1)) profile-scale))))
                   ;; transform and apply the normals
                   (write! (+ vertex prim-size)
                           (tx-proj (addr cur-tx-a) (read (+ profile-pos 1)))
@@ -230,10 +296,21 @@
                           (tx-proj (addr last-tx-a) (read (+ profile-pos 1)))
                           (tx-proj (addr cur-tx-a) (read (+ profile-pos 1))))
 
+                  ;; (write! (+ vertex prim-size)
+                  ;;         (tx-proj (addr cur-tx-a) (read profile-normal-pos))
+                  ;;         (tx-proj (addr cur-tx-a) (read profile-normal-pos))
+                  ;;         (tx-proj (addr last-tx-a) (read profile-normal-pos))
+
+                  ;;         (tx-proj (addr last-tx-a) (read profile-normal-pos))
+                  ;;         (tx-proj (addr last-tx-a) (read profile-normal-pos))
+                  ;;         (tx-proj (addr cur-tx-a) (read profile-normal-pos)))
+
+
                   ;; increment the vertex
                   (set! vertex (+ vertex 6))
                   ;; increment profile vertex
-                  (set! profile-pos (+ profile-pos 1)))
+                  (set! profile-pos (+ profile-pos 1))
+                  (set! profile-normal-pos (+ profile-normal-pos 1)))
 
 
             (set! t (+ t 1))
@@ -249,23 +326,39 @@
 
             ;; finished, so loop forever
             (when (> seq-pos seq-size)
-                  (forever))
+                  (set! seq-pos 0)
+                  (forever)
+                  )
 
             ;; record the current pos and rotation
             (set! last-pos pos)
             (set! last-tx-a cur-tx-a)
             (set! last-tx-b cur-tx-b)
             (set! last-tx-c cur-tx-c)
-            ))
-      ))
+            ))))
 
- ;; back to normal scheme
- (hint-unlit)
- (hint-wire)
+;; program the primitive
+(with-primitive
+ squeeze
+ (program-jelly
+  5000 prim-triangles 1 extruder)
+
+(shader (slurp "assets/shaders/gooch.vert.glsl")
+         (slurp "assets/shaders/gooch.frag.glsl"))
+ (shader-set! "LightPos" (vector 1 10 -50))
+ (shader-set! "WarmColour" (vector 0.8 0.2 0.1))
+ (shader-set! "CoolColour" (vector 0.0 0.1 0.5))
+ (shader-set! "SurfaceColour" (vector 0.3 0.2 0.2))
+ (shader-set! "OutlineWidth" 0.0)
+
  (pdata-map! (lambda (c) (vector 1 1 1)) "c")
  (pdata-map! (lambda (n) (vector 0 0 0)) "n")
 
  )
+
+;;(set! debug #t)
+;;(msg (disassemble-compiled extruder))
+;;(set! debug #f)
 
 ;; test yarn code
 (define incode "pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn
@@ -286,6 +379,10 @@ out,turn in,under,over,over,under,under,over,over,under,under,over,over,under,tu
 out,turn in,under,under,over,over,under,under,over,over,under,under,over,over,turn
 out,turn in,over,under,under,over,over,under,under,over,over,under,under,over,turn
 out,turn in")
+
+;(define incode "pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,pull 20,turn out,turn in,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in")
+
+;(define incode "pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,pull 24,turn out,turn in,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,under,over,under,over,under,over,under,over,under,over,under,turn out,turn in,over,over,under,under,over,over,under,under,over,over,under,under,turn out,turn in,under,over,over,under,under,over,over,under,under,over,over,under,turn out,turn in,under,under,over,over,under,under,over,over,under,under,over,over,turn out,turn in,over,under,under,over,over,under,under,over,over,under,under,over,turn out,turn in,over,over,under,under,over,over,under,under,over,over,under,under,turn out,turn in,under,over,over,under,under,over,over,under,under,over,over,under,turn out,turn in,under,under,over,over,under,under,over,over,under,under,over,over,turn out,turn in,over,under,under,over,over,under,under,over,over,under,under,over,turn out,turn in,over,over,under,under,over,over,under,under,over,over,under,under,turn out,turn in,under,over,over,under,under,over,over,under,under,over,over,under,turn out,turn in,under,under,over,over,under,under,over,over,under,under,over,over,turn out,turn in,over,under,under,over,over,under,under,over,over,under,under,over,turn out,turn in")
 
 ;; initial turn state
 (define turn-state 1)
@@ -320,7 +417,7 @@ out,turn in")
    '()
    (string-split incode (list #\,))))
 
-;;(define seqcode '(3 4 1 1 3 4))
+;(define seqcode '(3 4 1 1 0 0 ))
 
 (msg seqcode)
 
@@ -331,12 +428,17 @@ out,turn in")
 
 (every-frame
  (begin
-   (with-primitive camera (rotate (vector 0 0.125 0)))
+;   (with-primitive camera (rotate (vector -0.2 0.125 0)))
    (with-primitive
     squeeze
     (when (eqv? frame 2)
-          (write-profile 6)
+          (write-circular-profile 6)
           (write-seq seqcode))
+
+    (pdata-set! "x" addr-profile-scale
+                (vector (+ 1.0 (* 0. (sin (* frame 0.09))))
+                        0 0))
+
     (set! frame (+ frame 1))
     (translate (vector 30 0 -30))
     ;;(rotate (vector 0 0.25 0))

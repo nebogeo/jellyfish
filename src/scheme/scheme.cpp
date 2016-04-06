@@ -30,32 +30,9 @@
 #include <limits.h>
 #include <float.h>
 #include <ctype.h>
-#include <sys/time.h>
-#include <time.h>
+#include <stdint.h>
+#include "interface.h"
 
-///// starwisp stuff //////////////////////////
-
-#ifdef ANDROID_NDK
-#include <android/log.h>
-#endif
-
-#include "engine/engine.h"
-#include "core/geometry.h"
-#include "fluxa/graph.h"
-#include "fluxa/time.h"
-#include "audio.h"
-
-graph *m_audio_graph = NULL;
-audio_device *m_audio_device = NULL;
-
-char *starwisp_data = NULL;
-
-#ifdef USE_SQLITE
-#include "core/db_container.h"
-db_container the_db_container;
-#include "core/idmap.h"
-idmap the_idmap;
-#endif
 
 #ifdef _EE
 #define USE_STRLWR 0
@@ -141,34 +118,7 @@ static const char *strlwr(char *s) {
 # define FIRST_CELLSEGS 3
 #endif
 
-enum scheme_types {
-  T_STRING=1,
-  T_NUMBER=2,
-  T_SYMBOL=3,
-  T_PROC=4,
-  T_PAIR=5,
-  T_CLOSURE=6,
-  T_CONTINUATION=7,
-  T_FOREIGN=8,
-  T_CHARACTER=9,
-  T_PORT=10,
-  T_VECTOR=11,
-  T_MACRO=12,
-  T_PROMISE=13,
-  T_ENVIRONMENT=14,
-  T_LAST_SYSTEM_TYPE=14
-};
 
-/* ADJ is enough slack to align cells in a TYPE_BITS-bit boundary */
-#define ADJ 32
-#define TYPE_BITS 5
-#define T_MASKTYPE      31    /* 0000000000011111 */
-#define T_SYNTAX      4096    /* 0001000000000000 */
-#define T_IMMUTABLE   8192    /* 0010000000000000 */
-#define T_ATOM       16384    /* 0100000000000000 */   /* only for gc */
-#define CLRATOM      49151    /* 1011111111111111 */   /* only for gc */
-#define MARK         32768    /* 1000000000000000 */
-#define UNMARK       32767    /* 0111111111111111 */
 
 
 static num num_add(num a, num b);
@@ -188,30 +138,20 @@ static int num_le(num a, num b);
 static double round_per_R5RS(double x);
 #endif
 static int is_zero_double(double x);
-static INLINE int num_is_integer(pointer p) {
-  return ((p)->_object._number.is_fixnum);
-}
 
 static num num_zero;
 static num num_one;
 
-/* macros for cell operations */
-#define typeflag(p)      ((p)->_flag)
-#define type(p)          (typeflag(p)&T_MASKTYPE)
+INTERFACE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
+INTERFACE int is_number(pointer p)    { return (type(p)==T_NUMBER); }
+INTERFACE int is_integer(pointer p) {
+  return is_number(p) && ((p)->_object._number.is_fixnum);
+}
 
 INTERFACE INLINE int is_string(pointer p)     { return (type(p)==T_STRING); }
 #define strvalue(p)      ((p)->_object._string._svalue)
 #define strlength(p)        ((p)->_object._string._length)
 
-INTERFACE static int is_list(scheme *sc, pointer p);
-INTERFACE INLINE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
-INTERFACE static void fill_vector(pointer vec, pointer obj);
-INTERFACE static pointer vector_elem(pointer vec, int ielem);
-INTERFACE static pointer set_vector_elem(pointer vec, int ielem, pointer a);
-INTERFACE INLINE int is_number(pointer p)    { return (type(p)==T_NUMBER); }
-INTERFACE INLINE int is_integer(pointer p) {
-  return is_number(p) && ((p)->_object._number.is_fixnum);
-}
 
 INTERFACE INLINE int is_real(pointer p) {
   return is_number(p) && (!(p)->_object._number.is_fixnum);
@@ -233,8 +173,6 @@ INTERFACE INLINE int is_inport(pointer p)  { return is_port(p) && p->_object._po
 INTERFACE INLINE int is_outport(pointer p) { return is_port(p) && p->_object._port->kind & port_output; }
 
 INTERFACE INLINE int is_pair(pointer p)     { return (type(p)==T_PAIR); }
-#define car(p)           ((p)->_object._cons._car)
-#define cdr(p)           ((p)->_object._cons._cdr)
 INTERFACE pointer pair_car(pointer p)   { return car(p); }
 INTERFACE pointer pair_cdr(pointer p)   { return cdr(p); }
 INTERFACE pointer set_car(pointer p, pointer q) { return car(p)=q; }
@@ -280,19 +218,6 @@ INTERFACE INLINE int is_immutable(pointer p) { return (typeflag(p)&T_IMMUTABLE);
 /*#define setimmutable(p)  typeflag(p) |= T_IMMUTABLE*/
 INTERFACE INLINE void setimmutable(pointer p) { typeflag(p) |= T_IMMUTABLE; }
 
-#define caar(p)          car(car(p))
-#define cadr(p)          car(cdr(p))
-#define cdar(p)          cdr(car(p))
-#define cddr(p)          cdr(cdr(p))
-#define cadar(p)         car(cdr(car(p)))
-#define caddr(p)         car(cdr(cdr(p)))
-#define cadddr(p)        car(cdr(cdr(cdr(p))))
-#define caddddr(p)       car(cdr(cdr(cdr(cdr(p)))))
-#define cadddddr(p)      car(cdr(cdr(cdr(cdr(cdr(p))))))
-#define cdaar(p)         cdr(car(car(p)))
-#define cadaar(p)        car(cdr(car(car(p))))
-#define cadddr(p)        car(cdr(cdr(cdr(p))))
-#define cddddr(p)        cdr(cdr(cdr(cdr(p))))
 
 #if USE_CHAR_CLASSIFIERS
 static INLINE int Cisalpha(int c) { return isascii(c) && isalpha(c); }
@@ -371,7 +296,6 @@ static int count_consecutive_cells(pointer x, int needed);
 static pointer find_slot_in_env(scheme *sc, pointer env, pointer sym, int all);
 static pointer mk_number(scheme *sc, num n);
 static char *store_string(scheme *sc, int len, const char *str, char fill);
-static pointer mk_vector(scheme *sc, int len);
 static pointer mk_atom(scheme *sc, char *q);
 static pointer mk_sharp_const(scheme *sc, char *name);
 static pointer mk_port(scheme *sc, port *p);
@@ -1039,7 +963,7 @@ INTERFACE pointer mk_empty_string(scheme *sc, int len, char fill) {
      return (x);
 }
 
-INTERFACE static pointer mk_vector(scheme *sc, int len)
+INTERFACE pointer mk_vector(scheme *sc, int len)
 { return get_vector_object(sc,len,sc->NIL); }
 
 INTERFACE static void fill_vector(pointer vec, pointer obj) {
@@ -1053,7 +977,7 @@ INTERFACE static void fill_vector(pointer vec, pointer obj) {
      }
 }
 
-INTERFACE static pointer vector_elem(pointer vec, int ielem) {
+INTERFACE pointer vector_elem(pointer vec, int ielem) {
      int n=ielem/2;
      if(ielem%2==0) {
           return car(vec+1+n);
@@ -1062,7 +986,7 @@ INTERFACE static pointer vector_elem(pointer vec, int ielem) {
      }
 }
 
-INTERFACE static pointer set_vector_elem(pointer vec, int ielem, pointer a) {
+INTERFACE pointer set_vector_elem(pointer vec, int ielem, pointer a) {
      int n=ielem/2;
      if(ielem%2==0) {
           return car(vec+1+n)=a;
@@ -2305,7 +2229,6 @@ static INLINE pointer slot_value_in_env(pointer slot)
     sc->op = (int)(a);                                      \
     return sc->T; END
 
-#define s_return(sc,a) return _s_return(sc,a)
 
 #ifndef USE_SCHEME_STACK
 
@@ -2339,7 +2262,7 @@ static void s_save(scheme *sc, enum scheme_opcodes op, pointer args, pointer cod
   sc->dump = (pointer)(nframes+1);
 }
 
-static pointer _s_return(scheme *sc, pointer a)
+pointer _s_return(scheme *sc, pointer a)
 {
   uintptr_t nframes = (uintptr_t)sc->dump;
   struct dump_stack_frame *frame;
@@ -4401,506 +4324,9 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
           s_retbool(is_closure(car(sc->args)));
      case OP_MACROP:          /* macro? */
           s_retbool(is_macro(car(sc->args)));
-///////////// FLUXUS
-     case OP_ALOG:
-          #ifdef ANDROID_NDK
-          __android_log_print(ANDROID_LOG_INFO, "starwisp", string_value(car(sc->args)));
-          #endif
-          s_return(sc,sc->F);
-     case OP_SEND:
-          if (is_string(car(sc->args))) {
-               if (starwisp_data!=NULL) {
-               #ifdef ANDROID_NDK
-                    __android_log_print(ANDROID_LOG_INFO, "starwisp", "deleting starwisp data: something is wrong!");
-               #endif
-                    free(starwisp_data);
-               }
-               starwisp_data=strdup(string_value(car(sc->args)));
-          }
-          s_return(sc,sc->F);
-     case OP_OPEN_DB: {
-#ifdef USE_SQLITE
-          if (is_string(car(sc->args))) {
-               the_db_container.add(string_value(car(sc->args)),
-                                    new db(string_value(car(sc->args))));
-               s_return(sc,sc->T);
-          }
-#endif
-          s_return(sc,sc->F);
-     }
-     case OP_EXEC_DB: {
-#ifdef USE_SQLITE
-          if (is_string(car(sc->args)) &&
-              is_string(cadr(sc->args))) {
-               db *d=the_db_container.get(string_value(car(sc->args)));
-               if (d!=NULL)
-               {
-                    s_return(sc,db_exec(sc,d));
-               }
-          }
-#endif
-          s_return(sc,sc->F);
-     }
-     case OP_INSERT_DB: {
-#ifdef USE_SQLITE
-          if (is_string(car(sc->args)) &&
-              is_string(cadr(sc->args))) {
-               db *d=the_db_container.get(string_value(car(sc->args)));
-               if (d!=NULL)
-               {
-                    db_exec(sc,d);
-                    s_return(sc,mk_integer(sc,d->last_rowid()));
-               }
-          }
-#endif
-          s_return(sc,sc->F);
-     }
-/*     case OP_INSERT_BLOB_DB: {
-#ifndef FLX_RPI
-          if (is_string(car(sc->args)) &&
-              is_string(caddr(sc->args)) &&
-              is_string(cadddr(sc->args)) &&
-              is_string(caddddr(sc->args)) &&
-              is_string(cadddddr(sc->args))) {
-               db *d=the_db_container.get(string_value(car(sc->args)));
-               if (d!=NULL)
-               {
-                    db_exec(sc,d);
-                    s_return(sc,mk_integer(sc,d->last_rowid()));
-               }
-          }
-#endif
-          s_return(sc,sc->F);
-          } */
-     case OP_STATUS_DB: {
-#ifdef USE_SQLITE
-          if (is_string(car(sc->args))) {
-               s_return(sc,mk_string(sc,the_db_container.status()));
-          }
-#endif
-          s_return(sc,sc->F);
-     }
-     case OP_TIME: {
-          	timeval t;
-            // stop valgrind complaining
-            t.tv_sec=0;
-            t.tv_usec=0;
-            gettimeofday(&t,NULL);
-            s_return(sc,cons(sc,mk_integer(sc,t.tv_sec),
-                             cons(sc,mk_integer(sc,t.tv_usec),sc->NIL)));
-     }
-     case OP_NTP_TIME: {
-          spiralcore::time t;
-	  t.set_to_now();
-	  s_return(sc,cons(sc,mk_integer(sc,t.seconds),
-                       cons(sc,mk_integer(sc,t.fraction),sc->NIL)));
-     }
-     case OP_NTP_TIME_ADD: {
-          spiralcore::time t(ivalue(car(car(sc->args))),
-                 ivalue(cadr(car(sc->args))));
-
-          t+=rvalue(cadr(sc->args));
-
-          s_return(sc,cons(sc,mk_integer(sc,t.seconds),
-                           cons(sc,mk_integer(sc,t.fraction),sc->NIL)));
-     }
-     case OP_DATETIME: {
-          timeval t;
-          // stop valgrind complaining
-          t.tv_sec=0;
-          t.tv_usec=0;
-          gettimeofday(&t,NULL);
-
-          struct tm *now = gmtime((time_t *)&t.tv_sec);
-
-          /* note: now->tm_year is the number of years SINCE 1900.  On the year 2000, this
-             will be 100 not 0.  Do a man gmtime for more information */
-
-          s_return(sc,cons(sc,mk_integer(sc,now->tm_year + 1900),
-                           cons(sc,mk_integer(sc,now->tm_mon + 1),
-                                cons(sc,mk_integer(sc,now->tm_mday),
-                                     cons(sc,mk_integer(sc,now->tm_hour),
-                                          cons(sc,mk_integer(sc,now->tm_min),
-                                               cons(sc,mk_integer(sc,now->tm_sec), sc->NIL)))))));
-
-     }
-
-#ifdef USE_SQLITE
-     case OP_ID_MAP_ADD: {
-          the_idmap.add(
-               string_value(car(sc->args)),
-               ivalue(cadr(sc->args)));
-          s_return(sc,sc->F);
-     }
-     case OP_ID_MAP_GET: {
-          s_return(
-               sc,mk_integer(sc,the_idmap.get(
-                               string_value(car(sc->args)))));
-     }
-#endif
-
-//////////////////// fluxa /////////////////////////////////////////
-     case OP_SYNTH_INIT: {
-          // name,buf,sr,synths
-          m_audio_device = new audio_device(string_value(car(sc->args)),
-                                            ivalue(cadr(sc->args)),
-                                            ivalue(caddr(sc->args)));
-          m_audio_graph = new graph(ivalue(cadddr(sc->args)),ivalue(cadr(sc->args)));
-          m_audio_device->start_graph(m_audio_graph);
-          s_return(sc,sc->F);
-     } break;
-     case OP_SYNTH_RECORD: {
-          m_audio_device->start_recording(string_value(car(sc->args)));
-          s_return(sc,sc->F);
-     } break;
-     case OP_SYNTH_CRT: {
-          m_audio_graph
-               ->create(ivalue(car(sc->args)),
-                        (graph::node_type)(ivalue(cadr(sc->args))),
-                        rvalue(caddr(sc->args)));
-          s_return(sc,sc->F);
-     } break;
-     case OP_SYNTH_CON: {
-          m_audio_graph
-               ->connect(ivalue(car(sc->args)),
-                         ivalue(cadr(sc->args)),
-                         ivalue(caddr(sc->args)));
-          s_return(sc,sc->F);
-     } break;
-     case OP_SYNTH_PLY: {
-          m_audio_graph
-               ->play(ivalue(car(sc->args)),
-                      ivalue(cadr(sc->args)),
-                      ivalue(caddr(sc->args)),
-                      rvalue(cadddr(sc->args)));
-          s_return(sc,sc->F);
-     } break;
-     case OP_SLEEP: {
-	  usleep(ivalue(car(sc->args)));
-          s_return(sc,sc->F);
-     } break;
-     case OP_FMOD: {
-          s_return(sc,mk_real(sc,fmod(rvalue(car(sc->args)),rvalue(cadr(sc->args)))));
-     } break;
-
-//////////////////// fluxus /////////////////////////////////////////
-
-     case OP_PUSH:
-         engine::get()->push(); s_return(sc,sc->F);
-     case OP_POP:
-         engine::get()->pop(); s_return(sc,sc->F);
-     case OP_GRAB:
-         engine::get()->grab(ivalue(car(sc->args))); s_return(sc,sc->F);
-     case OP_UNGRAB:
-         engine::get()->ungrab(); s_return(sc,sc->F);
-     case OP_PARENT:
-          engine::get()->parent(ivalue(car(sc->args))); s_return(sc,sc->F);
-     case OP_LOCK_CAMERA:
-	  engine::get()->lock_camera(ivalue(car(sc->args))); s_return(sc,sc->F);
-     case OP_IDENTITY:
-         engine::get()->identity(); s_return(sc,sc->F);
-     case OP_TRANSLATE:
-         engine::get()->translate(rvalue(vector_elem(car(sc->args),0)),
-                                  rvalue(vector_elem(car(sc->args),1)),
-                                  rvalue(vector_elem(car(sc->args),2)));
-          s_return(sc,sc->F);
-     case OP_SCALE:
-          if (!is_vector(car(sc->args))) // uniform scale with one arg
-          {
-               engine::get()->scale(rvalue(car(sc->args)),
-                                    rvalue(car(sc->args)),
-                                    rvalue(car(sc->args)));
-          } else {
-               engine::get()->scale(rvalue(vector_elem(car(sc->args),0)),
-                                    rvalue(vector_elem(car(sc->args),1)),
-                                    rvalue(vector_elem(car(sc->args),2)));
-          }
-         s_return(sc,sc->F);
-     case OP_ROTATE:
-         engine::get()->rotate(rvalue(vector_elem(car(sc->args),0)),
-                               rvalue(vector_elem(car(sc->args),1)),
-                               rvalue(vector_elem(car(sc->args),2)));
-         s_return(sc,sc->F);
-     case OP_CONCAT:
-     {
-          mat44 t = mat44(rvalue(vector_elem(car(sc->args),0)),
-                                      rvalue(vector_elem(car(sc->args),1)),
-                                      rvalue(vector_elem(car(sc->args),2)),
-                                      rvalue(vector_elem(car(sc->args),3)),
-                                      rvalue(vector_elem(car(sc->args),4)),
-                                      rvalue(vector_elem(car(sc->args),5)),
-                                      rvalue(vector_elem(car(sc->args),6)),
-                                      rvalue(vector_elem(car(sc->args),7)),
-                                      rvalue(vector_elem(car(sc->args),8)),
-                                      rvalue(vector_elem(car(sc->args),9)),
-                                      rvalue(vector_elem(car(sc->args),10)),
-                                      rvalue(vector_elem(car(sc->args),11)),
-                                      rvalue(vector_elem(car(sc->args),12)),
-                                      rvalue(vector_elem(car(sc->args),13)),
-                                      rvalue(vector_elem(car(sc->args),14)),
-                          rvalue(vector_elem(car(sc->args),15)));
-          t.transpose();
-          engine::get()->concat(t);
-          s_return(sc,sc->F);
-     }
-     case OP_COLOUR:
-         engine::get()->colour(rvalue(vector_elem(car(sc->args),0)),
-                               rvalue(vector_elem(car(sc->args),1)),
-                               rvalue(vector_elem(car(sc->args),2)),
-                               rvalue(vector_elem(car(sc->args),3)));
-         s_return(sc,sc->F);
-     case OP_HINT:
-     {
-          u32 h=ivalue(car(sc->args));
-          switch (h)
-          {
-          case 0: engine::get()->hint(HINT_NONE); break; //???
-          case 1: engine::get()->hint(HINT_SOLID); break;
-          case 2: engine::get()->hint(HINT_WIRE); break;
-          case 3: engine::get()->hint(HINT_NORMAL); break;
-          case 4: engine::get()->hint(HINT_POINTS); break;
-          case 5: engine::get()->hint(HINT_AALIAS); break;
-          case 6: engine::get()->hint(HINT_BOUND); break;
-          case 7: engine::get()->hint(HINT_UNLIT); break;
-          case 8: engine::get()->hint(HINT_VERTCOLS); break;
-          case 9: engine::get()->hint(HINT_ORIGIN); break;
-          case 10: engine::get()->hint(HINT_CAST_SHADOW); break;
-          case 11: engine::get()->hint(HINT_IGNORE_DEPTH); break;
-          case 12: engine::get()->hint(HINT_DEPTH_SORT); break;
-          case 13: engine::get()->hint(HINT_LAZY_PARENT); break;
-          case 14: engine::get()->hint(HINT_CULL_CCW); break;
-          case 15: engine::get()->hint(HINT_WIRE_STIPPLED); break;
-          case 16: engine::get()->hint(HINT_SPHERE_MAP); break;
-          case 17: engine::get()->hint(HINT_FRUSTUM_CULL); break;
-          case 18: engine::get()->hint(HINT_NORMALISE); break;
-          case 19: engine::get()->hint(HINT_NOBLEND); break;
-          case 20: engine::get()->hint(HINT_NOZWRITE); break;
-          }
-          s_return(sc,sc->F);
-     }
-     case OP_DESTROY:
-          engine::get()->destroy(rvalue(car(sc->args)));
-          s_return(sc,sc->F);
-     case OP_LINE_WIDTH:
-          engine::get()->line_width(rvalue(car(sc->args)));
-          s_return(sc,sc->F);
-     case OP_TEXTURE:
-          engine::get()->texture(rvalue(car(sc->args)));
-          s_return(sc,sc->F);
-     case OP_LOAD_TEXTURE:
-          s_return(sc,mk_integer(sc,engine::get()->get_texture(string_value(car(sc->args)))));
-     case OP_DRAW_INSTANCE:
-          engine::get()->draw_instance(ivalue(car(sc->args)));
-          s_return(sc,sc->F);
-     case OP_BUILD_CUBE:
-         s_return(sc,mk_integer(sc,engine::get()->build_cube()));
-     case OP_LOAD_OBJ:
-         s_return(sc,mk_integer(sc,engine::get()->load_obj(string_value(car(sc->args)))));
-     case OP_RAW_OBJ:
-         s_return(sc,mk_integer(sc,engine::get()->raw_obj(string_value(car(sc->args)))));
-     case OP_BUILD_TEXT:
-         s_return(sc,mk_integer(sc,engine::get()->build_text(
-                                     string_value(car(sc->args)))));
-     case OP_BUILD_JELLYFISH:
-         s_return(sc,mk_integer(sc,engine::get()->build_jellyfish(ivalue(car(sc->args)))));
-     case OP_BUILD_POLYGONS:
-         s_return(sc,mk_integer(sc,engine::get()->build_polygons(
-                                    ivalue(car(sc->args)),
-                                    ivalue(cadr(sc->args))
-                                    )));
-     case OP_GET_TRANSFORM:
-     {
-         flx_real *m=&(engine::get()->get_transform()->m[0][0]);
-         pointer v=mk_vector(sc,16);
-         int i=0;
-         for (i=0; i<16; i++)
-         {
-             set_vector_elem(v,i,mk_real(sc,m[i]));
-         }
-         s_return(sc,v);
-     }
-     case OP_GET_GLOBAL_TRANSFORM:
-     {
-         mat44 mat=engine::get()->get_global_transform();
-         flx_real *m=&(mat.m[0][0]);
-         pointer v=mk_vector(sc,16);
-         int i=0;
-         for (i=0; i<16; i++)
-         {
-             set_vector_elem(v,i,mk_real(sc,m[i]));
-         }
-         s_return(sc,v);
-     }
-     case OP_GET_CAMERA_TRANSFORM:
-     {
-         flx_real *m=&(engine::get()->get_camera_transform()->m[0][0]);
-         pointer v=mk_vector(sc,16);
-         int i=0;
-         for (i=0; i<16; i++)
-         {
-             set_vector_elem(v,i,mk_real(sc,m[i]));
-         }
-         s_return(sc,v);
-     }
-     case OP_GET_SCREEN_SIZE:
-     {
-         unsigned int *s=engine::get()->get_screensize();
-         pointer v=mk_vector(sc,2);
-         set_vector_elem(v,0,mk_real(sc,s[0]));
-         set_vector_elem(v,1,mk_real(sc,s[1]));
-         s_return(sc,v);
-     }
-     case OP_APPLY_TRANSFORM:
-         engine::get()->apply_transform(); s_return(sc,sc->F);
-     case OP_CLEAR:
-         engine::get()->clear(); s_return(sc,sc->F);
-     case OP_CLEAR_COLOUR:
-         engine::get()->clear_colour(rvalue(vector_elem(car(sc->args),0)),
-                                     rvalue(vector_elem(car(sc->args),1)),
-                                     rvalue(vector_elem(car(sc->args),2)),
-                                     rvalue(vector_elem(car(sc->args),3)));
-         s_return(sc,sc->F);
-     case OP_PDATA_SIZE:
-          s_return(sc,mk_integer(sc,engine::get()->pdata_size()));
-     case OP_PDATA_ADD:
-         engine::get()->pdata_add(string_value(car(sc->args)));
-         s_return(sc,sc->F);
-     case OP_PDATA_REF:
-     {
-          vec3* vec=engine::get()->pdata_get(string_value(car(sc->args)),
-                                   ivalue(cadr(sc->args)));
-          pointer v=mk_vector(sc,3);
-          if (vec)
-          {
-               set_vector_elem(v,0,mk_real(sc,vec->x));
-               set_vector_elem(v,1,mk_real(sc,vec->y));
-               set_vector_elem(v,2,mk_real(sc,vec->z));
-          }
-          s_return(sc,v);
-     }
-     case OP_PDATA_SET:
-     {
-         vec3 vec(rvalue(vector_elem(caddr(sc->args),0)),
-                  rvalue(vector_elem(caddr(sc->args),1)),
-                  rvalue(vector_elem(caddr(sc->args),2)));
-         engine::get()->pdata_set(string_value(car(sc->args)),
-                                  ivalue(cadr(sc->args)),
-                                  vec);
-         s_return(sc,sc->F);
-     }
-     case OP_SET_TEXT:
-     {
-          engine::get()->text_set(string_value(car(sc->args)));
-          s_return(sc,sc->F);
-     }
-     case OP_TEXT_PARAMS:
-     {
-          engine::get()->text_params(string_value(list_ref(sc,sc->args,0)),
-                                     rvalue(list_ref(sc,sc->args,1)),
-                                     rvalue(list_ref(sc,sc->args,2)),
-                                     ivalue(list_ref(sc,sc->args,3)),
-                                     ivalue(list_ref(sc,sc->args,4)),
-                                     rvalue(list_ref(sc,sc->args,5)),
-                                     rvalue(list_ref(sc,sc->args,6)),
-                                     rvalue(list_ref(sc,sc->args,7)),
-                                     rvalue(list_ref(sc,sc->args,8)),
-                                     rvalue(list_ref(sc,sc->args,9)),
-                                     rvalue(list_ref(sc,sc->args,10)));
-          s_return(sc,sc->F);
-     }
-     case OP_RECALC_BB:
-     {
-          engine::get()->recalc_bb();
-          s_return(sc,sc->F);
-     }
-     case OP_BB_POINT_INTERSECT:
-     {
-         vec3 pvec(rvalue(vector_elem(car(sc->args),0)),
-                   rvalue(vector_elem(car(sc->args),1)),
-                   rvalue(vector_elem(car(sc->args),2)));
-         s_return(sc,mk_integer(sc,engine::get()->bb_point_intersect(pvec,rvalue(cadr(sc->args)))));
-     }
-     case OP_GEO_LINE_INTERSECT:
-     {
-         vec3 svec(rvalue(vector_elem(car(sc->args),0)),
-                   rvalue(vector_elem(car(sc->args),1)),
-                   rvalue(vector_elem(car(sc->args),2)));
-         vec3 evec(rvalue(vector_elem(cadr(sc->args),0)),
-                   rvalue(vector_elem(cadr(sc->args),1)),
-                   rvalue(vector_elem(cadr(sc->args),2)));
-	 bb::list *points=engine::get()->geo_line_intersect(svec,evec);
-         if (points!=NULL)
-         {
-              pointer list=sc->NIL;
-              intersect_point *p=static_cast<intersect_point*>(points->m_head);
-              while (p!=NULL)
-              {
-                   list=cons(sc,mk_real(sc,p->m_t),list);
-                   pointer blend=sc->NIL;
-                   intersect_point::blend *b=
-                        static_cast<intersect_point::blend*>
-                        (p->m_blends.m_head);
-                   while (b!=NULL)
-                   {
-                        pointer v=mk_vector(sc,3);
-                        set_vector_elem(v,0,mk_real(sc,b->m_blend.x));
-                        set_vector_elem(v,1,mk_real(sc,b->m_blend.y));
-                        set_vector_elem(v,2,mk_real(sc,b->m_blend.z));
-
-                        pointer l=sc->NIL;
-                        l=cons(sc,mk_string(sc,b->m_name),v);
-
-                        blend=cons(sc,l,blend);
-                        b=static_cast<intersect_point::blend*>(b->m_next);
-                   }
-                   list=cons(sc,blend,list);
-                   p=static_cast<intersect_point*>(p->m_next);
-              }
-              s_return(sc,list);
-         }
-         s_return(sc,sc->F);
-     }
-     case OP_GET_LINE_INTERSECT:
-     {
-         vec3 svec(rvalue(vector_elem(car(sc->args),0)),
-                   rvalue(vector_elem(car(sc->args),1)),
-                   rvalue(vector_elem(car(sc->args),2)));
-         vec3 evec(rvalue(vector_elem(cadr(sc->args),0)),
-                   rvalue(vector_elem(cadr(sc->args),1)),
-                   rvalue(vector_elem(cadr(sc->args),2)));
-         s_return(sc,mk_integer(sc,engine::get()->get_line_intersect(svec,evec)));
-     }
-     case OP_MINVERSE:
-     {
-          mat44 inm;
-          int i=0;
-          for (i=0; i<16; i++)
-          {
-               inm.arr()[i]=rvalue(vector_elem(car(sc->args),i));
-          }
-          inm=inm.inverse();
-          pointer v=mk_vector(sc,16);
-          for (i=0; i<16; i++)
-          {
-               set_vector_elem(v,i,mk_real(sc,inm.arr()[i]));
-          }
-          s_return(sc,v);
-     }
-     case OP_BITWISE_IOR:
-     {
-          s_return(sc,mk_integer(sc,
-                                 ivalue(car(sc->args))|
-                                 ivalue(cadr(sc->args))|
-                                 ivalue(caddr(sc->args))
-                        ));
-     }
-
-
-////////////////////
 
      default:
-          snprintf(sc->strbuff,STRBUFFSIZE,"%d: illegal operator", sc->op);
-          Error_0(sc,sc->strbuff);
+          return scheme_interface(sc,op);
      }
      return sc->T; /* NOTREACHED */
 }
@@ -5513,13 +4939,13 @@ static void dump_stack_print(scheme *sc, char *str)
      }
 }
 
-static pointer _Error_1(scheme *sc, const char *s, pointer a) {
+pointer _Error_1(scheme *sc, const char *s, pointer a) {
 #if SHOW_ERROR_LINE
      const char *str = s;
      char sbuf[STRBUFFSIZE];
      char stkbuf[STRBUFFSIZE];
 
-     putstr(sc, "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
+     //putstr(sc, "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
 
      /* make sure error is not in REPL */
      if(sc->load_stack[sc->file_i].rep.stdio.file != stdin) {

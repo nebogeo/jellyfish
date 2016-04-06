@@ -22,7 +22,8 @@ scenenode::scenenode(primitive *p) :
     m_parent(NULL),
     m_hints(HINT_SOLID),
     m_line_width(1),
-    m_texture(0)
+    m_texture(0),
+    m_shader(NULL)
 {
     if (m_primitive) m_primitive->build();
 }

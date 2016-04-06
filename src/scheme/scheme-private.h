@@ -21,7 +21,7 @@ enum scheme_port_kind {
   port_saw_EOF=64,
 };
 
-static pointer _Error_1(scheme *sc, const char *s, pointer a);
+pointer _Error_1(scheme *sc, const char *s, pointer a);
 #define Error_1(sc,s, a) return _Error_1(sc,s,a)
 #define Error_0(sc,s)    return _Error_1(sc,s,0)
 
@@ -163,7 +163,6 @@ void print_opcode_name(scheme* sc, enum scheme_opcodes op);
 
 int is_string(pointer p);
 char *string_value(pointer p);
-int is_number(pointer p);
 num nvalue(pointer p);
 long ivalue(pointer p);
 double rvalue(pointer p);
@@ -171,7 +170,7 @@ int is_integer(pointer p);
 int is_real(pointer p);
 int is_character(pointer p);
 long charvalue(pointer p);
-int is_vector(pointer p);
+
 
 int is_port(pointer p);
 
@@ -201,6 +200,82 @@ int is_promise(pointer p);
 int is_environment(pointer p);
 int is_immutable(pointer p);
 void setimmutable(pointer p);
+
+
+enum scheme_types {
+  T_STRING=1,
+  T_NUMBER=2,
+  T_SYMBOL=3,
+  T_PROC=4,
+  T_PAIR=5,
+  T_CLOSURE=6,
+  T_CONTINUATION=7,
+  T_FOREIGN=8,
+  T_CHARACTER=9,
+  T_PORT=10,
+  T_VECTOR=11,
+  T_MACRO=12,
+  T_PROMISE=13,
+  T_ENVIRONMENT=14,
+  T_LAST_SYSTEM_TYPE=14
+};
+
+/* ADJ is enough slack to align cells in a TYPE_BITS-bit boundary */
+#define ADJ 32
+#define TYPE_BITS 5
+#define T_MASKTYPE      31    /* 0000000000011111 */
+#define T_SYNTAX      4096    /* 0001000000000000 */
+#define T_IMMUTABLE   8192    /* 0010000000000000 */
+#define T_ATOM       16384    /* 0100000000000000 */   /* only for gc */
+#define CLRATOM      49151    /* 1011111111111111 */   /* only for gc */
+#define MARK         32768    /* 1000000000000000 */
+#define UNMARK       32767    /* 0111111111111111 */
+
+
+/* Used for documentation purposes, to signal functions in 'interface' */
+#define INTERFACE
+
+
+pointer mk_vector(scheme *sc, int len);
+
+/* macros for cell operations */
+#define typeflag(p)      ((p)->_flag)
+#define type(p)          (typeflag(p)&T_MASKTYPE)
+
+static INLINE int num_is_integer(pointer p) {
+  return ((p)->_object._number.is_fixnum);
+}
+
+INTERFACE static int is_list(scheme *sc, pointer p);
+INTERFACE static void fill_vector(pointer vec, pointer obj);
+INTERFACE pointer vector_elem(pointer vec, int ielem);
+
+
+INTERFACE pointer set_vector_elem(pointer vec, int ielem, pointer a);
+INTERFACE int is_vector(pointer p);
+INTERFACE int is_number(pointer p);
+INTERFACE int is_integer(pointer p);
+
+#define car(p)           ((p)->_object._cons._car)
+#define cdr(p)           ((p)->_object._cons._cdr)
+#define caar(p)          car(car(p))
+#define cadr(p)          car(cdr(p))
+#define cdar(p)          cdr(car(p))
+#define cddr(p)          cdr(cdr(p))
+#define cadar(p)         car(cdr(car(p)))
+#define caddr(p)         car(cdr(cdr(p)))
+#define cadddr(p)        car(cdr(cdr(cdr(p))))
+#define caddddr(p)       car(cdr(cdr(cdr(cdr(p)))))
+#define cadddddr(p)      car(cdr(cdr(cdr(cdr(cdr(p))))))
+#define cdaar(p)         cdr(car(car(p)))
+#define cadaar(p)        car(cdr(car(car(p))))
+#define cadddr(p)        car(cdr(cdr(cdr(p))))
+#define cddddr(p)        cdr(cdr(cdr(cdr(p))))
+
+pointer list_ref(scheme *sc, pointer l, int i);
+
+pointer _s_return(scheme *sc, pointer a);
+#define s_return(sc,a) return _s_return(sc,a)
 
 #ifdef __cplusplus
 }

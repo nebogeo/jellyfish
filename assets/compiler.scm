@@ -585,7 +585,6 @@
      (display ln)(display ": ")
      (cond
       ((vector? i)
-       (msg i)
        (if (and (>= (vector-ref i 0) 0)
                 (< (vector-ref i 0) (length instr)))
            (begin

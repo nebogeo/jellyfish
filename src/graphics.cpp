@@ -19,12 +19,13 @@
 
 #include "engine/importgl.h"
 #include "engine/engine.h"
+#include "engine/shader.h"
 #include "core/pixels.h"
 
 #include "graphics.h"
 #include "interpreter.h"
 
-//#define NO_GLUT
+#define NO_GLUT
 
 using namespace std;
 
@@ -58,6 +59,9 @@ void graphics::initialise()
     // setup the repl thread
     m_render_mutex = new pthread_mutex_t;
     pthread_mutex_init(m_render_mutex,NULL);
+
+    //shader::init();
+
 
 }
 

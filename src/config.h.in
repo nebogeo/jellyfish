@@ -15,11 +15,17 @@
 /* Define to 1 if you have the `EGL' library (-lEGL). */
 #undef HAVE_LIBEGL
 
+/* Define to 1 if you have the `freetype' library (-lfreetype). */
+#undef HAVE_LIBFREETYPE
+
 /* Define to 1 if you have the `GL' library (-lGL). */
 #undef HAVE_LIBGL
 
 /* Define to 1 if you have the `GLESv1_CM' library (-lGLESv1_CM). */
 #undef HAVE_LIBGLESV1_CM
+
+/* Define to 1 if you have the `GLEW' library (-lGLEW). */
+#undef HAVE_LIBGLEW
 
 /* Define to 1 if you have the `glut' library (-lglut). */
 #undef HAVE_LIBGLUT

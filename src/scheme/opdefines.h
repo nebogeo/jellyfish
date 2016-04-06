@@ -230,6 +230,8 @@
     _OP_DEF(opexe_6, "hint",                           1,  1,       0,                               OP_HINT             )
     _OP_DEF(opexe_6, "line-width",                     1,  1,       0,                               OP_LINE_WIDTH       )
     _OP_DEF(opexe_6, "texture",                        1,  1,       0,                               OP_TEXTURE          )
+    _OP_DEF(opexe_6, "shader",                         2,  2,       0,                               OP_SHADER           )
+    _OP_DEF(opexe_6, "shader-set!",                    2,  2,       0,                               OP_SHADER_SET       )
     _OP_DEF(opexe_6, "load-texture",                   1,  1,       0,                               OP_LOAD_TEXTURE     )
     _OP_DEF(opexe_6, "draw-instance",                  1,  1,       0,                               OP_DRAW_INSTANCE    )
     _OP_DEF(opexe_6, "build-cube",                     0,  0,       0,                               OP_BUILD_CUBE       )

@@ -33,7 +33,7 @@
 #include <GLES/gl.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-#else 
+#else
 
 
 #ifdef FLX_LINUX
@@ -43,8 +43,10 @@
 #define _M_IX86
 #endif
 
+
 extern "C" {
-//#include "GL/glew.h"
+  //#include "GL/glew.h"
+
 
 #ifndef __APPLE__
 #include "GL/glut.h"
@@ -56,13 +58,13 @@ extern "C" {
 #define GLfixed int
 #include <memory.h>
 
-void glTranslatex(GLfixed x, GLfixed y, GLfixed z);
+/*void glTranslatex(GLfixed x, GLfixed y, GLfixed z);
 void glFrustumx(GLfixed xmin, GLfixed xmax, GLfixed ymin, GLfixed ymax, GLfixed zNear, GLfixed zFar);
 void glClearColorx(GLfixed r, GLfixed g, GLfixed b, GLfixed a);
 void glMaterialx( GLenum face, GLenum pname, GLfixed param);
 void glMaterialxv( GLenum face, GLenum pname, GLfixed * params);
 void glLightxv( GLenum light, GLenum pname, GLfixed * params);
-void glMultMatrixx( GLfixed * mat );
+void glMultMatrixx( GLfixed * mat );*/
 
 #include <iostream>
 using namespace std;
@@ -79,7 +81,7 @@ extern "C" {
 #ifndef ANDROID_NDK
 #include <GLES/egl.h>
 #endif /* !ANDROID_NDK */
-   
+
 /* Use DISABLE_IMPORTGL if you want to link the OpenGL ES at
  * compile/link time and not import it dynamically runtime.
  */
@@ -219,4 +221,3 @@ FNDEF(void, glViewport, (GLint x, GLint y, GLsizei width, GLsizei height));
 #endif // _EE
 
 #endif // !IMPORTGL_H_INCLUDED
-

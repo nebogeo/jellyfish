@@ -16,6 +16,7 @@ AC_CHECK_LIB(EGL, eglCopyBuffers, [], [AC_MSG_ERROR([could not find EGL])])
 ])
 
 AC_CHECK_LIB(m, cos, [], [AC_MSG_ERROR([could not find libm])])
+AC_CHECK_LIB(GLEW, main) dnl no error on Pi
 AC_CHECK_LIB(glut, main) dnl no error on Pi
 AC_CHECK_LIB(GL, main) dnl no error on Pi
 AC_CHECK_LIB(png, main, [], [AC_MSG_ERROR([libpng not found])])
@@ -25,10 +26,12 @@ AC_CHECK_LIB(lo, main, [], [AC_MSG_ERROR([liblo was not found])])
 AC_CHECK_LIB(sndfile, main, [], [AC_MSG_ERROR([sndfile was not found])])
 AC_CHECK_LIB(jpeg, main)
 AC_CHECK_LIB(portaudio, main, [], [AC_MSG_ERROR([libportaudio not found])])
+AC_CHECK_LIB(freetype, main, [], [AC_MSG_ERROR([freetype not found])])
+AC_CHECK_LIB(GLU, main, [], [AC_MSG_ERROR([glu not found])])
 
 AC_PROG_CXX
 AC_LANG(C++)
 AC_CHECK_HEADERS(iostream)
 
-AC_CONFIG_HEADER(src/config.h)
+AC_CONFIG_HEADER(src/ac_config.h)
 AC_OUTPUT(Makefile)

@@ -65,5 +65,4 @@ public:
 private:
 
     static int m_frame_num;
-
 };

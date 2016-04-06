@@ -24,6 +24,8 @@
 #ifndef FLX_PRIMITIVE
 #define FLX_PRIMITIVE
 
+class shader;
+
 class primitive
 {
 public:
@@ -35,6 +37,9 @@ public:
     virtual void build();
 
     virtual void render(u32 hints);
+
+    // attache these primitives attributes to the shader
+    void set_shader_attribs(shader *s);
 
     void make_cube();
     void set_colour(flx_real r, flx_real g,
@@ -53,6 +58,7 @@ public:
     bool intersect_fast(const vec3 &start, const vec3 &end);
     // p is in object space
     bool intersect_bb(const vec3 &p, flx_real threshold);
+
 
 protected:
 

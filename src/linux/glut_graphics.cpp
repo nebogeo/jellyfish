@@ -5,7 +5,7 @@
 using namespace std;
 
 #ifndef FLX_RPI
-
+/*
 void glTranslatex(GLfixed x, GLfixed y, GLfixed z)
 {
     glTranslatef(x/65536.0,y/65536.0,z/65536.0);
@@ -57,5 +57,5 @@ void glMultMatrixx( GLfixed * mat )
     }
     glMultMatrixf(m);
 }
-
+*/
 #endif

@@ -17,6 +17,7 @@
 #include "../core/list.h"
 #include "../core/mat44.h"
 #include "primitive.h"
+#include "shader.h"
 
 #ifndef FLX_SCENENODE
 #define FLX_SCENENODE
@@ -61,6 +62,7 @@ public:
     u32 m_hints;
     u32 m_line_width;
     u32 m_texture;
+    shader *m_shader;
 };
 
 #endif

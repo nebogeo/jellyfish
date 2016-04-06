@@ -18,6 +18,7 @@
 #include "../core/fixed.h"
 #include "../core/geometry.h"
 #include "../engine/scenenode.h"
+#include "../engine/shader.h"
 
 #ifdef _EE
 #include "ee/ps2-renderer.h"
@@ -261,6 +262,18 @@ bool primitive::intersect_tristrip_fast(const vec3 &start, const vec3 &end)
 	}
 	return false;
 }
+
+/*
+void primitive::set_shader_attribs(shader *s) {
+  pdata_arr *n=static_cast<pdata_arr*>(m_pdata.m_head);
+  while (n!=NULL) {
+    s->set_vector_attrib(n->m_name,n->m_array);
+    n=static_cast<pdata_arr*>(n->m_next);
+  }
+
+
+}
+*/
 
 void primitive::render(u32 hints)
 {

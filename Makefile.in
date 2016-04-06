@@ -8,6 +8,7 @@ SRCS :=    src/graphics.cpp\
            src/core/list.cpp\
            src/core/idmap.cpp\
            src/scheme/scheme.cpp\
+		   src/scheme/interface.cpp\
            src/core/geometry.cpp\
            src/core/noise.cpp\
            src/core/pixels.cpp\
@@ -33,17 +34,21 @@ SRCS :=    src/graphics.cpp\
            src/engine/scenegraph.cpp\
            src/engine/scenenode.cpp\
            src/engine/texture.cpp\
+           src/engine/shader.cpp\
            src/engine/nomadic.cpp\
            src/engine/jellyfish_primitive.cpp\
            src/engine/jellyfish.cpp\
 	  	   src/linux/glut_graphics.cpp\
 	       src/rpi/graphics.cpp\
-	       src/rpi/input.cpp
+	       src/rpi/input.cpp\
+	       src/editor/GLEditor.cpp\
+		   src/editor/PolyGlyph.cpp\
+	       src/editor/Unicode.cpp
 
 MAIN_SRCS    := src/main.cpp
 
 # for the minute, go out and up to link to the vision lib
-CCFLAGS = -Ofast -march=native -mtune=native -ffast-math -Wno-unused -Isrc -Wno-write-strings -DASSETS_PATH=\"@prefix@/lib/jellyfish/\" -I/opt/local/include
+CCFLAGS = -ggdb -Ofast -march=native -mtune=native -ffast-math -Wno-unused -Isrc -Wno-write-strings -DASSETS_PATH=\"@prefix@/lib/jellyfish/\" -I/opt/local/include -I/usr/include/freetype2/
 LDFLAGS = @LDFLAGS@
 LIBS    = @LIBS@
 

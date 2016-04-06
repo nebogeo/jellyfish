@@ -220,12 +220,19 @@ void scenegraph::render_node_walk(scenenode *node, int depth)
     glEnable(GL_NORMALIZE);
 
 #endif
-    if (node->m_texture!=0)
-    {
-        glEnable(GL_TEXTURE_2D);
-        m_texture_manager.apply(node->m_texture);
+    if (node->m_texture!=0) {
+      glEnable(GL_TEXTURE_2D);
+      m_texture_manager.apply(node->m_texture);
     }
     else glDisable(GL_TEXTURE_2D);
+
+    /*
+    // apply the shader if we have one...
+    if (node->m_shader != NULL) {
+      node->m_shader->apply();
+	}
+	else shader::unapply();
+    */
 
     // hint-none = hidden
     if (node->m_primitive!=NULL && node->m_hints)
