@@ -26,8 +26,8 @@ AC_CHECK_LIB(lo, main, [], [AC_MSG_ERROR([liblo was not found])])
 AC_CHECK_LIB(sndfile, main, [], [AC_MSG_ERROR([sndfile was not found])])
 AC_CHECK_LIB(jpeg, main)
 AC_CHECK_LIB(portaudio, main, [], [AC_MSG_ERROR([libportaudio not found])])
-AC_CHECK_LIB(freetype, main, [], [AC_MSG_ERROR([freetype not found])])
-AC_CHECK_LIB(GLU, main, [], [AC_MSG_ERROR([glu not found])])
+#AC_CHECK_LIB(freetype, main, [], [AC_MSG_ERROR([freetype not found])])
+#AC_CHECK_LIB(GLU, main, [], [AC_MSG_ERROR([glu not found])])
 
 AC_PROG_CXX
 AC_LANG(C++)
