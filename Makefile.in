@@ -34,7 +34,6 @@ SRCS :=    src/graphics.cpp\
            src/engine/scenegraph.cpp\
            src/engine/scenenode.cpp\
            src/engine/texture.cpp\
-           src/engine/shader.cpp\
            src/engine/nomadic.cpp\
            src/engine/jellyfish_primitive.cpp\
            src/engine/jellyfish.cpp\
