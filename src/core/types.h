@@ -24,6 +24,10 @@
 
 // autoconf can tell us if we are on Pi
 // only support Pi and linux for the moment
+#ifdef HAVE_LIBBCM_HOST
+#define FLX_RPI
+#endif
+
 #ifndef FLX_RPI
 #define FLX_LINUX
 #endif
