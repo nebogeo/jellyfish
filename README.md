@@ -26,6 +26,12 @@ GLUT.
 
     scons
 
+### OSX ###
+
+    ./dist.sh
+    ./configure LDFLAGS="${LDFLAGS} -framework OpenGL"
+    make install
+
 ### Raspberry Pi ###
 
     scons TARGET=RPI
