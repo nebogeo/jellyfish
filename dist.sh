@@ -4,3 +4,5 @@ make distclean
 autoheader
 # build configure
 autoconf configure.ac > configure
+# make configure executable
+chmod +x configure
