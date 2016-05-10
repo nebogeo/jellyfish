@@ -239,8 +239,8 @@ enum scheme_types {
 pointer mk_vector(scheme *sc, int len);
 
 /* macros for cell operations */
-#define typeflag(p)      ((p)->_flag)
-#define type(p)          (typeflag(p)&T_MASKTYPE)
+#define celltypeflag(p)      ((p)->_flag)
+#define celltype(p)          (celltypeflag(p)&T_MASKTYPE)
 
 static INLINE int num_is_integer(pointer p) {
   return ((p)->_object._number.is_fixnum);
