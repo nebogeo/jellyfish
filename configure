@@ -2843,8 +2843,6 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-CFLAGS="$CFLAGS -I/opt/vc/include/"
-LDFLAGS="$LDFLAGS -L/opt/vc/lib"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for bcm_host_init in -lbcm_host" >&5
 $as_echo_n "checking for bcm_host_init in -lbcm_host... " >&6; }

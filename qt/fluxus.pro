@@ -83,10 +83,7 @@ QMAKE_CXXFLAGS += -Wfatal-errors -Wno-write-strings -Wno-unused
 
 #rpi stuff
 #DEFINES += FLX_RPI
-#INCLUDEPATH += /opt/vc/include/
-#INCLUDEPATH += /opt/vc/include/interface/vcos/pthreads/
-#INCLUDEPATH += /opt/vc/include/interface/vmcs_host/linux/
-#LIBS += -L/opt/vc/lib -lEGL -lGLESv1_CM -lbcm_host
+#LIBS += -lEGL -lGLESv1_CM -lbcm_host
 
 
 # assets
