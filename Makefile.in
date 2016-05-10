@@ -39,10 +39,7 @@ SRCS :=    src/graphics.cpp\
            src/engine/jellyfish.cpp\
 	  	   src/linux/glut_graphics.cpp\
 	       src/rpi/graphics.cpp\
-	       src/rpi/input.cpp\
-	       src/editor/GLEditor.cpp\
-		   src/editor/PolyGlyph.cpp\
-	       src/editor/Unicode.cpp
+	       src/rpi/input.cpp
 
 MAIN_SRCS    := src/main.cpp
 
