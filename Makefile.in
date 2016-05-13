@@ -1,5 +1,5 @@
 TARGET  := jellyfish
-TARGET_LIB := libjellyfish.a
+TARGET_LIB := libjellyfish
 
 SRCS :=    src/graphics.cpp\
 		   src/audio.cpp\
@@ -78,7 +78,10 @@ ${MAIN_DEPS}: %.dep: %.cpp Makefile
 	${CC} ${CCFLAGS} -MM $< > $@
 
 library: ${OBJS} ${COBJS}
-	$(AR) $(ARFLAGS) ${TARGET_LIB} ${OBJS} ${COBJS}
+	$(AR) $(ARFLAGS) ${TARGET_LIB}.a ${OBJS} ${COBJS}
+
+dylib: ${OBJS} ${COBJS}
+	${CC} -dynamiclib -undefined suppress -flat_namespace ${OBJS} -o ${TARGET_LIB}.dylib
 
 clean:: cleandeps
 	-rm -f *~ src/*.o src/*/*.o ${TARGET}
@@ -105,7 +108,6 @@ install_library:: library
 	install src/audio/*.h $(DESTDIR)@prefix@/include/jellyfish/audio/
 	install -d $(DESTDIR)@prefix@/include/jellyfish/fluxa/
 	install src/fluxa/*.h $(DESTDIR)@prefix@/include/jellyfish/fluxa/
-
 
 distclean:: clean
 	-rm -rf config.status autom4te.cache config.log Makefile
