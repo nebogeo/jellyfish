@@ -97,7 +97,15 @@ install:: ${TARGET}
 
 install_library:: library
 	install -d $(DESTDIR)@prefix@/lib/
-	install $(TARGET_LIB) $(DESTDIR)@prefix@/lib/
+	install $(TARGET_LIB).a $(DESTDIR)@prefix@/lib/
+	make install_headers
+
+install_dylib:: dylib
+	install -d $(DESTDIR)@prefix@/lib/
+	install $(TARGET_LIB).dylib $(DESTDIR)@prefix@/lib/
+	make install_headers
+
+install_headers:
 	install -d $(DESTDIR)@prefix@/include/jellyfish/
 	install src/*.h $(DESTDIR)@prefix@/include/jellyfish/
 	install -d $(DESTDIR)@prefix@/include/jellyfish/core/
