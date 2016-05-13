@@ -5,5 +5,7 @@ src/**/*.dep
 src/**/*.o
 Makefile
 config.log
+autoscan.log
+configure.scan
 config.status
 jellyfish
