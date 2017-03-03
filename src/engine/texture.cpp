@@ -15,11 +15,11 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "../core/list.h"
+#include "../core/pixels.h"
 #include "importgl.h"
 #include "texture.h"
 
-u32 texture_manager::load(const char *name, u32 w, u32 h, u8* data)
-{
+u32 texture_manager::load(const char *name, u32 w, u32 h, u8* data) {
     texture_node *new_node = new texture_node;
 
     glGenTextures(1,&new_node->id);
@@ -37,21 +37,21 @@ u32 texture_manager::load(const char *name, u32 w, u32 h, u8* data)
     return new_node->id;
 }
 
-u32 texture_manager::find(const char *name)
-{
+u32 texture_manager::find(const char *name) {
     texture_node *n=static_cast<texture_node*>(m_textures.m_head);
-    while (n!=NULL)
-    {
-        if (!strcmp(n->name,name))
-        {
-            return n->id;
-        }
-        n=static_cast<texture_node*>(n->m_next);
+    while (n!=NULL) {
+      if (!strcmp(n->name,name)) {
+	return n->id;
+      }
+      n=static_cast<texture_node*>(n->m_next);
     }
-    return 0;
+
+    // load it now...
+    long w,h=0;
+    u8 *tex=load_png(name,w,h);
+    return load(name,w,h,tex);    
 }
 
-void texture_manager::apply(u32 id)
-{
+void texture_manager::apply(u32 id) {
     glBindTexture(GL_TEXTURE_2D, id);
 }

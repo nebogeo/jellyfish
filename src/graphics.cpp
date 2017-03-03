@@ -60,7 +60,7 @@ void graphics::initialise()
     m_render_mutex = new pthread_mutex_t;
     pthread_mutex_init(m_render_mutex,NULL);
 
-    //shader::init();
+    shader::init();
 
 
 }
@@ -94,6 +94,10 @@ void graphics::prepare_frame(int width, int height)
     //              (GLfixed)(engine::get()->m_clear_g * 65536),
     //              (GLfixed)(engine::get()->m_clear_b * 65536),
     //              (GLfixed)(0.5 * 65536));
+    glClearColor(engine::get()->m_clear_r,
+                 engine::get()->m_clear_g,
+                 engine::get()->m_clear_b,
+                 engine::get()->m_clear_a);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);

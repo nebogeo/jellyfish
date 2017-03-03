@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
 
     }
 #else
-    graphics::m_w=800;
-    graphics::m_h=600;
+    graphics::m_w=1024;
+    graphics::m_h=768;
 
     if (window) {
       glutInit(&argc,argv);
@@ -88,16 +88,6 @@ int main(int argc, char *argv[])
     interpreter::eval_file(string(ASSETS_PATH)+"lib.scm");
     interpreter::eval_file(string(ASSETS_PATH)+"compiler.scm");
     interpreter::eval_file(string(ASSETS_PATH)+"fluxa.scm");
-
-    if (window) {
-      // preload the textures
-      long w=0,h=0;
-      graphics::load_texture_from_file(string(ASSETS_PATH),"raspberrypi.png");
-      graphics::load_texture_from_file(string(ASSETS_PATH),"stripes.png");
-      graphics::load_texture_from_file(string(ASSETS_PATH),"bg.png");
-      graphics::load_texture_from_file(string(ASSETS_PATH),"thread.png");
-      graphics::load_texture_from_file(string(ASSETS_PATH),"oolite-font.png");
-    }
 
     if (argc>1) interpreter::eval_file(argv[argc-1]);
 

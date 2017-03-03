@@ -45,7 +45,7 @@
 
 
 extern "C" {
-  //#include "GL/glew.h"
+  #include "GL/glew.h"
 
 
 #ifndef __APPLE__

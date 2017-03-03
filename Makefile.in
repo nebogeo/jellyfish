@@ -2,18 +2,18 @@ TARGET  := jellyfish
 TARGET_LIB := libjellyfish.a
 
 SRCS :=    src/graphics.cpp\
-		   src/audio.cpp\
-		   src/interpreter.cpp\
-	 	   src/core/fixed.cpp\
+	   src/audio.cpp\
+	   src/interpreter.cpp\
+	   src/core/fixed.cpp\
            src/core/list.cpp\
            src/core/idmap.cpp\
            src/scheme/scheme.cpp\
-		   src/scheme/interface.cpp\
+	   src/scheme/interface.cpp\
            src/core/geometry.cpp\
            src/core/noise.cpp\
            src/core/pixels.cpp\
            src/core/osc.cpp\
-	       src/core/stream.cpp\
+	   src/core/stream.cpp\
            src/fluxa/sample.cpp\
            src/fluxa/allocator.cpp\
            src/fluxa/graph.cpp\
@@ -22,11 +22,11 @@ SRCS :=    src/graphics.cpp\
            src/fluxa/module_nodes.cpp\
            src/fluxa/event.cpp\
            src/fluxa/event_queue.cpp\
-           src/fluxa/time.cpp\
-		   src/fluxa/ring_buffer.cpp\
-		   src/fluxa/command_ring_buffer.cpp\
-		   src/fluxa/OSC_server.cpp \
-		   src/audio/portaudio_client.cpp \
+	   src/fluxa/time.cpp\
+	   src/fluxa/ring_buffer.cpp\
+	   src/fluxa/command_ring_buffer.cpp\
+	   src/fluxa/OSC_server.cpp \
+	   src/audio/portaudio_client.cpp \
            src/engine/obj_reader.cpp\
            src/engine/engine.cpp\
            src/engine/primitive.cpp\
@@ -34,12 +34,13 @@ SRCS :=    src/graphics.cpp\
            src/engine/scenegraph.cpp\
            src/engine/scenenode.cpp\
            src/engine/texture.cpp\
+           src/engine/shader.cpp\
            src/engine/nomadic.cpp\
            src/engine/jellyfish_primitive.cpp\
            src/engine/jellyfish.cpp\
-	  	   src/linux/glut_graphics.cpp\
-	       src/rpi/graphics.cpp\
-	       src/rpi/input.cpp
+	   src/linux/glut_graphics.cpp\
+	   src/rpi/graphics.cpp\
+	   src/rpi/input.cpp
 
 MAIN_SRCS    := src/main.cpp
 

@@ -38,8 +38,7 @@ m_fragment_shader(0) {
   }
 }
 
-shader_pair::~shader_pair()
-{
+shader_pair::~shader_pair() {
   if (!shader::m_enabled) {
     if (m_vertex_shader!=0) glDeleteShader(m_vertex_shader);
     if (m_fragment_shader!=0) glDeleteShader(m_fragment_shader);
@@ -83,58 +82,57 @@ bool shader_pair::load(const string &vertexfilename, const string &fragmentfilen
 
 
 unsigned int shader_pair::load_shader(string filename, unsigned int type) {
-	if (!shader::m_enabled) return 0;
-	FILE* file = fopen(filename.c_str(), "r");
-	if (!file) {
-      cerr<<"Couldn't open shader ["<<filename<<"]"<<endl;
-      return 0;
-	}
+  if (!shader::m_enabled) return 0;
+  FILE* file = fopen(filename.c_str(), "r");
+  if (!file) {
+    cerr<<"Couldn't open shader ["<<filename<<"]"<<endl;
+    return 0;
+  }
 
-	fseek(file, 0, SEEK_END);
-	unsigned int size = ftell(file);
-	fseek(file, 0, SEEK_SET);
+  fseek(file, 0, SEEK_END);
+  unsigned int size = ftell(file);
+  fseek(file, 0, SEEK_SET);
 
-	char* code = new char[size+1];
-	code[size]='\0';
+  char* code = new char[size+1];
+  code[size]='\0';
 
-	if (fread(code,1,size,file)!=size) {
-      cerr<<"Error reading shader ["<<filename<<"]"<<endl;
-      delete[] code;
-      fclose(file);
-      return 0;
-	} else {
-      unsigned int shader = make_shader(filename,code,type);
-      delete[] code;
-      fclose(file);
-      return shader;
-	}
-	return 0;
+  if (fread(code,1,size,file)!=size) {
+    cerr<<"Error reading shader ["<<filename<<"]"<<endl;
+    delete[] code;
+    fclose(file);
+    return 0;
+  } else {
+    unsigned int shader = make_shader(filename,code,type);
+    delete[] code;
+    fclose(file);
+    return shader;
+  }
+  return 0;
 }
 
 
-unsigned int shader_pair::make_shader(const string &filename, const string &source, unsigned int type)
-{
-	if (!shader::m_enabled) return 0;
-	unsigned int shader = glCreateShader(type);
-	const char *t = source.c_str();
-	glShaderSource(shader, 1, &t, NULL);
+unsigned int shader_pair::make_shader(const string &filename, const string &source, unsigned int type) {
+  if (!shader::m_enabled) return 0;
+  unsigned int shader = glCreateShader(type);
+  const char *t = source.c_str();
+  glShaderSource(shader, 1, &t, NULL);
 
-	glCompileShader(shader);
+  glCompileShader(shader);
 
-	GLint status = GL_FALSE;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if(status != GL_TRUE) {
-      GLsizei size = 0;
-      char log[1024];
+  GLint status = GL_FALSE;
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+  if(status != GL_TRUE) {
+    GLsizei size = 0;
+    char log[1024];
 
-      glGetShaderInfoLog(shader, 1024, &size, log);
-      cerr<<"compile errors for ["<<filename<<"]"<<endl;
-      cerr<<log<<endl;
+    glGetShaderInfoLog(shader, 1024, &size, log);
+    cerr<<"compile errors for ["<<filename<<"]"<<endl;
+    cerr<<log<<endl;
 
-      glDeleteShader(shader);
-      return 0;
-	}
-	return shader;
+    glDeleteShader(shader);
+    return 0;
+  }
+  return shader;
 }
 
 
@@ -142,124 +140,111 @@ unsigned int shader_pair::make_shader(const string &filename, const string &sour
 /////////////////////////////////////////
 
 shader::shader(const shader_pair &pair) :
-m_program(0),
-m_ref_count(1)
+  m_program(0),
+  m_ref_count(1)
 {
-	if (!m_enabled) return;
+  if (!m_enabled) return;
 
-	m_program = glCreateProgram();
-	if (pair.get_vertex_shader())
-		glAttachShader(m_program, pair.get_vertex_shader());
-	if (pair.get_fragment_shader())
-		glAttachShader(m_program, pair.get_fragment_shader());
-	glLinkProgram(m_program);
+  m_program = glCreateProgram();
+  if (pair.get_vertex_shader())
+    glAttachShader(m_program, pair.get_vertex_shader());
+  if (pair.get_fragment_shader())
+    glAttachShader(m_program, pair.get_fragment_shader());
+  glLinkProgram(m_program);
 
-	GLint status = GL_FALSE;
-	glGetProgramiv(m_program, GL_LINK_STATUS, &status);
-	if (status != GL_TRUE) {
-		char log[1024];
-		glGetProgramInfoLog(m_program, 1024, NULL, log);
-	    cerr<<log<<endl;
-	}
+  GLint status = GL_FALSE;
+  glGetProgramiv(m_program, GL_LINK_STATUS, &status);
+  if (status != GL_TRUE) {
+    char log[1024];
+    glGetProgramInfoLog(m_program, 1024, NULL, log);
+    cerr<<log<<endl;
+  }
 
-	glValidateProgram(m_program);
-	glGetProgramiv(m_program, GL_VALIDATE_STATUS, &status);
-	if (status != GL_TRUE) {
-      char log[1024];
-      glGetProgramInfoLog(m_program, 1024, NULL, log);
-      cerr<<log<<endl;
-	} else {
-      m_is_valid = true;
-	}
+  glValidateProgram(m_program);
+  glGetProgramiv(m_program, GL_VALIDATE_STATUS, &status);
+  if (status != GL_TRUE) {
+    char log[1024];
+    glGetProgramInfoLog(m_program, 1024, NULL, log);
+    cerr<<log<<endl;
+  } else {
+    m_is_valid = true;
+  }
 }
 
-shader::~shader()
-{
-	if (!m_enabled) return;
-	glDeleteProgram(m_program);
+shader::~shader() {
+  if (!m_enabled) return;
+  glDeleteProgram(m_program);
 }
 
-void shader::init()
-{
+void shader::init() {
   if(glewInit() != GLEW_OK) {
     cerr<< "ERROR Unable to check OpenGL extensions" << endl;
   }
   m_enabled = glewIsSupported("GL_VERSION_2_0");
 }
 
-void shader::apply()
-{
-	if (!m_enabled) return;
-	glUseProgram(m_program);
+void shader::apply() {
+  if (!m_enabled) return;
+  glUseProgram(m_program);
 }
 
-void shader::unapply()
-{
-	if (!m_enabled) return;
-	glUseProgram(0);
+void shader::unapply() {
+  if (!m_enabled) return;
+  glUseProgram(0);
 }
 
-void shader::set_int(const string &name, int s)
-{
-	if (!m_enabled) return;
-	GLuint param = glGetUniformLocation(m_program, name.c_str());
-	glUniform1i(param,s);
+void shader::set_int(const string &name, int s) {
+  if (!m_enabled) return;
+  GLuint param = glGetUniformLocation(m_program, name.c_str());
+  glUniform1i(param,s);
 }
 
-void shader::set_float(const string &name, float s)
-{
-	if (!m_enabled) return;
-	GLuint param = glGetUniformLocation(m_program, name.c_str());
-	glUniform1f(param,s);
+void shader::set_float(const string &name, float s) {
+  if (!m_enabled) return;
+  GLuint param = glGetUniformLocation(m_program, name.c_str());
+  glUniform1f(param,s);
 }
 
-void shader::set_vector(const string &name, vec3 s)
-{
-	if (!m_enabled) return;
-	GLuint param = glGetUniformLocation(m_program, name.c_str());
-    glUniform3f(param, s.x, s.y, s.z);
+void shader::set_vector(const string &name, vec3 s) {
+  if (!m_enabled) return;
+  GLuint param = glGetUniformLocation(m_program, name.c_str());
+  glUniform3f(param, s.x, s.y, s.z);
 }
 
-void shader::set_matrix(const string &name, mat44 &m)
-{
-	if (!m_enabled) return;
-	GLuint param = glGetUniformLocation(m_program, name.c_str());
-	glUniformMatrix4fv(param, 1, GL_FALSE, &m.m[0][0]);
+void shader::set_matrix(const string &name, mat44 &m) {
+  if (!m_enabled) return;
+  GLuint param = glGetUniformLocation(m_program, name.c_str());
+  glUniformMatrix4fv(param, 1, GL_FALSE, &m.m[0][0]);
 }
 
-void shader::set_int_array(const string &name, const vector<int> &s)
-{
-	if (!m_enabled) return;
-	GLuint param = glGetUniformLocation(m_program, name.c_str());
-	glUniform1iv(param,s.size(),&(*s.begin()));
+void shader::set_int_array(const string &name, const vector<int> &s) {
+  if (!m_enabled) return;
+  GLuint param = glGetUniformLocation(m_program, name.c_str());
+  glUniform1iv(param,s.size(),&(*s.begin()));
 }
 
-void shader::set_float_array(const string &name, const vector<float> &s)
-{
-	if (!m_enabled) return;
-	GLuint param = glGetUniformLocation(m_program, name.c_str());
-	glUniform1fv(param,s.size(),&(*s.begin()));
+void shader::set_float_array(const string &name, const vector<float> &s) {
+  if (!m_enabled) return;
+  GLuint param = glGetUniformLocation(m_program, name.c_str());
+  glUniform1fv(param,s.size(),&(*s.begin()));
 }
 
-void shader::set_vector_array(const string &name, const vector<vec3> &s)
-{
-	if (!m_enabled) return;
-	GLuint param = glGetUniformLocation(m_program, name.c_str());
-	glUniform4fv(param,s.size(),&s.begin()->x);
+void shader::set_vector_array(const string &name, const vector<vec3> &s) {
+  if (!m_enabled) return;
+  GLuint param = glGetUniformLocation(m_program, name.c_str());
+  glUniform4fv(param,s.size(),&s.begin()->x);
 }
 
-void shader::set_float_attrib(const string &name, const vector<float> &s)
-{
-	if (!m_enabled) return;
-	GLuint attrib = glGetAttribLocation(m_program, name.c_str());
-	glEnableVertexAttribArray(attrib);
-	glVertexAttribPointer(attrib,1,GL_FLOAT,false,0,&(*s.begin()));
+void shader::set_float_attrib(const string &name, const vector<float> &s) {
+  if (!m_enabled) return;
+  GLuint attrib = glGetAttribLocation(m_program, name.c_str());
+  glEnableVertexAttribArray(attrib);
+  glVertexAttribPointer(attrib,1,GL_FLOAT,false,0,&(*s.begin()));
 }
 
-void shader::set_vector_attrib(const string &name, const vec3 *s)
-{
-	if (!m_enabled) return;
-	GLuint attrib = glGetAttribLocation(m_program, name.c_str());
-	glEnableVertexAttribArray(attrib);
-	glVertexAttribPointer(attrib,3,GL_FLOAT,false,0,s);
+void shader::set_vector_attrib(const string &name, const vec3 *s) {
+  if (!m_enabled) return;
+  GLuint attrib = glGetAttribLocation(m_program, name.c_str());
+  glEnableVertexAttribArray(attrib);
+  glVertexAttribPointer(attrib,3,GL_FLOAT,false,0,s);
 }

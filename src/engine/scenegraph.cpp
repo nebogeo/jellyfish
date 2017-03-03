@@ -21,275 +21,245 @@
 #endif
 
 scenegraph::scenegraph() :
-    m_root(NULL),
-    m_immediate_root(NULL),
-    m_current_id(0)
+  m_root(NULL),
+  m_immediate_root(NULL),
+  m_current_id(0)
 {
-	clear();
+  clear();
 }
 
-scenegraph::~scenegraph()
-{
+scenegraph::~scenegraph() {
+  delete m_root;
+}
+
+void scenegraph::clear() {
+  if (m_root!=NULL) {
     delete m_root;
+    m_root=NULL;
+  }
+  m_root=new scenenode(NULL);
+  m_root->m_id=0;
+  m_current_id=1;
+
+  if (m_immediate_root!=NULL) {
+    delete m_immediate_root;
+    m_immediate_root=NULL;
+  }
+  m_immediate_root=new scenenode(NULL);
+  m_immediate_root->m_id=9999;
 }
 
-void scenegraph::clear()
-{
-    if (m_root!=NULL)
-    {
-        delete m_root;
-        m_root=NULL;
+int scenegraph::add(int pid, scenenode *node) {
+  scenenode *parent=find(pid);
+  if (!parent) parent=m_root;
+  node->m_id=m_current_id++;
+  parent->m_children.add_to_front(node);
+  node->m_parent=parent;
+  return node->m_id;
+}
+
+void scenegraph::add_immediate(scenenode *node) {
+  scenenode *parent=m_immediate_root;
+  node->m_id=9999;
+  parent->m_children.add_to_front(node);
+  node->m_parent=parent;
+}
+
+void scenegraph::remove(int id) {
+  scenenode *n=find(id);
+  if (n!=NULL) {
+    if (n->m_parent!=NULL){
+      n->m_parent->remove_child(id);
     }
-	m_root=new scenenode(NULL);
-    m_root->m_id=0;
-    m_current_id=1;
-
-    if (m_immediate_root!=NULL)
-    {
-        delete m_immediate_root;
-        m_immediate_root=NULL;
-    }
-	m_immediate_root=new scenenode(NULL);
-    m_immediate_root->m_id=9999;
+    delete n;
+  }
 }
 
-int scenegraph::add(int pid, scenenode *node)
-{
-    scenenode *parent=find(pid);
-    if (!parent) parent=m_root;
-    node->m_id=m_current_id++;
-    parent->m_children.add_to_front(node);
-    node->m_parent=parent;
-    return node->m_id;
+scenenode *scenegraph::find(int id) const {
+  return find_node_walk(m_root,id);
 }
 
-void scenegraph::add_immediate(scenenode *node)
-{
-    scenenode *parent=m_immediate_root;
-    node->m_id=9999;
-    parent->m_children.add_to_front(node);
-    node->m_parent=parent;
+scenenode *scenegraph::find_node_walk(scenenode *node, int id) const {
+  if (node==NULL) return NULL;
+  if (node->m_id==id) return node;
+  
+  scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
+  while (n!=NULL) {
+    scenenode *r=find_node_walk(n,id);
+    if (r!=NULL) return r;
+    n=static_cast<scenenode*>(n->m_next);
+  }
+  return NULL;
 }
 
-void scenegraph::remove(int id)
-{
-    scenenode *n=find(id);
-    if (n!=NULL) {
-        if (n->m_parent!=NULL){
-            n->m_parent->remove_child(id);
-        }
-        delete n;
-    }
+void scenegraph::dump() const {
+  dump_walk(m_root,0);
 }
 
-scenenode *scenegraph::find(int id) const
-{
-    return find_node_walk(m_root,id);
-}
-
-scenenode *scenegraph::find_node_walk(scenenode *node, int id) const
-{
-	if (node==NULL) return NULL;
-    if (node->m_id==id) return node;
-
-    scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
-    while (n!=NULL)
-    {
-        scenenode *r=find_node_walk(n,id);
-        if (r!=NULL) return r;
-        n=static_cast<scenenode*>(n->m_next);
-    }
-
-	return NULL;
-}
-
-void scenegraph::dump() const
-{
-    dump_walk(m_root,0);
-}
-
-void scenegraph::dump_walk(scenenode *node, int d) const
-{
-	if (node==NULL) return;
-
-//    for (int i=0; i<d; i++) cerr<<"   ";
-
-//    cerr<<node->m_id<<endl;
-
-    scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
-    while (n!=NULL)
-    {
-        dump_walk(n,d+1);
-        n=static_cast<scenenode*>(n->m_next);
-    }
+void scenegraph::dump_walk(scenenode *node, int d) const {
+  if (node==NULL) return;
+  
+  //    for (int i=0; i<d; i++) cerr<<"   ";
+  
+  //    cerr<<node->m_id<<endl;
+  
+  scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
+  while (n!=NULL) {
+    dump_walk(n,d+1);
+    n=static_cast<scenenode*>(n->m_next);
+  }
 }
 
 /// Moves a node (and all it's children) around the graph
-void scenegraph::reparent(int id, int pid)
-{
-	scenenode *node = find(id);
-	scenenode *new_parent = find(pid);
-
-	if (node==NULL) return;
-	if (new_parent==NULL) return;
-
-    scenenode *old_parent=node->m_parent;
-	old_parent->remove_child(id);
-    new_parent->m_children.add_to_front(node);
-	node->m_parent=new_parent;
+void scenegraph::reparent(int id, int pid) {
+  scenenode *node = find(id);
+  scenenode *new_parent = find(pid);
+  
+  if (node==NULL) return;
+  if (new_parent==NULL) return;
+  
+  scenenode *old_parent=node->m_parent;
+  old_parent->remove_child(id);
+  new_parent->m_children.add_to_front(node);
+  node->m_parent=new_parent;
 }
 
-bool scenegraph::is_attached_to(scenenode *parent, scenenode *child) const
-{
-/*	Node *current = Child;
+bool scenegraph::is_attached_to(scenenode *parent, scenenode *child) const {
+  /*	Node *current = Child;
 
-	// iterate back up the tree looking at parents...
-	while(current!=NULL)
-	{
-		if (current==Parent)
-		{
-			return true;
-		}
-		current=current->Parent;
-        }*/
-	return false;
+  // iterate back up the tree looking at parents...
+  while(current!=NULL)
+  {
+  if (current==Parent)
+  {
+  return true;
+  }
+  current=current->Parent;
+  }*/
+  return false;
 }
 
-void scenegraph::render()
-{
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ZERO /*GL_ONE_MINUS_SRC_ALPHA*/);
+void scenegraph::render() {
+  glEnable(GL_TEXTURE_2D);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ZERO /*GL_ONE_MINUS_SRC_ALPHA*/);
+  
+  if (m_root!=NULL) {
+    render_node_walk(m_root,1);
+  }
 
-    if (m_root!=NULL)
-    {
-        render_node_walk(m_root,1);
-    }
-
-    // render immediate mode
-    render_node_walk(m_immediate_root,1);
-    // protect the instances from being deleted...
-    clear_primitives_walk(m_immediate_root);
-
-    // clear immediate mode
-    delete m_immediate_root;
-	m_immediate_root=new scenenode(NULL);
-    m_immediate_root->m_id=9999;
+  // render immediate mode
+  render_node_walk(m_immediate_root,1);
+  // protect the instances from being deleted...
+  clear_primitives_walk(m_immediate_root);
+  
+  // clear immediate mode
+  delete m_immediate_root;
+  m_immediate_root=new scenenode(NULL);
+  m_immediate_root->m_id=9999;
 }
 
-void scenegraph::clear_primitives_walk(scenenode *node)
-{
-    node->m_primitive=NULL;
-    scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
-    while (n!=NULL)
-    {
-        clear_primitives_walk(n);
-        n=static_cast<scenenode*>(n->m_next);
-    }
+void scenegraph::clear_primitives_walk(scenenode *node) {
+  node->m_primitive=NULL;
+  scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
+  while (n!=NULL) {
+    clear_primitives_walk(n);
+    n=static_cast<scenenode*>(n->m_next);
+  }
 }
 
-void scenegraph::render_node_walk(scenenode *node, int depth)
-{
+void scenegraph::render_node_walk(scenenode *node, int depth) {
 #ifdef _EE
-    ps2_renderer::get()->push_matrix();
-    ps2_renderer::get()->mult_matrix(node->m_tx.arr());
+  ps2_renderer::get()->push_matrix();
+  ps2_renderer::get()->mult_matrix(node->m_tx.arr());
 #else
-	glPushMatrix();
-    //    glMultMatrixx((GLfixed*)&node->m_tx.m[0][0]);
-    glMultMatrixf(&node->m_tx.m[0][0]);
+  glPushMatrix();
+  //    glMultMatrixx((GLfixed*)&node->m_tx.m[0][0]);
+  glMultMatrixf(&node->m_tx.m[0][0]);
 #endif
-
+  
 #ifndef _EE
-//    glDisable(GL_LIGHTING);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-
-    // global render hints settings
-    if (node->m_hints&HINT_UNLIT) glDisable(GL_LIGHTING);
-    else glEnable(GL_LIGHTING);
-
-    // not supported on gles
-    //glLineWidth(node->m_line_width);
-    //glPointSize(node->m_line_width); // ok to share this??
-	if (node->m_hints&HINT_NOZWRITE) glDepthMask(false);
-    else glDepthMask(true);
-	if (node->m_hints&HINT_IGNORE_DEPTH) glDisable(GL_DEPTH_TEST);
-    else glEnable(GL_DEPTH_TEST);
-
-    glEnable(GL_NORMALIZE);
-
+  glBlendFunc(node->m_srcblend,node->m_dstblend);
+  glEnable(GL_BLEND);
+  
+  // global render hints settings
+  if (node->m_hints&HINT_UNLIT) glDisable(GL_LIGHTING);
+  else glEnable(GL_LIGHTING);
+  
+  // not supported on gles
+  //glLineWidth(node->m_line_width);
+  //glPointSize(node->m_line_width); // ok to share this??
+  if (node->m_hints&HINT_NOZWRITE) glDepthMask(false);
+  else glDepthMask(true);
+  if (node->m_hints&HINT_IGNORE_DEPTH) glDisable(GL_DEPTH_TEST);
+  else glEnable(GL_DEPTH_TEST);
+  
+  glEnable(GL_NORMALIZE);
+  
 #endif
-    if (node->m_texture!=0) {
-      glEnable(GL_TEXTURE_2D);
-      m_texture_manager.apply(node->m_texture);
-    }
-    else glDisable(GL_TEXTURE_2D);
+  if (node->m_texture!=0) {
+    glEnable(GL_TEXTURE_2D);
+    m_texture_manager.apply(node->m_texture);
+  }
+  else glDisable(GL_TEXTURE_2D);
+  
+  
+  // apply the shader if we have one...
+  if (node->m_shader != NULL) {
+    node->m_primitive->set_shader_attribs(node->m_shader);
+    node->m_shader->apply();
+  }
+  else {
+    shader::unapply();
+  }
 
-    /*
-    // apply the shader if we have one...
-    if (node->m_shader != NULL) {
-      node->m_shader->apply();
-	}
-	else shader::unapply();
-    */
+  // hint-none = hidden
+  if (node->m_primitive!=NULL && node->m_hints) {
+    node->m_primitive->render(node->m_hints);
+  }
 
-    // hint-none = hidden
-    if (node->m_primitive!=NULL && node->m_hints)
-    {
-        node->m_primitive->render(node->m_hints);
-    }
-
-    depth++;
-    scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
-    while (n!=NULL)
-    {
-        render_node_walk(n,depth);
-        n=static_cast<scenenode*>(n->m_next);
-    }
-
+  depth++;
+  scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
+  while (n!=NULL) {
+    render_node_walk(n,depth);
+    n=static_cast<scenenode*>(n->m_next);
+  }
+  
 #ifdef _EE
-    ps2_renderer::get()->pop_matrix();
+  ps2_renderer::get()->pop_matrix();
 #else
-	glPopMatrix();
+  glPopMatrix();
 #endif
 }
 
-u32 scenegraph::intersect_node_walk(scenenode *node,  const vec3 &start, const vec3 &end)
-{
-    if (node->m_primitive!=NULL)
-    {
-        // transform the line into local space
-        mat44 inv=get_global_transform(node).inverse();
-        vec3 ls=inv.transform(start);
-        vec3 le=inv.transform(end);
-
-        // run the intersection
-        if (node->m_primitive->intersect_fast(ls,le))
-        {
-            return node->m_id;
-        }
+u32 scenegraph::intersect_node_walk(scenenode *node,  const vec3 &start, const vec3 &end) {
+  if (node->m_primitive!=NULL) {
+    // transform the line into local space
+    mat44 inv=get_global_transform(node).inverse();
+    vec3 ls=inv.transform(start);
+    vec3 le=inv.transform(end);
+    
+    // run the intersection
+    if (node->m_primitive->intersect_fast(ls,le)) {
+      return node->m_id;
     }
+  }
 
-    scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
-    while (n!=NULL)
-    {
-        u32 r=intersect_node_walk(n,start,end);
-        if (r!=0) return r;
-        n=static_cast<scenenode*>(n->m_next);
-    }
-    return 0;
+  scenenode *n=static_cast<scenenode*>(node->m_children.m_head);
+  while (n!=NULL) {
+    u32 r=intersect_node_walk(n,start,end);
+    if (r!=0) return r;
+    n=static_cast<scenenode*>(n->m_next);
+  }
+  return 0;
 }
 
-
-mat44 scenegraph::get_global_transform(scenenode *node)
-{
-	mat44 mat;
-	scenenode* current=node;
-	while(current!=NULL)
-	{
-		mat*=current->m_tx;
-		current=static_cast<scenenode*>(current->m_parent);
-	}
-	return mat;
+mat44 scenegraph::get_global_transform(scenenode *node) {
+  mat44 mat;
+  scenenode* current=node;
+  while(current!=NULL) {
+    mat*=current->m_tx;
+    current=static_cast<scenenode*>(current->m_parent);
+  }
+  return mat;
 }

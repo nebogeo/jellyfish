@@ -17,6 +17,6 @@ void main()
     N = normalize(gl_NormalMatrix*gl_Normal);
     P = gl_Vertex.xyz;
     V = -vec3(gl_ModelViewMatrix*gl_Vertex);
-	L = vec3(gl_ModelViewMatrix*(vec4(LightPos,1)-gl_Vertex));
+    L = vec3((vec4(LightPos,1)-gl_Vertex));
     gl_Position = ftransform();
 }

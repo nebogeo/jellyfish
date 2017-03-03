@@ -44,7 +44,9 @@ public:
     void rotate(float x, float y, float z);
     void colour(float r, float g, float b, float a);
     void concat(mat44 m);
+    void aim(float x, float y, float z, float ux, float uy, float uz);
     void hint(u32 hint);
+    void blend_mode(u32 src, u32 dst);
     void line_width(u32 w);
     void texture(u32 id);
     void set_shader(const string &vertex, const string &fragment);
@@ -100,8 +102,7 @@ private:
     list m_state_stack;
     list m_grab_stack;
 
-    class state_stack_item : public list::node
-    {
+    class state_stack_item : public list::node {
     public:
         state_stack_item();
         state_stack_item(const state_stack_item &other);
@@ -113,10 +114,11 @@ private:
         u32 m_line_width;
         u32 m_texture;
         shader *m_shader;
+	u32 m_srcblend;
+	u32 m_dstblend;
     };
 
-    class grab_stack_item : public list::node
-    {
+    class grab_stack_item : public list::node {
     public:
         int m_id;
     };

@@ -268,6 +268,14 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
                                rvalue(vector_elem(car(sc->args),1)),
                                rvalue(vector_elem(car(sc->args),2)));
          s_return(sc,sc->F);
+     case OP_AIM:
+         engine::get()->aim(rvalue(vector_elem(car(sc->args),0)),
+			    rvalue(vector_elem(car(sc->args),1)),
+			    rvalue(vector_elem(car(sc->args),2)),
+			    rvalue(vector_elem(cadr(sc->args),0)),
+			    rvalue(vector_elem(cadr(sc->args),1)),
+			    rvalue(vector_elem(cadr(sc->args),2)));
+         s_return(sc,sc->F);
      case OP_CONCAT:
      {
           mat44 t = mat44(rvalue(vector_elem(car(sc->args),0)),
@@ -334,7 +342,7 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
      case OP_TEXTURE:
           engine::get()->texture(rvalue(car(sc->args)));
           s_return(sc,sc->F);
-          /*
+          
      case OP_SHADER:
           engine::get()->set_shader(string_value(car(sc->args)),
                                     string_value(cadr(sc->args)));
@@ -387,7 +395,6 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
           shader->unapply();
           s_return(sc,sc->F);
      }
-          */
      case OP_LOAD_TEXTURE:
           s_return(sc,mk_integer(sc,engine::get()->get_texture(string_value(car(sc->args)))));
      case OP_DRAW_INSTANCE:
@@ -595,7 +602,36 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
                                  ivalue(caddr(sc->args))
                         ));
      }
+     case OP_BLEND_MODE:
+     {
+       u32 src = GL_SRC_ALPHA;
+       u32 dst = GL_ONE_MINUS_SRC_ALPHA;
 
+       u32 s = ivalue(car(sc->args));
+       u32 d = ivalue(cadr(sc->args));
+       
+       if (s==0) src=GL_ZERO;
+       else if (s==1) src=GL_ONE;
+       else if (s==2) src=GL_DST_COLOR;
+       else if (s==3) src=GL_ONE_MINUS_DST_COLOR;
+       else if (s==4) src=GL_SRC_ALPHA;
+       else if (s==5) src=GL_ONE_MINUS_SRC_ALPHA;
+       else if (s==6) src=GL_DST_ALPHA;
+       else if (s==7) src=GL_ONE_MINUS_DST_ALPHA;
+       else if (s==8) src=GL_SRC_ALPHA_SATURATE;
+        
+       if (d==0) dst=GL_ZERO;
+       else if (d==1) dst=GL_ONE;
+       else if (d==9) dst=GL_SRC_COLOR;
+       else if (d==10) dst=GL_ONE_MINUS_SRC_COLOR;
+       else if (d==4) dst=GL_SRC_ALPHA;
+       else if (d==5) dst=GL_ONE_MINUS_SRC_ALPHA;
+       else if (d==6) dst=GL_DST_ALPHA;
+       else if (d==7) dst=GL_ONE_MINUS_DST_ALPHA;
+
+       engine::get()->blend_mode(src,dst);
+       s_return(sc,sc->F);
+     }
      default:
        snprintf(sc->strbuff,STRBUFFSIZE,"%d: illegal operator", sc->op);
        Error_0(sc,sc->strbuff);

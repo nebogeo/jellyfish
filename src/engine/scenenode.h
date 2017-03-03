@@ -63,6 +63,8 @@ public:
     u32 m_line_width;
     u32 m_texture;
     shader *m_shader;
+    u32 m_srcblend;
+    u32 m_dstblend;
 };
 
 #endif

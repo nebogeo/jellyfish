@@ -22,6 +22,18 @@
 (define triangles 0)
 (define triangle-strip 1)
 
+(define blend-zero 0)
+(define blend-one 1)
+(define blend-dst-colour 2)
+(define blend-one-minus-dst-colour 3)
+(define blend-src-alpha 4)
+(define blend-one-minus-src-alpha 5)
+(define blend-dst-alpha 6)
+(define blend-one-minus-dst-alpha 7)
+(define blend-alpha-saturate 8)
+(define blend-src-colour 9)
+(define blend-one-minus-src-colour 10)
+
 (define (hint-none) (hint 0))
 (define (hint-solid) (hint 1))
 (define (hint-wire) (hint 2))

@@ -23,41 +23,37 @@ scenenode::scenenode(primitive *p) :
     m_hints(HINT_SOLID),
     m_line_width(1),
     m_texture(0),
-    m_shader(NULL)
+    m_shader(NULL),
+    m_srcblend(GL_SRC_ALPHA),
+    m_dstblend(GL_ONE_MINUS_SRC_ALPHA)
 {
-    if (m_primitive) m_primitive->build();
+  if (m_primitive) m_primitive->build();
 }
 
-scenenode::~scenenode()
-{
-    // list destr deletes children
+scenenode::~scenenode() {
+  // list destr deletes children
+  
+  if (m_parent!=NULL) {
+    m_parent->remove_child(m_id);
+  }
 
-	if (m_parent!=NULL)
-	{
-		m_parent->remove_child(m_id);
-	}
-
-    if (m_primitive!=NULL) delete m_primitive;
+  if (m_primitive!=NULL) delete m_primitive;
 }
 
-scenenode *scenenode::find_child(int id)
-{
-    scenenode *n=static_cast<scenenode*>(m_children.m_head);
-    while (n!=NULL)
-    {
-        if (n->m_id==id) return n;
-        n=static_cast<scenenode*>(n->m_next);
-    }
-    return NULL;
+scenenode *scenenode::find_child(int id) {
+  scenenode *n=static_cast<scenenode*>(m_children.m_head);
+  while (n!=NULL) {
+    if (n->m_id==id) return n;
+    n=static_cast<scenenode*>(n->m_next);
+  }
+  return NULL;
 }
 
 // deleting the node is someone elses business - we may be reparenting
-void scenenode::remove_child(int id)
-{
-    scenenode *n=find_child(id);
-    if (n!=NULL)
-    {
-        //delete n;
-        m_children.remove(n);
-    }
+void scenenode::remove_child(int id) {
+  scenenode *n=find_child(id);
+  if (n!=NULL) {
+    //delete n;
+    m_children.remove(n);
+  }
 }

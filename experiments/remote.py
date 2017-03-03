@@ -2,8 +2,10 @@ import osc,time
 from random import choice
 
 code = ["""
- (make-jelly
-  10000 prim-tristrip
+(with-primitive
+  (build-jellyfish 4096)
+ (program-jelly
+  10000 prim-tristrip 1
   '(let ((vertex positions-start)
          (t 0)
          (v 0)
@@ -18,11 +20,13 @@ code = ["""
             (set! vertex (+ vertex 1)))
 
       (set! t (+ t 0.01))
-      )))
+      ))))
 """,
 
 """
-   (make-jelly 10000 prim-tristrip
+(with-primitive
+  (build-jellyfish 4096)
+   (program-jelly 10000 prim-tristrip 1
     '(let ((vertex positions-start))
        (write! reg-graphics (vector 512 1 2))
        (forever
@@ -30,12 +34,13 @@ code = ["""
         (loop (< vertex positions-end)
               (write-add! vertex (* (sincos (* (read vertex) 0.01)) 0.1))
               (++! vertex))
-       )))
+       ))))
 """,
 
 """
 (with-primitive
-  (make-jelly
+  (build-jellyfish 4096)
+  (program-jelly
    10000 prim-triangles
    '(let ((vertex positions-start)
            (t 0)
@@ -74,7 +79,8 @@ code = ["""
 
 """
 (with-primitive
- (make-jelly
+  (build-jellyfish 4096)
+ (program-jelly
   10000 prim-triangles
   '(let ((vertex positions-start)
          (flingdamp (vector 50 -20 0))

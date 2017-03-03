@@ -16,8 +16,7 @@
 
 #include "../core/list.h"
 
-class texture_manager
-{
+class texture_manager {
 public:
     texture_manager() {}
     ~texture_manager() {}
@@ -27,13 +26,11 @@ public:
     void apply(u32 id);
     
 private:
-    class texture_node : public list::node
-    {
+    class texture_node : public list::node {
     public:
         char *name;
         u32 id;
         u32 width, height;
     };
-    
     list m_textures;
 };

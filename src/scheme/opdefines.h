@@ -226,6 +226,7 @@
     _OP_DEF(opexe_6, "rotate",                         1,  1,       0,                               OP_ROTATE           )
     _OP_DEF(opexe_6, "scale",                          1,  1,       0,                               OP_SCALE            )
     _OP_DEF(opexe_6, "concat",                         1,  1,       0,                               OP_CONCAT           )
+    _OP_DEF(opexe_6, "aim",                            2,  2,       0,                               OP_AIM              )
     _OP_DEF(opexe_6, "colour",                         1,  1,       0,                               OP_COLOUR           )
     _OP_DEF(opexe_6, "hint",                           1,  1,       0,                               OP_HINT             )
     _OP_DEF(opexe_6, "line-width",                     1,  1,       0,                               OP_LINE_WIDTH       )
@@ -260,6 +261,7 @@
     _OP_DEF(opexe_6, "minverse",                       1,  1,       0,                               OP_MINVERSE )
     _OP_DEF(opexe_6, "bitwise-ior",                    3,  3,       0,                               OP_BITWISE_IOR )
     _OP_DEF(opexe_6, "destroy",                        1,  1,       0,                               OP_DESTROY )
+    _OP_DEF(opexe_6, "blend-mode",                     2,  2,       0,                               OP_BLEND_MODE )
 
 
 #undef _OP_DEF
