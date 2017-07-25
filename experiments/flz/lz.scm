@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init 20 44100)
+(synth-init "fluxa" 44100 512 20)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -141,11 +141,11 @@
 (define (set-nz-vals! n v) (vector-set! n 1 v))
 (define (set-nz-vx! n v) (vector-set! n 2 v))
 (define (set-nz-cur-t! n v) (vector-set! n 4 v))
-
-(define (t) (ntp-time))
+(define (set-nz-tk! n v) (vector-set! n 5 v))
+(define (set-nz-off! n v) (vector-set! n 6 v))
 
 (define (build-nz lz sz tk)
-  (make-nz lz '(20) 0 sz (ntp-time-add (t) 5) tk 1.0))
+  (make-nz lz '(20) 0 sz (ntp-time-add (ntp-time) 5) tk 0.0))
 
 (define (nz-pop! nz)
   (let ((tmp (car (nz-vals nz))))
@@ -170,23 +170,57 @@
         (display (lz-tick (nz-lz nz)))
         (nz-dump nz (- c 1))))
 
+; figures out the offset to the nearest tick
+(define (calc-offset time-now sync-time beat-dur)
+  ;; find the difference in terms of tempo
+  (let* ((diff (/ (ntp-time-diff sync-time time-now) beat-dur))
+         ;; get the fractional remainder (doesn't matter how
+         ;; far in the past or future the synctime is)
+         (fract (- diff (floor diff))))
+    ;; do the snapping
+    (if (< fract 0.5)
+        ;; need to jump forwards - convert back into seconds
+        (* fract beat-dur)
+        ;; the beat is behind us, so go backwards
+        (- (* (- 1 fract) beat-dur)))))
+
+(define (bpm->seconds bpm)
+  (/ 60 bpm))
+
+(define (nz-sync nz bpm)
+  (let ((new-tk (bpm->seconds bpm))
+	(now (ntp-time)))
+    (msg (car now) " " (cadr now) " sync")
+    (set-nz-off! nz (* new-tk 4))
+    (set-nz-tk! nz new-tk)
+    (let ((sync (ntp-time-add 
+		 (nz-cur-t nz) 
+		 (- (calc-offset now (nz-cur-t nz) new-tk))
+		 )))
+      (msg (car sync) " " (cadr sync) " setting")
+      (set-nz-cur-t! nz sync))))
+
 (define (nz-tick nz)
-  (when (ntp>? (ntp-time-add (t) (nz-off nz)) (nz-cur-t nz))
+  (when (ntp>? (ntp-time) (nz-cur-t nz))
+	(msg (car (nz-cur-t nz)) " " (cadr (nz-cur-t nz)) " tick-time")
+	(let ((real (ntp-time)))
+	  (msg (car real) " " (cadr real) " tick-real"))
         (let ((t (lz-tick (nz-lz nz)))
               (v (car (nz-vals nz))))
-          (when (or (char=? t #\a) (char=? t #\b)
-                    (char=? t #\c) (char=? t #\d)
-                    (char=? t #\.))
-                (set-nz-cur-t! nz (ntp-time-add (nz-cur-t nz) (nz-tk nz))))
+          ;(when (or (char=? t #\a) (char=? t #\b)
+          ;          (char=? t #\c) (char=? t #\d)
+          ;          (char=? t #\.))
+	  (set-nz-cur-t! nz (ntp-time-add (nz-cur-t nz) (nz-tk nz)))
+	  ;)
           (cond
            ((char=? t #\+) (set-nz-vals! nz (cons (+ (car (nz-vals nz)) 1) (cdr (nz-vals nz)))))
            ((char=? t #\-) (set-nz-vals! nz (cons (- (car (nz-vals nz)) 1) (cdr (nz-vals nz)))))
            ((char=? t #\<) (set-nz-vx! nz (modulo (- (nz-vx nz) 1) (length (nz-sz nz)))))
            ((char=? t #\>) (set-nz-vx! nz (modulo (+ (nz-vx nz) 1) (length (nz-sz nz)))))
-           ((char=? t #\a) (play (nz-cur-t nz) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 0) v) 0))
-           ((char=? t #\b) (play (nz-cur-t nz) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 1) v) 0))
-           ((char=? t #\c) (play (nz-cur-t nz) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 2) v) 0))
-           ((char=? t #\d) (play (nz-cur-t nz) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 3) v) 0))
+           ((char=? t #\a) (play (ntp-time-add (nz-cur-t nz) (nz-off nz)) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 0) v) 0))
+           ((char=? t #\b) (play (ntp-time-add (nz-cur-t nz) (nz-off nz)) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 1) v) 0))
+           ((char=? t #\c) (play (ntp-time-add (nz-cur-t nz) (nz-off nz)) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 2) v) 0))
+           ((char=? t #\d) (play (ntp-time-add (nz-cur-t nz) (nz-off nz)) ((list-ref (list-ref (nz-sz nz) (nz-vx nz)) 3) v) 0))
            ((char=? t #\[) (nz-dup! nz))
            ((char=? t #\]) (nz-pop! nz)))
           )))
@@ -285,15 +319,20 @@
 
 (define l (build-lz 9 8 4))
 
-(lz-prog l 0 "B++B--BB")
-(lz-prog l 1 "C+D--C-D")
-(lz-prog l 2 "a+b--c+d")
-(lz-prog l 3 "c++b--")
+;(lz-prog l 0 "B++B--BB")
+;(lz-prog l 1 "C+D--C-D")
+;(lz-prog l 2 ">+b--c+d")
+;(lz-prog l 3 "c++b--")
 
 ;(lz-prog l 0 "a       ")
 ;(lz-prog l 1 "        ")
 ;(lz-prog l 2 "        ")
 ;,(lz-prog l 3 "        ")
+
+(lz-prog l 0 "cccb")
+(lz-prog l 1 "        ")
+(lz-prog l 2 "        ")
+(lz-prog l 3 "        ")
 
 
 ;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))

@@ -40,94 +40,95 @@ static RPI_STATE_T _state, *state=&_state;
 
 int main(int argc, char *argv[])
 {
-    bool window=true;
-    if (argc>=2 && !strcmp(argv[1],"-nw")) window=false;
-    if (argc>=2 && !strcmp(argv[1],"-r")) graphics::m_record=true;
+  bool window=true;
+  if (argc>=2 && !strcmp(argv[1],"-nw")) window=false;
+  if (argc>=2 && !strcmp(argv[1],"-r")) graphics::m_record=true;
 
 #ifdef FLX_RPI
-   bcm_host_init();
-   // Clear application state
-   memset( state, 0, sizeof( *state ) );
-    if (window) {
-      cerr<<"init_ogl_rpi"<<endl;
-      init_ogl_rpi(state);
-      graphics::rpi_state = state;
+  bcm_host_init();
+  // Clear application state
+  memset( state, 0, sizeof( *state ) );
+  if (window) {
+    cerr<<"init_ogl_rpi"<<endl;
+    init_ogl_rpi(state);
+    graphics::rpi_state = state;
 
-      cerr<<state->screen_width<<" "<<state->screen_height<<endl;
-      graphics::m_w=state->screen_width;
-      graphics::m_h=state->screen_height;
+    cerr<<state->screen_width<<" "<<state->screen_height<<endl;
+    graphics::m_w=state->screen_width;
+    graphics::m_h=state->screen_height;
 
-    }
+  }
 #else
-    graphics::m_w=1024;
-    graphics::m_h=768;
+  graphics::m_w=1024;
+  graphics::m_h=768;
 
-    if (window) {
-      glutInit(&argc,argv);
-      glutInitWindowSize(graphics::m_w,graphics::m_h);
-      glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
-      glutCreateWindow(PACKAGE_STRING);
-      glutDisplayFunc(graphics::display_callback);
-      glutIdleFunc(graphics::idle_callback);
-      glutKeyboardFunc(graphics::keyboard_callback);
-      glutKeyboardUpFunc(graphics::keyboard_up_callback);
-      glutMouseFunc(graphics::mouse_callback);
-      glutMotionFunc(graphics::motion_callback);
-      glutPassiveMotionFunc(graphics::passive_motion_callback);
-    }
+  if (window) {
+    glutInit(&argc,argv);
+    glutInitWindowSize(graphics::m_w,graphics::m_h);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
+    glutCreateWindow(PACKAGE_STRING);
+    glutDisplayFunc(graphics::display_callback);
+    glutIdleFunc(graphics::idle_callback);
+    glutKeyboardFunc(graphics::keyboard_callback);
+    glutKeyboardUpFunc(graphics::keyboard_up_callback);
+    glutMouseFunc(graphics::mouse_callback);
+    glutMotionFunc(graphics::motion_callback);
+    glutPassiveMotionFunc(graphics::passive_motion_callback);
+  }
 #endif
 
-    cerr<<"window="<<window<<endl;
+  cerr<<"window="<<window<<endl;
 
-    interpreter::initialise();
-    if (window) graphics::initialise();
+  interpreter::initialise();
+  if (window) graphics::initialise();
+  else graphics::init_mutex();
+  
+  interpreter::eval_file(string(ASSETS_PATH)+"init.scm");
+  interpreter::eval_file(string(ASSETS_PATH)+"boot.scm");
+  if (window) interpreter::eval_file(string(ASSETS_PATH)+"fluxus.scm");
+  interpreter::eval_file(string(ASSETS_PATH)+"lib.scm");
+  interpreter::eval_file(string(ASSETS_PATH)+"compiler.scm");
+  interpreter::eval_file(string(ASSETS_PATH)+"fluxa.scm");
 
-    interpreter::eval_file(string(ASSETS_PATH)+"init.scm");
-    interpreter::eval_file(string(ASSETS_PATH)+"boot.scm");
-    if (window) interpreter::eval_file(string(ASSETS_PATH)+"fluxus.scm");
-    interpreter::eval_file(string(ASSETS_PATH)+"lib.scm");
-    interpreter::eval_file(string(ASSETS_PATH)+"compiler.scm");
-    interpreter::eval_file(string(ASSETS_PATH)+"fluxa.scm");
+  if (argc>1) interpreter::eval_file(argv[argc-1]);
 
-    if (argc>1) interpreter::eval_file(argv[argc-1]);
-
-    interpreter::start_repl(graphics::m_render_mutex);
-    network_osc::start_osc_repl(graphics::m_render_mutex);
+  interpreter::start_repl(graphics::m_render_mutex);
+  network_osc::start_osc_repl(graphics::m_render_mutex);
 
 #ifdef FLX_RPI
-    //    getMouse();
-    //getKeys();
+  //    getMouse();
+  //getKeys();
 
-    while (!terminate_prog)
+  while (!terminate_prog)
     {
       //doEvents(state->screen_width, state->screen_height,
       //          graphics::keyboard_callback,
       //          graphics::keyboard_up_callback);
 
-        //usleep(5*1000);
-        if (window) graphics::display_callback();
-        else {
-            if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
-                interpreter::eval("(frame-hook)");
-                pthread_mutex_unlock(graphics::m_render_mutex);
-            }
-        }
-        usleep(1000);
+      //usleep(5*1000);
+      if (window) graphics::display_callback();
+      else {
+	if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
+	  interpreter::eval("(frame-hook)");
+	  pthread_mutex_unlock(graphics::m_render_mutex);
+	}
+      }
+      usleep(1000);
     }
 #else
-	if (window) glutMainLoop();
-	else
+  if (window) glutMainLoop();
+  else
     {
       while(true)
         {
-            //if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
-                interpreter::eval("(frame-hook)");
-                usleep(10);
-                //    pthread_mutex_unlock(graphics::m_render_mutex);
-                //}
+	  if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
+	    interpreter::eval("(frame-hook)");
+	    usleep(10);
+	    pthread_mutex_unlock(graphics::m_render_mutex);
+	  }
 	}
     }
 #endif
 
-	return 0;
+  return 0;
 }

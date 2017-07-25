@@ -20,7 +20,7 @@
 #ifndef SPIRALCORE_TIME
 #define SPIRALCORE_TIME
 
-static const double ONE_OVER_UINT_MAX = 1.0/UINT_MAX;
+static const double ONE_OVER_UINT_MAX = 1.0/ULONG_MAX;
 
 namespace spiralcore
 {
@@ -29,7 +29,7 @@ class time
 {
  public:
   time();
-  time(int s, int f) : seconds(s),fraction(f) {}
+  time(unsigned long s, unsigned long f) : seconds(s),fraction(f) {}
   void set_to_now();
   void set_from_posix(timeval tv);
   void inc_by_sample(unsigned long samples, unsigned long samplerate);
@@ -41,12 +41,12 @@ class time
   time &operator+=(double s);
   void print() const;
   double get_fraction() const { return fraction*ONE_OVER_UINT_MAX; }
-  void set_fraction(double s) { fraction = (int)(s*(double)UINT_MAX); }
+  void set_fraction(double s) { fraction = (long)(s*(double)ULONG_MAX); }
   bool is_empty() { return (!seconds && !fraction); }
   double get_difference(const time& other);
 
-  unsigned int seconds;
-  unsigned int fraction;
+  unsigned long seconds;
+  unsigned long fraction;
 };
 
 }

@@ -151,6 +151,14 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
           s_return(sc,cons(sc,mk_integer(sc,t.seconds),
                            cons(sc,mk_integer(sc,t.fraction),sc->NIL)));
      }
+     case OP_NTP_TIME_DIFF: {
+       spiralcore::time t(ivalue(car(car(sc->args))),
+			  ivalue(cadr(car(sc->args))));
+       spiralcore::time t2(ivalue(car(cadr(sc->args))),
+			   ivalue(cadr(cadr(sc->args))));
+
+       s_return(sc,mk_real(sc,t.get_difference(t2)));
+     }
      case OP_DATETIME: {
           timeval t;
           // stop valgrind complaining

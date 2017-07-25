@@ -31,6 +31,7 @@ public:
     static pthread_mutex_t* m_render_mutex;
 
     static void initialise();
+    static void init_mutex();
 
     // in case we don't have glu/glut
     static void glu_perspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar);

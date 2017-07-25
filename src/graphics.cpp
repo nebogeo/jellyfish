@@ -55,14 +55,14 @@ void graphics::initialise()
     glEnableClientState(GL_VERTEX_ARRAY);
 
     engine::init();
+    init_mutex();
+    shader::init();
+}
 
+void graphics::init_mutex() {
     // setup the repl thread
     m_render_mutex = new pthread_mutex_t;
     pthread_mutex_init(m_render_mutex,NULL);
-
-    shader::init();
-
-
 }
 
 // in case we don't have glu/glut
