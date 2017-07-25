@@ -77,7 +77,7 @@ void graphics::glu_perspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfl
     /*    glFrustumx((GLfixed)(xmin * 65536), (GLfixed)(xmax * 65536),
                (GLfixed)(ymin * 65536), (GLfixed)(ymax * 65536),
                (GLfixed)(zNear * 65536), (GLfixed)(zFar * 65536));*/
-    glFrustum(xmin, xmax,
+    glFrustumf(xmin, xmax,
                ymin, ymax,
                zNear, zFar);
 }
@@ -181,7 +181,7 @@ void graphics::display_callback() {
           static char fn[256];
           sprintf(fn,"shot-%0.4d.jpg",m_frame_num);
           cerr<<fn<<endl;
-          write_jpg(get_screen_buffer(0, 0, m_w, m_h, 1),fn,"",0,0,m_w,m_h,95,1);
+          //write_jpg(get_screen_buffer(0, 0, m_w, m_h, 1),fn,"",0,0,m_w,m_h,95,1);
           m_frame_num++;
         }
 

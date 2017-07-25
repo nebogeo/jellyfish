@@ -65,7 +65,7 @@ using namespace bb;
 
 #else
 //-Android------------------------------
-#define flx_real x32
+#define flx_real float
 #endif
 #endif
 

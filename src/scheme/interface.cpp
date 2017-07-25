@@ -511,7 +511,7 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
      }
      case OP_TEXT_PARAMS:
      {
-          engine::get()->text_params(string_value(list_ref(sc,sc->args,0)),
+       /*          engine::get()->text_params(string_value(list_ref(sc,sc->args,0)),
                                      rvalue(list_ref(sc,sc->args,1)),
                                      rvalue(list_ref(sc,sc->args,2)),
                                      ivalue(list_ref(sc,sc->args,3)),
@@ -522,7 +522,7 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
                                      rvalue(list_ref(sc,sc->args,8)),
                                      rvalue(list_ref(sc,sc->args,9)),
                                      rvalue(list_ref(sc,sc->args,10)));
-          s_return(sc,sc->F);
+       */ s_return(sc,sc->F);
      }
      case OP_RECALC_BB:
      {
@@ -531,10 +531,11 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
      }
      case OP_BB_POINT_INTERSECT:
      {
-         vec3 pvec(rvalue(vector_elem(car(sc->args),0)),
-                   rvalue(vector_elem(car(sc->args),1)),
-                   rvalue(vector_elem(car(sc->args),2)));
-         s_return(sc,mk_integer(sc,engine::get()->bb_point_intersect(pvec,rvalue(cadr(sc->args)))));
+       //         vec3 pvec(rvalue(vector_elem(car(sc->args),0)),
+       //            rvalue(vector_elem(car(sc->args),1)),
+       //            rvalue(vector_elem(car(sc->args),2)));
+       //  s_return(sc,mk_integer(sc,engine::get()->bb_point_intersect(pvec,rvalue(cadr(sc->args)))));
+          s_return(sc,sc->F);
      }
      case OP_GEO_LINE_INTERSECT:
      {
