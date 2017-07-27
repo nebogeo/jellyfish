@@ -203,6 +203,7 @@
     _OP_DEF(opexe_6, "ntp-time",                       0,  0,       TST_NONE,                        OP_NTP_TIME         )
     _OP_DEF(opexe_6, "ntp-time-add",                   2,  2,       TST_NONE,                        OP_NTP_TIME_ADD     )
     _OP_DEF(opexe_6, "ntp-time-diff",                  2,  2,       TST_NONE,                        OP_NTP_TIME_DIFF    )
+    _OP_DEF(opexe_6, "ntp>?",                          2,  2,       TST_NONE,                        OP_NTP_TIME_GTR     )
     _OP_DEF(opexe_6, "date-time",                      0,  0,       TST_NONE,                        OP_DATETIME         )
     _OP_DEF(opexe_6, "id-map-add",                     2,  2,       TST_NONE,                        OP_ID_MAP_ADD       )
     _OP_DEF(opexe_6, "id-map-get",                     1,  1,       TST_NONE,                        OP_ID_MAP_GET       )

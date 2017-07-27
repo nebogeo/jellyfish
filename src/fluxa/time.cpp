@@ -18,8 +18,10 @@
 #include <math.h>
 #include <iostream>
 #include "time.h"
+#include <bitset>
 
 using namespace spiralcore;
+using namespace std;
 
 // got this and usec2ntp from http://www.openmash.org/lxr/source/rtp/ntp-time.h
 static const unsigned long GETTIMEOFDAY_TO_NTP_OFFSET = 2208988800UL;
@@ -62,13 +64,18 @@ void time::inc_by_sample(unsigned long samples, unsigned long samplerate)
   (*this)+=samples/(double)samplerate;
 }
 
-spiralcore::time &time::operator+=(double s)
-{
-  unsigned int secs = (unsigned int)floor(s);
+spiralcore::time &time::operator+=(double s) {
+  int secs = (int)floor(s);
+  // secs can be negative, floor will convert e.g. -3.5 to -4
   seconds += secs;
+  // this means frac will always be positive
   double frac = s-secs;
-  // overflow? (must do this better)
-  if (frac+fraction*ONE_OVER_UINT_MAX>1.0f) seconds++;
+  // predict and deal with overflow after adding 
+  // by "carrying" over to seconds
+  if (frac+fraction*ONE_OVER_UINT_MAX>1.0f) seconds++; 
+  // as frac is positive, and between 0 and 1 we expand 
+  // it to the full unsigned range, if the total is greater 
+  // than one (as above) then it will wrap correctly
   fraction += (unsigned int)(frac*UINT_MAX);
   return *this;
 }
