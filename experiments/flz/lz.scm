@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init "fluxa" 44100 512 20)
+(synth-init "fluxa" 44100 2048 20)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -222,7 +222,7 @@
 	       ((char=? t #\]) (nz-pop! nz)))
 	      )))))
 
-;; --
+; --
 
 
 (define ss
@@ -274,17 +274,11 @@
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 440 (* v 20)))))
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 240 (* v 20)))))
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (+ 140 (* v 20)))))
-    (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (mul (adsr 0 0.1 0 0) (+ 40 (* v 50)))))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1) (pink (mul (adsr 0 0.1 0 0) (+ 40 (* v 50))))))
 
-   )
-  )
+   
+    )
 
-(define (sample n) (mul (adsr 0.4 0.2 0 0) (sine n)))
-(define (get-sample n samples) (note n))
-(define samples 0)
-
-(define voices
-  (list
    (list
     (lambda (n) (mul 1 (sample (get-sample n samples) 440)))
     (lambda (n) (mul (adsr 0 0.1 0 0) (moogbp
@@ -294,6 +288,7 @@
                                               (adsr 0.1 0 0 0) 0.4)))
     (lambda (n) (mul (adsr 0 0.1 0.05 1) (sine
                                           (add (mul 100 (sine (* 0.3333 (note n)))) (note n))))))
+   
    (list
     (lambda (n) (mul 1 (sample (get-sample n samples) 440)))
     (lambda (n) (mul (adsr 0 0.1 0 0)
@@ -312,29 +307,36 @@
                                        (add (saw (note n)) (saw (* 0.333333 (note n))))
                                        (* 0.1 (random 10)) 0.48)))
     (lambda (n) (mul (adsr 0 0.1 0.05 1) (sine
-                                          (add (mul 1000 (sine (* 0.3333 (note n)))) (note n))))))))
+                                          (add (mul 1000 (sine (* 0.3333 (note n)))) (note n))))))
+
+   
+  ))
+
+(define (sample n) (mul (adsr 0.4 0.2 0 0) (sine n)))
+(define (get-sample n samples) (note n))
+(define samples 0)
 
 (define l (build-lz 9 8 4))
 
-;(lz-prog l 0 "B++B--BB")
-;(lz-prog l 1 "C+D--C-D")
-;(lz-prog l 2 ">+b--c+d")
-;(lz-prog l 3 "c++b--")
+(lz-prog l 0 "B++a-b")
+(lz-prog l 1 "C+D--C-D")
+(lz-prog l 2 "+b--c+d")
+(lz-prog l 3 "c++b--")
 
 ;(lz-prog l 0 "a       ")
 ;(lz-prog l 1 "        ")
 ;(lz-prog l 2 "        ")
 ;,(lz-prog l 3 "        ")
 
-(lz-prog l 0 "cccb")
-(lz-prog l 1 "        ")
-(lz-prog l 2 "        ")
-(lz-prog l 3 "        ")
+;(lz-prog l 0 "cccb")
+;(lz-prog l 1 "        ")
+;(lz-prog l 2 "        ")
+;(lz-prog l 3 "        ")
 
 
 ;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
 
-(define z (build-nz l voices 0.2))
+(define z (build-nz l ss 0.2))
 
 (set-scale '(2 2 2 2 1 1 1))
 

@@ -46,21 +46,27 @@ portaudio_client::~portaudio_client()
 
 bool portaudio_client::attach(const string &client_name, const device_options &dopt)
 {
-	if (m_attached) return true;
+  if (m_attached) return true;
+  
+  PaError err;
+  err = Pa_Initialize();
+  if( err != paNoError )
+    {
+      cerr<<"could not init portaudio_client"<<endl;
+      Pa_Terminate();
+      fprintf( stderr, "an error occured while using the portaudio stream\n" );
+      fprintf( stderr, "error number: %d\n", err );
+      fprintf( stderr, "error message: %s\n", Pa_GetErrorText( err ) );
+    }
 
-    PaError err;
-	err = Pa_Initialize();
-    if( err != paNoError )
- 	{
-		cerr<<"could not init portaudio_client"<<endl;
-        Pa_Terminate();
-        fprintf( stderr, "an error occured while using the portaudio stream\n" );
-        fprintf( stderr, "error number: %d\n", err );
-        fprintf( stderr, "error message: %s\n", Pa_GetErrorText( err ) );
-	}
-
-    PaStreamParameters output_parameters;
-    output_parameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
+  int num_devices = Pa_GetDeviceCount();
+  for (int i=0; i<num_devices; i++) {
+    const PaDeviceInfo *deviceInfo = Pa_GetDeviceInfo(i);
+    cerr<<i<<" "<<deviceInfo->name<<endl;
+  }
+  
+  PaStreamParameters output_parameters;
+  output_parameters.device = 2; //Pa_GetDefaultOutputDevice(); /* default output device */
     if (output_parameters.device == paNoDevice) {
 		cerr<<"error: no default output device."<<endl;
     }
