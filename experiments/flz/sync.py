@@ -4,7 +4,7 @@ import time
 def sync(bpm):
     osc.Message("/eval",["(nz-sync z "+str(bpm)+")"]).sendlocal(8000)
 
-bpm = 753.23
+bpm = 353.23
 #bpm = 240.0
 count = 0
 

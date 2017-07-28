@@ -185,30 +185,30 @@
 (define (nz-sync nz bpm)
   (let ((new-tk (bpm->seconds bpm))
 	(now (ntp-time)))
-    (msg (car now) " " (cadr now) " sync")
+    ;;(msg (car now) " " (cadr now) " sync")
     (set-nz-off! nz (* new-tk 4))
     (set-nz-tk! nz new-tk)
-    (let ((sync (ntp-time-add 
-		 (nz-cur-t nz) 
-		 (- (calc-offset now (nz-cur-t nz) new-tk))
-		 )))
-      (msg (car sync) " " (cadr sync) " setting")
-      (set-nz-cur-t! nz sync))))
+    (let ((offs (calc-offset now (nz-cur-t nz) new-tk)))
+      (let ((sync (ntp-time-add
+		   ;; definitely negative this...
+		   (nz-cur-t nz) (- offs))))
+	(msg "time error is: " offs)
+	;;(msg (car sync) " " (cadr sync) " setting")
+	(set-nz-cur-t! nz sync)))))
 
 (define (nz-tick nz)
   (let ((now (ntp-time)))
     (let ((future (ntp-time-add now (nz-off nz))))
       (when (ntp>? future (nz-cur-t nz))
-	    (msg (car (nz-cur-t nz)) " " (cadr (nz-cur-t nz)) " tick-time")
-	    (msg (car now) " " (cadr now) " tick-real")
-	    (msg (car future) " " (cadr future) " tick-future")
+	    ;;(msg (car (nz-cur-t nz)) " " (cadr (nz-cur-t nz)) " tick-time")
+	    ;;(msg (car now) " " (cadr now) " tick-real")
+	    ;;(msg (car future) " " (cadr future) " tick-future")
 	    (let ((t (lz-tick (nz-lz nz)))
 		  (v (car (nz-vals nz))))
-	      ;;(when (or (char=? t #\a) (char=? t #\b)
-	      ;;          (char=? t #\c) (char=? t #\d)
-	      ;;          (char=? t #\.))
-	      (set-nz-cur-t! nz (ntp-time-add (nz-cur-t nz) (nz-tk nz)))
-	      ;;)
+	      (when (or (char=? t #\a) (char=? t #\b)
+	                (char=? t #\c) (char=? t #\d)
+	                (char=? t #\.))
+		    (set-nz-cur-t! nz (ntp-time-add (nz-cur-t nz) (nz-tk nz))))
 	      (cond
 	       ((char=? t #\+) (set-nz-vals! nz (cons (+ (car (nz-vals nz)) 1) (cdr (nz-vals nz)))))
 	       ((char=? t #\-) (set-nz-vals! nz (cons (- (car (nz-vals nz)) 1) (cdr (nz-vals nz)))))
@@ -227,6 +227,30 @@
 
 (define ss
   (list
+   (list
+    (lambda (v) (mul
+		 0.4
+		 (mul (adsr 0.001 0.02 0.1 1)
+		      (add
+		       (tri (note v))
+		       (add
+			(tri (* (note v) 1.666))
+			(tri (* (note v) 2))
+			)))))
+    (lambda (v) (mul 0.4 (mul (adsr 0.3 0.01 0 0)
+		     (add
+		      (tri (note v))
+		      (tri (* (note v) 0.333))))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1)
+		     (add
+		      (saw (note v))
+		      (sine (* (note v) 1.333)))))
+    (lambda (v) (mul (adsr 0 0.01 0.1 1)
+		     (add
+		      (saw (note v))
+		      (sine (* (note v) 1.333))))))
+
+   
    (list
     (lambda (v) (mul (adsr 0 0.01 0.1 1) (sine (add (mul 20 (sine 4)) (note v)))))
     (lambda (v) (mul (adsr 0 0.1 0 0) (mul 0.2 (add (saw (* 1.5 (note v)))
@@ -318,10 +342,10 @@
 
 (define l (build-lz 9 8 4))
 
-(lz-prog l 0 "B++a-b")
-(lz-prog l 1 "C+D--C-D")
-(lz-prog l 2 "+b--c+d")
-(lz-prog l 3 "c++b--")
+(lz-prog l 0 "a+a-B")
+(lz-prog l 1 "C+ab-")
+(lz-prog l 2 "+BAb-")
+(lz-prog l 3 "c++b-")
 
 ;(lz-prog l 0 "a       ")
 ;(lz-prog l 1 "        ")
