@@ -678,76 +678,69 @@ void formant_filter::process(unsigned int buf_size, sample &sin, sample *cutoffC
 {
   float res,o[5],out=0, in=0;
 
-  for (unsigned int n=0; n<buf_size; n++)
-    {
-      in = sin[n];
+  for (unsigned int n=0; n<buf_size; n++) {
+    in = sin[n];
 
-      // work around denormal calculation CPU spikes where in --> 0
-      if ((in >= 0) && (in < 0.000000001))
-	in += 0.000000001;
-      else
-	if ((in <= 0) && (in > -0.000000001))
-	  in -= 0.000000001;
+    // work around denormal calculation CPU spikes where in --> 0
+    if ((in >= 0) && (in < 0.000000001))
+      in += 0.000000001;
+    else
+      if ((in <= 0) && (in > -0.000000001))
+	in -= 0.000000001;
 
-      for (int v=0; v<5; v++)
-	{
-	  res= (float) (coeff[v][0]*in +
-			coeff[v][1]*memory[v][0] +
-			coeff[v][2]*memory[v][1] +
-			coeff[v][3]*memory[v][2] +
-			coeff[v][4]*memory[v][3] +
-			coeff[v][5]*memory[v][4] +
-			coeff[v][6]*memory[v][5] +
-			coeff[v][7]*memory[v][6] +
-			coeff[v][8]*memory[v][7] +
-			coeff[v][9]*memory[v][8] +
-			coeff[v][10]*memory[v][9]);
+    for (int v=0; v<5; v++) {
+      res= (float) (coeff[v][0]*in +
+		    coeff[v][1]*memory[v][0] +
+		    coeff[v][2]*memory[v][1] +
+		    coeff[v][3]*memory[v][2] +
+		    coeff[v][4]*memory[v][3] +
+		    coeff[v][5]*memory[v][4] +
+		    coeff[v][6]*memory[v][5] +
+		    coeff[v][7]*memory[v][6] +
+		    coeff[v][8]*memory[v][7] +
+		    coeff[v][9]*memory[v][8] +
+		    coeff[v][10]*memory[v][9]);
 
-	  memory[v][9]=memory[v][8];
-	  memory[v][8]=memory[v][7];
-	  memory[v][7]=memory[v][6];
-	  memory[v][6]=memory[v][5];
-	  memory[v][5]=memory[v][4];
-	  memory[v][4]=memory[v][3];
-	  memory[v][3]=memory[v][2];
-	  memory[v][2]=memory[v][1];
-	  memory[v][1]=memory[v][0];
-	  memory[v][0]=(double) res;
+      memory[v][9]=memory[v][8];
+      memory[v][8]=memory[v][7];
+      memory[v][7]=memory[v][6];
+      memory[v][6]=memory[v][5];
+      memory[v][5]=memory[v][4];
+      memory[v][4]=memory[v][3];
+      memory[v][3]=memory[v][2];
+      memory[v][2]=memory[v][1];
+      memory[v][1]=memory[v][0];
+      memory[v][0]=(double) res;
 
-	  o[v]=res;
-	}
-
-      float vowel=m_vowel;
-      if (cutoffCV!=NULL) vowel+=(*cutoffCV)[n];
-
-      // mix between vowel sounds
-      if (vowel<1)
-	{
-	  out=linear(0,1,vowel,o[1],o[0]);
-	}
-      else
-	if (vowel>1 && vowel<2)
-	  {
-	    out=linear(0,1,vowel-1.0f,o[2],o[1]);
-	  }
-	else
-	  if (vowel>2 && vowel<3)
-	    {
-	      out=linear(0,1,m_vowel-2.0f,o[3],o[2]);
-	    }
-	  else
-	    if (vowel>3 && vowel<4)
-	      {
-		out=linear(0,1,vowel-3.0f,o[4],o[3]);
-	      }
-	    else
-	      if (vowel==4)
-		{
-		  out=o[4];
-		}
-
-      sout[n]=out;
+      o[v]=res;
     }
+
+    float vowel=m_vowel;
+    if (cutoffCV!=NULL) vowel+=(*cutoffCV)[n];
+
+    // mix between vowel sounds
+    if (vowel<1) {
+      out=linear(0,1,vowel,o[1],o[0]);
+    }
+    else
+      if (vowel>1 && vowel<2) {
+	out=linear(0,1,vowel-1.0f,o[2],o[1]);
+      }
+      else
+	if (vowel>2 && vowel<3) {
+	  out=linear(0,1,m_vowel-2.0f,o[3],o[2]);
+	}
+	else
+	  if (vowel>3 && vowel<4) {
+	    out=linear(0,1,vowel-3.0f,o[4],o[3]);
+	  }
+	  else
+	    if (vowel==4) {
+	      out=o[4];
+	    }
+
+    sout[n]=out;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1002,10 +995,9 @@ void KS::trigger(float time, float pitch, float slidepitch, float vol)
 
   unsigned int delay=(unsigned int)(m_sample_rate*m_delay);
 
-  for (unsigned int n=0; n<delay; n++)
-    {
-      m_buffer[n]=rand_range(-1,1);
-    }
+  for (unsigned int n=0; n<delay; n++) {
+    m_buffer[n]=rand_range(-1,1);
+  }
 }
 
 void KS::process(unsigned int buf_size, sample &out)
@@ -1013,17 +1005,15 @@ void KS::process(unsigned int buf_size, sample &out)
   unsigned int delay=(unsigned int)(m_sample_rate*m_delay);
 
   if (delay==0) return;
-  if (delay>=(unsigned int)m_buffer.get_length())
-    {
-      delay=m_buffer.get_length()-1;
-    }
+  if (delay>=(unsigned int)m_buffer.get_length()) {
+    delay=m_buffer.get_length()-1;
+  }
 
-  for (unsigned int n=0; n<buf_size; n++)
-    {
-      m_buffer[m_position]=m_filter.process_single(m_buffer[m_position]);
-      out[n]=m_buffer[m_position];
-      m_position=(m_position+1)%delay;
-    }
+  for (unsigned int n=0; n<buf_size; n++) {
+    m_buffer[m_position]=m_filter.process_single(m_buffer[m_position]);
+    out[n]=m_buffer[m_position];
+    m_position=(m_position+1)%delay;
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -1031,8 +1021,7 @@ void KS::process(unsigned int buf_size, sample &out)
 pad::pad(int sample_rate) :
   module(sample_rate),
   m_table_length(4096),
-  m_filter(sample_rate)
-{
+  m_filter(sample_rate) {
   reset();
 
   m_table_per_sample=m_table_length/(float)sample_rate;
@@ -1047,22 +1036,22 @@ pad::pad(int sample_rate) :
   write_waves();
 }
 
-void pad::reset()
-{
+void pad::reset() {
   m_filter.reset();
   m_pitch=0;
 }
 
-void pad::write_waves()
-{
+void pad::write_waves() {
   float rad_cycle = (M_PI/180)*360;
   float pos=0;
+  //for (int i=0; i<m_table.get_length(); i++) {
+  //  m_table.set(i,rand_range(-1,1));
+  //} 
   //    m_table.zero();
   m_table.set(0,1);
 }
 
-void pad::trigger(float time, float pitch, float slidepitch, float vol)
-{
+void pad::trigger(float time, float pitch, float slidepitch, float vol) {
   m_pitch=pitch;
   m_volume=vol*1.0;
   //    write_waves();
@@ -1070,29 +1059,25 @@ void pad::trigger(float time, float pitch, float slidepitch, float vol)
   m_write_pos=0;
 }
 
-void pad::process(unsigned int buf_size, sample &in)
-{
+void pad::process(unsigned int buf_size, sample &in) {
   float incr = m_pitch*(m_table_length/(float)m_sample_rate);
 
   if (m_gap==0) m_gap=0.00001;
   if (m_gap>1) m_gap=1;
 
-  for (unsigned int n=0; n<buf_size; n++)
-    {
-      m_cycle_pos+=incr;
-      m_write_pos++;
-
-      in[n]=0;
-      for (int i=0; i<12; i++)
-        {
-	  in[n]+=m_table[m_cycle_pos*((i+1)*m_gap)]/12.0f;
-        }
-
-      if (m_table[m_write_pos]<-1 || m_table[m_write_pos]>1)
-	m_table[m_write_pos]=m_filter.process_single(in[n]+m_table[m_write_pos])*0.99;
-      else
-	m_table[m_write_pos]=m_filter.process_single(in[n]+m_table[m_write_pos]);
-
-
+  for (unsigned int n=0; n<buf_size; n++) {
+    m_cycle_pos+=incr;
+    m_write_pos++;
+    
+    in[n]=0;
+    for (int i=0; i<12; i++) {
+      in[n]+=m_table[m_cycle_pos*((i+1)*m_gap)]/12.0f;
     }
+    
+    if (m_table[m_write_pos]<-1 || m_table[m_write_pos]>1) {
+      m_table[m_write_pos]=m_filter.process_single(in[n]+m_table[m_write_pos])*0.99;
+    } else {
+      m_table[m_write_pos]=m_filter.process_single(in[n]+m_table[m_write_pos]);
+    }
+  }
 }

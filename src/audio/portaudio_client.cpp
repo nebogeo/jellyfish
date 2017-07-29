@@ -39,7 +39,7 @@ portaudio_client::portaudio_client()
 
 portaudio_client::~portaudio_client()
 {
-	detach();
+  detach();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,14 +50,13 @@ bool portaudio_client::attach(const string &client_name, const device_options &d
   
   PaError err;
   err = Pa_Initialize();
-  if( err != paNoError )
-    {
-      cerr<<"could not init portaudio_client"<<endl;
-      Pa_Terminate();
-      fprintf( stderr, "an error occured while using the portaudio stream\n" );
-      fprintf( stderr, "error number: %d\n", err );
-      fprintf( stderr, "error message: %s\n", Pa_GetErrorText( err ) );
-    }
+  if( err != paNoError ) {
+    cerr<<"could not init portaudio_client"<<endl;
+    Pa_Terminate();
+    fprintf( stderr, "an error occured while using the portaudio stream\n" );
+    fprintf( stderr, "error number: %d\n", err );
+    fprintf( stderr, "error message: %s\n", Pa_GetErrorText( err ) );
+  }
 
   int num_devices = Pa_GetDeviceCount();
   for (int i=0; i<num_devices; i++) {
@@ -66,30 +65,31 @@ bool portaudio_client::attach(const string &client_name, const device_options &d
   }
   
   PaStreamParameters output_parameters;
-  output_parameters.device = 2; //Pa_GetDefaultOutputDevice(); /* default output device */
-    if (output_parameters.device == paNoDevice) {
-		cerr<<"error: no default output device."<<endl;
-    }
-    output_parameters.channelCount = 2;       /* stereo output */
-    output_parameters.sampleFormat = paFloat32; /* 32 bit floating point output */
-    output_parameters.suggestedLatency = Pa_GetDeviceInfo( output_parameters.device )->defaultLowOutputLatency;
-    output_parameters.hostApiSpecificStreamInfo = NULL;
-
-    PaStreamParameters input_parameters;
-    input_parameters.device = Pa_GetDefaultInputDevice(); /* default output device */
-    if (input_parameters.device == paNoDevice) {
-		cerr<<"error: no default input device."<<endl;
-    }
-    input_parameters.channelCount = 2;       /* stereo output */
-    input_parameters.sampleFormat = paFloat32; /* 32 bit floating point output */
-    input_parameters.suggestedLatency = Pa_GetDeviceInfo( input_parameters.device )->defaultLowInputLatency;
-    input_parameters.hostApiSpecificStreamInfo = NULL;
-
-    PaStream *stream;
-
-    err = Pa_OpenStream(
-              &stream,
-              NULL, //&input_parameters,
+  output_parameters.device = dopt.device_num; 
+  //Pa_GetDefaultOutputDevice(); /* default output device */
+  if (output_parameters.device == paNoDevice) {
+    cerr<<"error: no default output device."<<endl;
+  }
+  output_parameters.channelCount = 2;       /* stereo output */
+  output_parameters.sampleFormat = paFloat32; /* 32 bit floating point output */
+  output_parameters.suggestedLatency = Pa_GetDeviceInfo( output_parameters.device )->defaultLowOutputLatency;
+  output_parameters.hostApiSpecificStreamInfo = NULL;
+  
+  PaStreamParameters input_parameters;
+  input_parameters.device = Pa_GetDefaultInputDevice(); /* default output device */
+  if (input_parameters.device == paNoDevice) {
+    cerr<<"error: no default input device."<<endl;
+  }
+  input_parameters.channelCount = 2;       /* stereo output */
+  input_parameters.sampleFormat = paFloat32; /* 32 bit floating point output */
+  input_parameters.suggestedLatency = Pa_GetDeviceInfo( input_parameters.device )->defaultLowInputLatency;
+  input_parameters.hostApiSpecificStreamInfo = NULL;
+  
+  PaStream *stream;
+  
+  err = Pa_OpenStream(
+	      &stream,
+	      NULL, //&input_parameters,
               &output_parameters,
               dopt.samplerate,
               dopt.buffer_size,
@@ -97,34 +97,32 @@ bool portaudio_client::attach(const string &client_name, const device_options &d
               process,
               NULL);
 
-    if( err != paNoError )
-	{
-		cerr<<"could not attach portaudio_client: "<<Pa_GetErrorText( err )<<endl;
-		Pa_Terminate();
-		return false;
-	}
+  if( err != paNoError ) {
+    cerr<<"could not attach portaudio_client: "<<Pa_GetErrorText( err )<<endl;
+    Pa_Terminate();
+    return false;
+  }
 
-	err = Pa_StartStream(stream);
+  err = Pa_StartStream(stream);
 
-	if( err != paNoError )
-	{
-		cerr<<"could not start stream: "<<Pa_GetErrorText( err )<<endl;
-		Pa_Terminate();
-		return false;
-	}
+  if( err != paNoError ) {
+    cerr<<"could not start stream: "<<Pa_GetErrorText( err )<<endl;
+    Pa_Terminate();
+    return false;
+  }
 
-	m_attached=true;
-	cerr<<"connected to portaudio..."<<endl;
-	return true;
+  m_attached=true;
+  cerr<<"connected to portaudio device "<<output_parameters.device<<endl;
+  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 void portaudio_client::detach()
 {
-    cerr<<"detaching from portaudio"<<endl;
-    Pa_Terminate();
-    m_attached=false;
+  cerr<<"detaching from portaudio"<<endl;
+  Pa_Terminate();
+  m_attached=false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,36 +133,34 @@ int portaudio_client::process(const void *input_buffer, void *output_buffer,
                              PaStreamCallbackFlags status_flags,
                              void *user_data)
 {
-	m_buffer_size=frames_per_buffer;
+  m_buffer_size=frames_per_buffer;
+  
+  if(run_callback&&run_context) {
+    // do the work
+    run_callback(run_context, frames_per_buffer);
+  }
 
-	if(run_callback&&run_context)
+  if (m_right_data && m_left_data) {
+    float *out = (float*)output_buffer;
+    for (unsigned int n=0; n<m_buffer_size; n++) {
+      *out=m_left_data[n];
+      out++;
+      *out=m_right_data[n];
+      out++;
+    }
+  }
+  
+  /*	if (m_right_in_data && m_left_in_data)
 	{
-		// do the work
-		run_callback(run_context, frames_per_buffer);
+	float *in = (float*)input_buffer;
+	for (unsigned int n=0; n<m_buffer_size; n++)
+	{
+	m_left_in_data[n]=*in;
+	in++;
+	m_right_in_data[n]=*in;
+	in++;
 	}
-
-	if (m_right_data && m_left_data)
-	{
-		float *out = (float*)output_buffer;
-		for (unsigned int n=0; n<m_buffer_size; n++)
-		{
-			*out=m_left_data[n];
-			out++;
-			*out=m_right_data[n];
-			out++;
-		}
-	}
-
-	/*	if (m_right_in_data && m_left_in_data)
-	{
-		float *in = (float*)input_buffer;
-		for (unsigned int n=0; n<m_buffer_size; n++)
-		{
-			m_left_in_data[n]=*in;
-			in++;
-			m_right_in_data[n]=*in;
-			in++;
-		}
-		}*/
-	return 0;
+	}*/
+  
+  return 0;
 }
