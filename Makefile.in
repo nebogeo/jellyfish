@@ -91,7 +91,9 @@ install:: ${TARGET}
 	install -d $(DESTDIR)@prefix@/bin/
 	install jellyfish $(DESTDIR)@prefix@/bin/
 	install -d $(DESTDIR)@prefix@/lib/jellyfish/
-	install assets/* $(DESTDIR)@prefix@/lib/jellyfish/
+	install assets/*.* $(DESTDIR)@prefix@/lib/jellyfish/
+	install -d $(DESTDIR)/usr/local/lib/jellyfish/shaders/
+	install assets/shaders/*.* $(DESTDIR)/usr/local/lib/jellyfish/shaders/
 
 install_library:: library
 	install -d $(DESTDIR)@prefix@/lib/

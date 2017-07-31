@@ -34,7 +34,7 @@ public:
     static void init_mutex();
 
     // in case we don't have glu/glut
-    static void glu_perspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar);
+    static void do_perspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar);
     static void prepare_frame(int width, int height);
     static void configure_light_and_material();
     static void render(int width, int height);

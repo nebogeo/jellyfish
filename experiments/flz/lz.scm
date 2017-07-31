@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init "fluxa" 4 44100 2048 20)
+(synth-init "fluxa" 3 44100 2048 20)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))

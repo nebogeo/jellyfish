@@ -69,7 +69,7 @@ void glMultMatrixx( GLfixed * mat );*/
 #include <iostream>
 using namespace std;
 
-#else
+#else // FLX_LINUX
 
 #ifdef __cplusplus
 extern "C" {
