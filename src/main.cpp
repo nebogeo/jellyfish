@@ -49,14 +49,10 @@ int main(int argc, char *argv[])
   // Clear application state
   memset( state, 0, sizeof( *state ) );
   if (window) {
-    cerr<<"init_ogl_rpi"<<endl;
     init_ogl_rpi(state);
     graphics::rpi_state = state;
-
-    cerr<<state->screen_width<<" "<<state->screen_height<<endl;
     graphics::m_w=state->screen_width;
     graphics::m_h=state->screen_height;
-
   }
 #else
   graphics::m_w=1024;
@@ -77,8 +73,6 @@ int main(int argc, char *argv[])
   }
 #endif
 
-  cerr<<"window="<<window<<endl;
-
   interpreter::initialise();
   if (window) graphics::initialise();
   else graphics::init_mutex();
@@ -91,7 +85,7 @@ int main(int argc, char *argv[])
   interpreter::eval_file(string(ASSETS_PATH)+"fluxa.scm");
 
   if (argc>1) interpreter::eval_file(argv[argc-1]);
-
+  
   interpreter::start_repl(graphics::m_render_mutex);
   network_osc::start_osc_repl(graphics::m_render_mutex);
 
@@ -99,35 +93,33 @@ int main(int argc, char *argv[])
   //    getMouse();
   //getKeys();
 
-  while (!terminate_prog)
-    {
-      //doEvents(state->screen_width, state->screen_height,
-      //          graphics::keyboard_callback,
-      //          graphics::keyboard_up_callback);
-
-      //usleep(5*1000);
-      if (window) graphics::display_callback();
-      else {
-	if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
-	  interpreter::eval("(frame-hook)");
-	  pthread_mutex_unlock(graphics::m_render_mutex);
-	}
+  while (!terminate_prog) {
+    //doEvents(state->screen_width, state->screen_height,
+    //          graphics::keyboard_callback,
+    //          graphics::keyboard_up_callback);
+    
+    //usleep(5*1000);
+    if (window) graphics::display_callback();
+    else {
+      if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
+	interpreter::eval("(frame-hook)");
+	pthread_mutex_unlock(graphics::m_render_mutex);
       }
-      usleep(1000);
     }
+    usleep(1000);
+  }
 #else
-  if (window) glutMainLoop();
-  else
-    {
-      while(true)
-        {
-	  if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
-	    interpreter::eval("(frame-hook)");
-	    usleep(10);
-	    pthread_mutex_unlock(graphics::m_render_mutex);
-	  }
-	}
+  if (window) {
+    glutMainLoop();
+  } else {
+    while(true) {
+      if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
+	interpreter::eval("(frame-hook)");
+	usleep(10);
+	pthread_mutex_unlock(graphics::m_render_mutex);
+      }
     }
+  }
 #endif
 
   return 0;
