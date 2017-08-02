@@ -71,7 +71,7 @@ def test_classifier():
     c.observation(0.1,convert_4bit([0,1,0,0]))
     c.observation(0.1,convert_4bit([0,1,0,0]))
 
-test_classifier()
+#test_classifier()
 
 ####################################
 
@@ -89,13 +89,20 @@ symbols = {" ":[1,1,1,1],".":[0,0,0,0],
 
 def send_pattern(pat):
     osc.Message("/eval",["(lz-prog l 0 \""+pat[0]+"\")\n "+\
-                         "(lz-prog l 0 \""+pat[1]+"\")\n "+\
-                         "(lz-prog l 0 \""+pat[2]+"\")\n "+\
-                         "(lz-prog l 0 \""+pat[3]+"\")\n "]).sendlocal(8000)
+                         "(lz-prog l 1 \""+pat[1]+"\")\n "+\
+                         "(lz-prog l 2 \""+pat[2]+"\")\n "+\
+                         "(lz-prog l 3 \""+pat[3]+"\")\n "]).sendlocal(8000)
 
-send_pattern(["ad-B+",
-              "ad+C-",
-              "ab+D-",
+osc.Message("/eval",["(set-scale '(2 4 2 2 2))"]).sendlocal(8000)
+
+osc.Message("/eval",["(set-nz-grp! z 3)"]).sendlocal(8000)
+
+#osc.Message("/eval",["(synth-record \"dz\")"]).sendlocal(8000)
+
+
+send_pattern(["dcbBa",
+              "-C-++",
+              "aA>Ca",
               "++A--"])
 
 

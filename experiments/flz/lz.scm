@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init "fluxa" 3 44100 2048 20)
+(synth-init "fluxa" 4 44100 2048 20)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -362,6 +362,47 @@
 
     )
    (list ;; group 4 - rave, stabs and acid
+
+    (list
+     (lambda (v d) ;; wobble bass
+       (mul (adsr 0 d 0.5 (* (modulo v 5) 0.02)) 
+	    (sine 
+	     (add (* (note v) 0.5)  
+		  (mul (mul 400 (adsr (* (modulo v 5) 0.02) 0.1 0.2 0.3))
+		       (sine (/ (note v) 5)))))))
+     (lambda (v d) 
+       (mul (adsr 0 d 0.5 d) 
+	    (sine 
+	     (add (note v) (mul (mul 5000 (adsr d d 0.5 d)) 
+				(sine (* (note v) 0.75)))))))
+     (lambda (v d) (echo (mul (adsr 0 d 0 0) 
+			      (crush (white (mul (adsr 0 d 0 0) 500)) 0.5 (* 0.1 (modulo v 10))))
+			 (* d 3) 0.5))
+     (lambda (v d) (mul (adsr 0 d 0 0) (squ (mul (adsr 0 0.1 0 0) 200))))
+
+
+     (lambda (v d) 
+       (let ((in (* (+ (modulo v 10) 1) 200)))
+	 (mul (adsr 0 (* d 3) 0.2 2) 
+	      (sine 
+	       (add 900 (mul (mul in (adsr 0 0 0.9 1)) 
+			     (sine 
+			      (add 10 (mul (mul in (adsr 0 0 0.9 1)) 
+					   (sine (note v)))))))))))
+     )
+
+    (list ;; random acid w kik
+     (lambda (v d) (mul (adsr 0 d 0 0) (moogbp (add (saw (note v))
+						    (saw (* (note v) 0.75)))
+					       (mul (adsr 0 d 0 0) (* (modulo v 10) 0.1)) 0.7)))
+     (lambda (v d) (mul (adsr 0 (* d 4) 0 0) (mooghp (add (saw (note v))
+							  (saw (* (note v) 3)))
+						     (add (mul (sin 1) 0.5) 1) 
+						     0.43)))
+     (lambda (v d) (mul (adsr 0 d 0.1 1) (crush (white (mul (adsr 0 d 0.4 1) 500)) 0.5 (* 0.1 (modulo v 10)))))
+     (lambda (v d) (mul (adsr 0 d 0 0) (squ (mul (adsr 0 d 0 0) (+ 200 (* 2 (modulo v 15)))))))
+     )
+
     (list ;; stabs
      (lambda (v d) (mul (adsr 0 d 0 1) 
 			(moogbp 
@@ -442,11 +483,15 @@
 
 (define l (build-lz 10 8 4))
 
-(lz-prog l 0 "ad-B+")
-(lz-prog l 1 "ad+C-")
-(lz-prog l 2 "ab+D-")
-(lz-prog l 3 "++A--")
+;(lz-prog l 0 "ad-B+")
+;(lz-prog l 1 "bc+C-")
+;(lz-prog l 2 "ab+D-")
+;(lz-prog l 3 "++A--")
 
+(lz-prog l 0 "aadBd")
+(lz-prog l 1 "a+C-d")
+(lz-prog l 2 "ca+D-")
+(lz-prog l 3 "+AaA-")
 
 					;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
 
@@ -458,8 +503,8 @@
 ;; voice group
 ;; bar sync lock
 
-;;(set-scale '(4 4 1 1 2))
-(set-scale '(1 1 1 1 1 1 1 1 1 1 1 1))
+(set-scale '(4 4 1 1 2))
+;;(set-scale '(1 1 1 1 1 1 1 1 1 1 1 1))
 
 (nz-dump z 1000)
 
