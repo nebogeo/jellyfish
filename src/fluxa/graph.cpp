@@ -226,8 +226,8 @@ void graph::process(unsigned int bufsize, sample &left, sample &right)
 			if (pan<0) leftpan=1-pan;
 			else rightpan=1+pan;
 
-			left.mul_mix(m_node_map[i->first]->get_output(),0,0.5*leftpan);
-			right.mul_mix(m_node_map[i->first]->get_output(),0,0.5*rightpan);
+			left.mul_mix(m_node_map[i->first]->get_output(),0,0.1*leftpan);
+			right.mul_mix(m_node_map[i->first]->get_output(),0,0.1*rightpan);
 		}
 	}
 

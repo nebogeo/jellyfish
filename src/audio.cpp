@@ -21,7 +21,7 @@
 
 using namespace std;
 
-audio_device::audio_device(const string &clientname, u32 samplerate, u32 buffer_size) :
+audio_device::audio_device(const string &clientname, u32 device, u32 samplerate, u32 buffer_size) :
     left_out(buffer_size),
     right_out(buffer_size),
     left_in(buffer_size),
@@ -30,6 +30,7 @@ audio_device::audio_device(const string &clientname, u32 samplerate, u32 buffer_
     m_record_filename("")
 {
     portaudio_client::device_options opt;
+    opt.device_num = device;
     opt.buffer_size = buffer_size;
     opt.num_buffers = 2;
     opt.samplerate = samplerate;
@@ -75,9 +76,10 @@ void audio_device::maybe_record() {
         m_record_buffer_left.add(left_out);
         m_record_buffer_right.add(right_out);
         m_record_counter++;
-        if (m_record_counter%10==0) {
-            save_sample(m_record_filename+"-left.wav", m_record_buffer_left);
-            save_sample(m_record_filename+"-right.wav", m_record_buffer_right);
+        if (m_record_counter%100==0) {
+	  cerr<<"dumping to disk..."<<endl;
+	  save_sample(m_record_filename+"-left.wav", m_record_buffer_left);
+	  save_sample(m_record_filename+"-right.wav", m_record_buffer_right);
         }
     }
 }

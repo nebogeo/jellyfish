@@ -208,8 +208,9 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
     // name,buf,sr,synths
     m_audio_device = new audio_device(string_value(car(sc->args)),
 				      ivalue(cadr(sc->args)),
-				      ivalue(caddr(sc->args)));
-    m_audio_graph = new graph(ivalue(cadddr(sc->args)),ivalue(cadr(sc->args)));
+				      ivalue(caddr(sc->args)),
+				      ivalue(cadddr(sc->args)));
+    m_audio_graph = new graph(ivalue(caddddr(sc->args)),ivalue(caddr(sc->args)));
     m_audio_device->start_graph(m_audio_graph);
     s_return(sc,sc->F);
   } break;
