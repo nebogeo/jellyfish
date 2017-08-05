@@ -115,7 +115,35 @@
            (_ l c (+ cc 1) (+ a (pick l cc))))))
   (_ l c 0 0))
 
+(define harmonic-minor '(2 1 2 2 1 3 1))
+(define major '(2 2 1 2 2 2 1))
+(define whole '(2 2 2 2 2 2))
+(define pentatonic-major '(2 2 3 2 3))
+(define pentatonic-minor '(3 2 2 3 2))
+(define pentatonic-blues '(3 2 1 1 3 2))
+(define pentatonic-neutral '(2 3 2 3 2))
+(define dorian '(2 1 2 2 2 1 2))
+(define prygian '(1 2 2 2 1 2 2))
+(define lydian '(2 2 2 1 2 2 1))
+(define mixolydian '(2 2 1 2 2 1 2))
+(define aeolian '(2 1 2 2 1 2 2))
+(define locrian '(1 2 2 1 2 2 2))
+(define arabian-a '(2 1 2 1 2 1 2 1))
+(define arabian-b '(2 2 1 1 2 2 2))
+(define ethiopian '(2 1 2 2 1 2 2))
+(define hawaiian '(2 1 2 2 2 2 1))
+(define hindu '(2 2 1 2 1 2 2))
+(define jewish '(1 1 1 2 2 2 1 2))
+(define persian '(1 3 1 1 2 3 1))
+
+(define notes-start 12)
+(define notes-end (* 3 12))
+(define notes-range (- notes-end notes-start))
+
+(define (clamp-note n)
+  (+ (modulo (- n notes-start) notes-range) notes-start))
+
 (define (note n)
-  (list-ref scale-lut (modulo (inter flx-scale (abs (inexact->exact (round n)))) (length scale-lut))))
+  (list-ref scale-lut (clamp-note (inter flx-scale (abs (inexact->exact (round n)))))))
 
 ;;---------------------------------------------------------------

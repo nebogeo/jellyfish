@@ -679,7 +679,7 @@ void formant_filter::process(unsigned int buf_size, sample &sin, sample *cutoffC
   float res,o[5],out=0, in=0;
 
   for (unsigned int n=0; n<buf_size; n++) {
-    in = sin[n];
+    in = sin[n]*0.2; // stop clipping somewhere...
 
     // work around denormal calculation CPU spikes where in --> 0
     if ((in >= 0) && (in < 0.000000001))
@@ -990,19 +990,16 @@ void KS::reset()
 
 void KS::trigger(float time, float pitch, float slidepitch, float vol)
 {
-  m_delay=1.0f/pitch;
-  //m_volume=vol*1.0;
+  m_delay = pitch*(m_buffer.get_length()/(float)m_sample_rate);
 
-  unsigned int delay=(unsigned int)(m_sample_rate*m_delay);
-
-  for (unsigned int n=0; n<delay; n++) {
+  for (unsigned int n=0; n<m_delay; n++) {
     m_buffer[n]=rand_range(-1,1);
   }
 }
 
 void KS::process(unsigned int buf_size, sample &out)
 {
-  unsigned int delay=(unsigned int)(m_sample_rate*m_delay);
+  unsigned int delay=m_delay;
 
   if (delay==0) return;
   if (delay>=(unsigned int)m_buffer.get_length()) {

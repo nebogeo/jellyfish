@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
     while(true) {
       if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
 	interpreter::eval("(frame-hook)");
-	usleep(10);
 	pthread_mutex_unlock(graphics::m_render_mutex);
+	usleep(10);
       }
     }
   }
