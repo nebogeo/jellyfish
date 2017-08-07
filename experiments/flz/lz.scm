@@ -275,6 +275,7 @@
      (lambda (v d) (mul (adsr 0 (* (modulo v 9) 0.01) 1 0) (sine 440)))
      (lambda (v d) (mul (adsr 0 (* (modulo v 11) 0.01) 1 0) (tri 440)))
      (lambda (v d) (mul (adsr 0 (* (modulo v 12) 0.01) 1 0) (pink 44))))
+
     (list
      (lambda (v d) (mul (adsr 0 0.1 0 0) (pink (mul (adsr 0 (* (modulo v 10) 0.2) 0 0) 1000))))
      (lambda (v d) (mul (adsr 0 0.1 0.1 1) (sine (mul (adsr 0 0.2 0 0) 100))))
@@ -357,7 +358,29 @@
    ;;--------------------------------------------------------
    ;; group 4 - pure percussion
    (list
+    (list ;; arcade
+     (lambda (v d) (crush (moogbp (mul (adsr 0 d 0.1 0.5) (white 10)) 
+				  (adsr 0 d 0.2 0.1) 0.5)
+			  (* (modulo v 41) 0.1) 30))
+     (lambda (v d) (mul (adsr 0 d 0 0)
+			(white (mul 10 (adsr 0 d 0 0)))))
+     (lambda (v d) (mul (adsr 0 d 0.3 (* d 5))
+			(white (mul 300 (pow (adsr 0 d 0.9 (* d 4)) 10)))))
+     (lambda (v d) (mul (adsr 0 d 0 0)
+			(sine (mul 100 (adsr 0 d 0 0)))))
+     )
 
+    (list ;; snappy
+     (lambda (v d) (moogbp (mul (adsr 0 d 0 0) (white 12)) 
+			   (adsr 0 d 0.5 0.5) 0.1))
+     (lambda (v d) (moogbp (mul (adsr 0 d 0 0) (pink 13)) 
+			   (adsr 0 d 0.2 0.1) 0.3))
+     (lambda (v d) (crush (moogbp (mul (adsr 0 d 0.1 0.5) (white 100)) 
+				  (adsr 0 d 0.2 0.1) 0.5)
+			  (* (modulo v 41) 0.1) 0.3))
+     (lambda (v d) (mul (adsr 0 d 0 0)
+			(sine (mul 300 (adsr 0 d 0 0)))))
+     )
 
     )
 
@@ -455,6 +478,8 @@
      (lambda (v d) (mul (adsr 0 0.1 0.1 1) (sine (mul (adsr 0 0.1 0 0) 150)))))
 
     )
+
+   ;;--------------------------------------------------------
    (list ;; group 7 - rave, stabs and acid V
     (list
      (lambda (v d) ;; wobble bass
@@ -526,7 +551,8 @@
 
 
     )
-   (list ;; group 4 - aljazari
+   ;;--------------------------------------------------------
+   (list ;; group 8 - aljazari
     
     (list
      (lambda (n d) (mul 1 (sample (get-sample n samples) 440)))
@@ -586,9 +612,9 @@
 ;; (lz-prog l 2 "ca+D-")
 ;; (lz-prog l 3 "+AaA-")
 
-(lz-prog l 0 "a-aB")
+(lz-prog l 0 "abcB")
 (lz-prog l 1 "b+C++")
-(lz-prog l 2 ">c+D-")
+(lz-prog l 2 "c+D-")
 (lz-prog l 3 "+AdA-")
 
 ;;(define z (build-nz (vector 9 5 '((4 2) (4 1) (6 0) (3 2) (4 1) (6 0)) 8 3 (list->vector (string->list "BaaadBdcd--C+++ --Aba+dd        "))) ss 0.2))
@@ -624,14 +650,15 @@
 ;; chord 
 ;; voice group
 ;; bar sync lock
+;; more bass
 
 (set-scale pentatonic-minor)
 ;;(set-scale '(1 1 1 1 1 1 1 1 1 1 1 1))
 
 (nz-dump z 1000)
 
-(set-nz-grp! z 5)
-(set-nz-vx! z 3)
+(set-nz-grp! z 3)
+;;(set-nz-vx! z 3)
 
 (every-frame (nz-tick z))
 
