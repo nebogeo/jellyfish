@@ -97,17 +97,22 @@ def send_pattern(pat):
 def send_grp(grp):
     osc.Message("/eval",["(set-nz-grp! z "+str(grp)+")"]).sendlocal(8000)
 
-send_grp(2)
+send_grp(3)
     
 osc.Message("/eval",["(set-scale '(2 4 2 2 2))"]).sendlocal(8000)
-osc.Message("/eval",["(set-nz-grp! z 3)"]).sendlocal(8000)
+#osc.Message("/eval",["(set-scale '(2 2 2 2 2 2))"]).sendlocal(8000)
 
 #osc.Message("/eval",["(synth-record \"dz\")"]).sendlocal(8000)
 
-send_pattern(["B+B-B",
-              "abcdc",
-              "acaaA",
-              "--A++"])
+#send_pattern(["B+B-B",
+#              "abcdc",
+#              "acaaA",
+#              "--A++"])
+
+send_pattern(["........",
+              "aaaaa",
+              "-aAa+",
+              "-aAa+"])
 
 
 

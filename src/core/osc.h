@@ -26,7 +26,10 @@ public:
 private:
     static void osc_error_handler(int num, const char *msg, const char *path);
     static int osc_default_handler(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-    static int osc_eval_handler(const char *path, const char *types, lo_arg **argv,
-                         int argc, void *data, void *user_data);
+    static int osc_eval_handler(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+    static int osc_sync_handler(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+    static int osc_delay_handler(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
     static pthread_mutex_t *m_render_mutex;
+
+    static float m_sync_delay;
 };

@@ -1,16 +1,19 @@
 import osc
 import time
 
-def sync(bpm):
-    osc.Message("/eval",["(nz-sync z "+str(bpm)+")"]).sendlocal(8000)
+def sync(bpb,bpm):
+    osc.Message("/sync",[bpb,bpm]).sendlocal(8000)
 
-bpm = 353.23
-#bpm = 240.0
+#bpm = 753.23
+bpm = 40.0
 count = 0
+bpb = 8
 
 while 1:
-    if (count%4==0): 
-        sync(bpm)
-        print(60/bpm)
-    time.sleep(60/bpm)
+    if (count%bpb==0): 
+        print("sync")
+        sync(bpb,bpm)
+    t=60/bpm
+    print(t)
+    time.sleep(t-0.0005)
     count+=1

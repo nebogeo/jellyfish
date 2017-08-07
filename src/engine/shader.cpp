@@ -195,11 +195,13 @@ shader::~shader() {
 #endif
 }
 
-  void shader::init() {
+void shader::init() {
+#ifndef NO_SHADERS
   if(glewInit() != GLEW_OK) {
-  cerr<< "ERROR Unable to check OpenGL extensions" << endl;
-}
+    cerr<< "ERROR Unable to check OpenGL extensions" << endl;
+  }
   m_enabled = glewIsSupported("GL_VERSION_2_0");
+#endif
 }
 
   void shader::apply() {

@@ -18,32 +18,65 @@
 #include <stdio.h>
 #include <app.h>
 #include "core/osc.h"
+#include "fluxa/time.h"
 #include "interpreter.h"
 #include "graphics.h"
 
 pthread_mutex_t *network_osc::m_render_mutex=NULL;
+float network_osc::m_sync_delay=0;
 
-void network_osc::osc_error_handler(int num, const char *msg, const char *path)
-{
+void network_osc::osc_error_handler(int num, const char *msg, const char *path) {
     printf("liblo server error %d in path %s\n",num,path);
 }
 
-int network_osc::osc_default_handler(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
+int network_osc::osc_default_handler(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
     //printf("osc server no handler for: %s %s\n",path,types);
 	return 1;
 }
 
 int network_osc::osc_eval_handler(const char *path, const char *types, lo_arg **argv,
-		    int argc, void *data, void *user_data)
-{
+		    int argc, void *data, void *user_data) {
     if (types[0]=='s') {
-        printf("%s\n",argv[0]);
         pthread_mutex_lock(m_render_mutex);
         interpreter::eval((char*)argv[0]);
         pthread_mutex_unlock(m_render_mutex);
     }
-	return 1;
+    return 1;
+}
+
+// "/sync" if [bpb bpm]
+int network_osc::osc_sync_handler(const char *path, const char *types, lo_arg **argv,
+				  int argc, void *data, void *user_data) {
+  if (!strcmp(types,"if")) {
+    //int beatnum = argv[0]->i;
+    int beatsperbar = argv[0]->i; //4;
+    float beatsperminute = argv[1]->f;
+
+    cerr<<"jellyfish: sync to "<<beatsperbar<<" bpb "<<beatsperminute<<" bpm"<<endl;
+    spiralcore::time t;
+    t.set_to_now();
+    t+=m_sync_delay;
+    
+    if (beatsperminute>0) {
+      char cmd[4096];
+      snprintf(cmd,4096,"(sync %d %d %d %f)",
+	       t.seconds,t.fraction,beatsperbar,beatsperminute);
+      pthread_mutex_lock(m_render_mutex);
+      interpreter::eval(cmd);
+      pthread_mutex_unlock(m_render_mutex);
+      
+    }
+  }
+  return 1;
+}
+
+int network_osc::osc_delay_handler(const char *path, const char *types, lo_arg **argv,
+				   int argc, void *data, void *user_data) {
+  if (!strcmp(types,"f")) {
+    m_sync_delay=argv[0]->f;
+    cerr<<"delay now: "<<m_sync_delay<<endl;
+  }
+  return 1;
 }
 
 void network_osc::start_osc_repl(pthread_mutex_t* render_mutex) {
@@ -52,5 +85,7 @@ void network_osc::start_osc_repl(pthread_mutex_t* render_mutex) {
 	lo_server_thread server = lo_server_thread_new("8000", osc_error_handler);
     lo_server_thread_add_method(server, NULL, NULL, osc_default_handler, NULL);
     lo_server_thread_add_method(server, "/eval", "s", osc_eval_handler, NULL);
-	lo_server_thread_start(server);
+    lo_server_thread_add_method(server, "/sync", "if", osc_sync_handler, NULL);
+    lo_server_thread_add_method(server, "/delay", "f", osc_delay_handler, NULL);
+    lo_server_thread_start(server);
 }
