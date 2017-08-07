@@ -21,6 +21,9 @@
 #include "fluxa/time.h"
 #include "interpreter.h"
 #include "graphics.h"
+#include <iostream>
+
+using namespace std;
 
 pthread_mutex_t *network_osc::m_render_mutex=NULL;
 float network_osc::m_sync_delay=0;

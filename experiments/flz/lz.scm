@@ -586,7 +586,7 @@
 ;; (lz-prog l 2 "ca+D-")
 ;; (lz-prog l 3 "+AaA-")
 
-(lz-prog l 0 "a-aB")
+(lz-prog l 0 "baaa ")
 (lz-prog l 1 "b+C++")
 (lz-prog l 2 ">c+D-")
 (lz-prog l 3 "+AdA-")
@@ -630,8 +630,8 @@
 
 (nz-dump z 1000)
 
-(set-nz-grp! z 5)
-(set-nz-vx! z 3)
+(set-nz-grp! z 0)
+(set-nz-vx! z 0)
 
 (every-frame (nz-tick z))
 
