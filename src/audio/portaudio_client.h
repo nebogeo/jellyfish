@@ -59,18 +59,22 @@ class portaudio_client
 		      void *user_data);
 
  private:
+  portaudio_client(const portaudio_client& that) = delete;
+  portaudio_client& operator=(portaudio_client const&) = delete;
 
-  static long unsigned int  m_buffer_size;
-  static long unsigned int  m_sample_rate;
-  static bool               m_attached;
+  long unsigned int  m_buffer_size;
+  long unsigned int  m_sample_rate;
+  bool               m_attached;
+  
+  const float *m_right_data;
+  const float *m_left_data;
+  float *m_right_in_data;
+  float *m_left_in_data;
 
-  static const float *m_right_data;
-  static const float *m_left_data;
-  static float *m_right_in_data;
-  static float *m_left_in_data;
+  void(*run_callback)(void *, unsigned int);
+  void *run_context;
 
-  static void(*run_callback)(void *, unsigned int);
-  static void *run_context;
+  PaStream *m_stream;
 };
 
 #endif

@@ -30,10 +30,14 @@ public:
   audio_device(const string &clientname, u32 device, u32 samplerate, u32 buffer_size);
 
   void start_graph(graph *graph);
-  
+  void reset_watchdog_counter() { m_watchdog_counter=0; }
+
   void start_recording(std::string filename);
   void stop_recording();
   void maybe_record();
+
+  void start_audio();
+  void check_audio();
   
   sample left_out;
   sample right_out;
@@ -41,7 +45,7 @@ public:
   sample right_in;
   graph *m_graph;
 
-  portaudio_client m_client;
+  portaudio_client *m_client;
 
   static void save_sample(const std::string &filename, const sample s);
 
@@ -51,7 +55,10 @@ public:
   sample m_record_buffer_left;
   sample m_record_buffer_right;
   u32 m_record_counter;
+  u32 m_watchdog_counter;
+  string m_client_name;
 
+  portaudio_client::device_options m_opt;
 };
 
 }

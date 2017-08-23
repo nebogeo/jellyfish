@@ -23,8 +23,6 @@ using namespace std;
 #include "module_nodes.h"
 #include "modules.h"
 
-pthread_mutex_t* m_mutex;
-
 graph::graph(unsigned int num_nodes, unsigned int sample_rate) :
   m_num_nodes(num_nodes),
   m_sample_rate(sample_rate) 
@@ -180,9 +178,8 @@ void graph::process(unsigned int bufsize, sample &left, sample &right) {
   {
     spiralcore::time last_time = m_current_time;
     m_current_time.inc_by_sample(bufsize,m_sample_rate);
-    
+
     if (time_reset_countdown--<0) {
-      cerr<<"time reset"<<endl;
       m_current_time.set_to_now();
       time_reset_countdown = COUNTDOWN_TIMER;
     }

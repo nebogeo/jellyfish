@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 	pthread_mutex_unlock(graphics::m_render_mutex);
       }
     }
-    usleep(1000);
+    usleep(10000);
   }
 #else
   if (window) {
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
       if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
 	interpreter::eval("(frame-hook)");
 	pthread_mutex_unlock(graphics::m_render_mutex);
-	usleep(10);
+	usleep(10000);
       }
     }
   }

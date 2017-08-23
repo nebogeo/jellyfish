@@ -22,25 +22,24 @@
 using namespace std;
 
 audio_device::audio_device(const string &clientname, u32 device, u32 samplerate, u32 buffer_size) :
-    left_out(buffer_size),
-    right_out(buffer_size),
-    left_in(buffer_size),
-    right_in(buffer_size),
-    m_recording(false),
-    m_record_filename("")
+  left_out(buffer_size),
+  right_out(buffer_size),
+  left_in(buffer_size),
+  right_in(buffer_size),
+  m_client(NULL),
+  m_graph(NULL),
+  m_recording(false),
+  m_record_filename(""),
+  m_watchdog_counter(0),
+  m_client_name(clientname)
 {
-    portaudio_client::device_options opt;
-    opt.device_num = device;
-    opt.buffer_size = buffer_size;
-    opt.num_buffers = 2;
-    opt.samplerate = samplerate;
-    opt.in_channels = 2;
-    opt.out_channels = 2;
-
-    m_client.attach(clientname,opt);
-    m_client.set_outputs(left_out.get_buffer(), right_out.get_buffer());
-    m_client.set_inputs(left_in.get_non_const_buffer(), right_in.get_non_const_buffer());
-
+    m_opt.device_num = device;
+    m_opt.buffer_size = buffer_size;
+    m_opt.num_buffers = 2;
+    m_opt.samplerate = samplerate;
+    m_opt.in_channels = 2;
+    m_opt.out_channels = 2;
+    start_audio();
 }
 
 void audio_device::save_sample(const string &filename, const sample s) {
@@ -87,11 +86,12 @@ void audio_device::maybe_record() {
 #ifndef DONT_USE_FLUXA_GRAPH
 void run_graph(void *c, unsigned int size) {
 #ifndef DONT_USE_FLUXA_GRAPH
-    audio_device *a=(audio_device *)c;
-    a->left_out.zero();
-    a->right_out.zero();
-    a->m_graph->process(size, a->left_out, a->right_out);
-    a->maybe_record();
+  audio_device *a=(audio_device *)c;
+  a->reset_watchdog_counter();
+  a->left_out.zero();
+  a->right_out.zero();
+  a->m_graph->process(size, a->left_out, a->right_out);
+  a->maybe_record();
 #endif
 }
 #endif
@@ -99,6 +99,28 @@ void run_graph(void *c, unsigned int size) {
 void audio_device::start_graph(graph *graph) {
 #ifndef DONT_USE_FLUXA_GRAPH
     m_graph = graph;
-    m_client.set_callback(run_graph,this);
+    m_client->set_callback(run_graph,this);
 #endif
+}
+
+void audio_device::start_audio() {
+  if (m_client!=NULL) delete m_client;
+  m_client = new portaudio_client();
+  m_client->attach(m_client_name,m_opt);
+  m_client->set_outputs(left_out.get_buffer(), right_out.get_buffer());
+  m_client->set_inputs(left_in.get_non_const_buffer(), right_in.get_non_const_buffer());
+  if (m_graph!=NULL) {
+    m_client->set_callback(run_graph,this);
+  }
+}
+
+void audio_device::check_audio() {
+  ++m_watchdog_counter;
+  if (m_watchdog_counter>=200) {
+    m_watchdog_counter=0;
+    cerr<<"restarting audio"<<endl;
+    pthread_mutex_lock(m_graph->m_mutex);
+    start_audio(); 
+    pthread_mutex_unlock(m_graph->m_mutex);
+  }
 }

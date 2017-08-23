@@ -42,6 +42,8 @@ class graph {
   void play(unsigned int seconds, unsigned int fraction, unsigned int id, float pan);
   void process(unsigned int bufsize, sample &left, sample &right);
 
+  pthread_mutex_t* m_mutex;
+
  private:
   void _play(float time, unsigned int id, float pan);
 
