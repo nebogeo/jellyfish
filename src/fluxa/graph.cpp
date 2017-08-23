@@ -247,6 +247,7 @@ void graph::play(unsigned int seconds, unsigned int fraction, unsigned int id, f
     
     if (e.time_stamp.get_difference(m_current_time)>30) {
       cerr<<"reset clock? event far in future: "<<e.time_stamp.get_difference(m_current_time)<<endl;
+      m_current_time.set_to_now();
     }
   } else {
     cerr<<"event arrived too late ignoring: "<<m_current_time.get_difference(e.time_stamp)<<endl;

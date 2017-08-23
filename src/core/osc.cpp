@@ -51,19 +51,19 @@ int network_osc::osc_eval_handler(const char *path, const char *types, lo_arg **
 int network_osc::osc_sync_handler(const char *path, const char *types, lo_arg **argv,
 				  int argc, void *data, void *user_data) {
   if (!strcmp(types,"if")) {
-    //int beatnum = argv[0]->i;
-    int beatsperbar = argv[0]->i; //4;
+    int beat = argv[0]->i;
     float beatsperminute = argv[1]->f;
 
-    cerr<<"jellyfish: sync to "<<beatsperbar<<" bpb "<<beatsperminute<<" bpm"<<endl;
-    spiralcore::time t;
-    t.set_to_now();
-    t+=m_sync_delay;
-    
     if (beatsperminute>0) {
+      if (beat%8==0) cerr<<"jellyfish: sync to "<<beat<<" "<<beatsperminute<<" bpm"<<endl;
+
+      spiralcore::time t;
+      t.set_to_now();
+      t+=m_sync_delay;
+
       char cmd[4096];
       snprintf(cmd,4096,"(sync %d %d %d %f)",
-	       t.seconds,t.fraction,beatsperbar,beatsperminute);
+	       t.seconds,t.fraction,beat,beatsperminute);
       pthread_mutex_lock(m_render_mutex);
       interpreter::eval(cmd);
       pthread_mutex_unlock(m_render_mutex);
