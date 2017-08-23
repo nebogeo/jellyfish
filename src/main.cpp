@@ -41,6 +41,7 @@ static RPI_STATE_T _state, *state=&_state;
 int main(int argc, char *argv[])
 {
   bool window=true;
+  bool repl=false;
   if (argc>=2 && !strcmp(argv[1],"-nw")) window=false;
   if (argc>=2 && !strcmp(argv[1],"-r")) graphics::m_record=true;
 
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 
   if (argc>1) interpreter::eval_file(argv[argc-1]);
   
-  interpreter::start_repl(graphics::m_render_mutex);
+  if (repl) interpreter::start_repl(graphics::m_render_mutex);
   network_osc::start_osc_repl(graphics::m_render_mutex);
 
 #ifdef FLX_RPI
