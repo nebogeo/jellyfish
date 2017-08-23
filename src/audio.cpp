@@ -98,8 +98,8 @@ void run_graph(void *c, unsigned int size) {
 
 void audio_device::start_graph(graph *graph) {
 #ifndef DONT_USE_FLUXA_GRAPH
-    m_graph = graph;
-    m_client->set_callback(run_graph,this);
+  m_graph = graph;
+  m_client->set_callback(run_graph,this);
 #endif
 }
 

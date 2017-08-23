@@ -23,6 +23,8 @@ using namespace std;
 #include "module_nodes.h"
 #include "modules.h"
 
+#define MAX_PLAYING_ROOTS 5
+
 graph::graph(unsigned int num_nodes, unsigned int sample_rate) :
   m_num_nodes(num_nodes),
   m_sample_rate(sample_rate) 
@@ -166,6 +168,11 @@ void graph::_play(float time, unsigned int id, float pan) {
       m_node_map[id]->trigger(time);
       m_root_nodes.push_back(pair<unsigned int, float>(id,pan));
     }
+
+    while (m_root_nodes.size()>MAX_PLAYING_ROOTS) {
+      m_root_nodes.erase(m_root_nodes.begin());
+    }
+
     // pthread_mutex_unlock(m_mutex);
   }
 }
