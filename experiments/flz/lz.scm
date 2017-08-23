@@ -1,5 +1,5 @@
 ; lz/nz
-(synth-init "fluxa" 2 44100 2048 20)
+(synth-init "fluxa" 5 44100 2048 20)
 
 (define (make-lz md d stk w h mem)
   (vector md d stk w h mem))
@@ -659,7 +659,7 @@
 
 (set-nz-grp! z 0)
 (set-nz-vx! z 0)
-(set-nz-bar-reset! z #t)
+(set-nz-bar-reset! z #f)
 
 (every-frame (nz-tick z))
 

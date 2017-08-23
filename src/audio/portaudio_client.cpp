@@ -144,12 +144,12 @@ int portaudio_client::process(const void *input_buffer, void *output_buffer,
     float *out = (float*)output_buffer;
     for (unsigned int n=0; n<m_buffer_size; n++) {
       *out=m_left_data[n];
-      //      if (out[n]>1) out[n]=1;
-      //if (out[n]<-1) out[n]=-1;
+      if (*out>1) *out=1;
+      if (*out<-1) *out=-1;
       out++;
       *out=m_right_data[n];
-      //if (out[n]>1) out[n]=1;
-      //if (out[n]<-1) out[n]=-1;
+      if (*out>1) *out=1;
+      if (*out<-1) *out=-1;
       out++;
     }
   }

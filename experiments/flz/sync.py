@@ -3,10 +3,11 @@ import time
 
 def sync(bpb,bpm):
     osc.Message("/sync",[bpb,bpm]).sendlocal(8000)
+    osc.Message("/sync",[bpb,bpm]).sendlocal(4000)
     osc.Message("/sync",[bpb,bpm]).sendto("192.168.0.21",8000)
 
 #bpm = 753.23
-bpm = 120.0
+bpm = 25.0
 count = 0
 bpb = 8
 

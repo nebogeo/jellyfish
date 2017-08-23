@@ -807,19 +807,22 @@ void delay::process(unsigned int buf_size, sample &in, sample &out)
 {
   unsigned int delay=(unsigned int)(m_sample_rate*m_delay);
 
-  if (delay==0)
-    {
-      return;
-    }
+  if (delay==0) {
+    return;
+  }
 
-  if (delay>=(unsigned int)m_buffer.get_length()) delay=m_buffer.get_length()-1;
+  if (delay>=(unsigned int)m_buffer.get_length()) {
+    delay=m_buffer.get_length()-1;
+  }
+  
 
-  for (unsigned int n=0; n<buf_size; n++)
-    {
-      m_buffer[m_position]=in[n]+m_buffer[m_position]*m_feedback;
-      out[n]=m_buffer[m_position];
-      m_position=(m_position+1)%delay;
-    }
+  for (unsigned int n=0; n<buf_size; n++) {
+    m_buffer[m_position]=in[n]+m_buffer[m_position]*m_feedback;
+    if (m_buffer[m_position]>1.0) m_buffer[m_position]=1.0;
+    if (m_buffer[m_position]<-1.0) m_buffer[m_position]=-1.0;
+    out[n]=m_buffer[m_position];
+    m_position=(m_position+1)%delay;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1069,6 +1072,8 @@ void pad::process(unsigned int buf_size, sample &in) {
     in[n]=0;
     for (int i=0; i<12; i++) {
       in[n]+=m_table[m_cycle_pos*((i+1)*m_gap)]/12.0f;
+      if (in[n]>1.0) in[n]=1.0;
+      if (in[n]<-1.0) in[n]=-1.0;
     }
     
     if (m_table[m_write_pos]<-1 || m_table[m_write_pos]>1) {
