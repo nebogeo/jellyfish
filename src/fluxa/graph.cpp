@@ -251,6 +251,7 @@ void graph::play(unsigned int seconds, unsigned int fraction, unsigned int id, f
     }
   } else {
     cerr<<"event arrived too late ignoring: "<<m_current_time.get_difference(e.time_stamp)<<endl;
+    m_current_time.set_to_now();
     
     //m_current_time.print();
     //e.time_stamp=m_current_time;
