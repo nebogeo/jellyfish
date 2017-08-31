@@ -1,5 +1,9 @@
 (msg "started")
 
+(clear)
+(clear-colour (vector 1 0 0 0.5))
+(build-cube)
+
 (define (spikey n)
   (when (not (zero? n))
         (with-state

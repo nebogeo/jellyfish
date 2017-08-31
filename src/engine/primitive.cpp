@@ -298,7 +298,7 @@ void primitive::render(u32 hints) {
   */
 #else
 
-  glVertexPointer(3, GL_FIXED, 0, &m_positions[0]);
+  glVertexPointer(3, GL_FLOAT, 0, &m_positions[0]);
 
   if (m_colours!=NULL) {
     for (int i=0; i<m_size; i++) {
@@ -315,14 +315,14 @@ void primitive::render(u32 hints) {
   }
 
   if (m_normals!=NULL) {
-    glNormalPointer(GL_FIXED, 0, &m_normals[0]);
+    glNormalPointer(GL_FLOAT, 0, &m_normals[0]);
     glEnableClientState(GL_NORMAL_ARRAY);
   } else {
     glDisableClientState(GL_NORMAL_ARRAY);
   }
 
   if (m_tex!=NULL) {
-    glTexCoordPointer(3, GL_FIXED, 0, &m_tex[0]);
+    glTexCoordPointer(3, GL_FLOAT, 0, &m_tex[0]);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   } else {
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);

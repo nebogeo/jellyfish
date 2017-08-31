@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
 	interpreter::eval("(frame-hook)");
 	pthread_mutex_unlock(graphics::m_render_mutex);
       }
+      usleep(10000);
     }
-    usleep(10000);
   }
 #else
   if (window) {

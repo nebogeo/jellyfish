@@ -166,7 +166,7 @@ u32 graphics::load_texture_raw(const string &texname,int width, int height, char
 
 void graphics::display_callback() {
   if (!pthread_mutex_trylock(m_render_mutex)) {
-
+    
 #ifdef FLX_RPI
     graphics::render(rpi_state->screen_width,rpi_state->screen_height);
     eglSwapBuffers(rpi_state->display,rpi_state->surface);
