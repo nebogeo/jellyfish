@@ -41,7 +41,7 @@ static RPI_STATE_T _state, *state=&_state;
 int main(int argc, char *argv[])
 {
   bool window=true;
-  bool repl=false;
+  bool repl=true;
   if (argc>=2 && !strcmp(argv[1],"-nw")) window=false;
   if (argc>=2 && !strcmp(argv[1],"-r")) graphics::m_record=true;
 

@@ -49,6 +49,11 @@ public:
 
   static void save_sample(const std::string &filename, const sample s);
 
+  eq m_left_eq;
+  eq m_right_eq;
+  compressor m_left_comp;
+  compressor m_right_comp;
+
  private:
   bool m_recording;
   std::string m_record_filename;

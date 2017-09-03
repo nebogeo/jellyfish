@@ -26,6 +26,10 @@ audio_device::audio_device(const string &clientname, u32 device, u32 samplerate,
   right_out(buffer_size),
   left_in(buffer_size),
   right_in(buffer_size),
+  m_left_eq(samplerate),
+  m_right_eq(samplerate),
+  m_left_comp(samplerate),
+  m_right_comp(samplerate),
   m_client(NULL),
   m_graph(NULL),
   m_recording(false),
@@ -91,6 +95,14 @@ void run_graph(void *c, unsigned int size) {
   a->left_out.zero();
   a->right_out.zero();
   a->m_graph->process(size, a->left_out, a->right_out);
+
+  a->m_left_eq.process(size,a->left_out);
+  a->m_right_eq.process(size,a->right_out);
+
+  // slow and can't get it to work properly
+  //  a->m_left_comp.process(size,a->left_out);
+  // a->m_right_comp.process(size,a->right_out);
+
   a->maybe_record();
 #endif
 }

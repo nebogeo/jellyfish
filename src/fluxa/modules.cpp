@@ -919,8 +919,8 @@ compressor::compressor(int sample_rate) :
   threshold(0.5),
   slope(0.5),
   sr(sample_rate),
-  tla(1.0f*1e-3),
-  twnd(3.0f*1e-3),
+  tla(3.0f*1e-3),
+  twnd(1.0f*1e-3),
   tatt(0.1f*1e-3),
   trel(300.0f*1e-3)
 {
@@ -963,6 +963,8 @@ void compressor::process(unsigned int buf_size, sample &in)
       // the very easy hard knee 1:N compressor
       float  gain = 1.0;
       if (env > threshold) gain = gain - (env - threshold) * slope;
+
+      if (i==0) cerr<<threshold<<" "<<env<<" "<<gain<<endl;
       // result - two hard kneed compressed channels...
       in[i] *= gain;
       //		if (i==0) cerr<<threshold<<" "<<env<<" "<<gain<<endl;

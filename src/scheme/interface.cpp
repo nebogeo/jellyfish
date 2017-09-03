@@ -222,6 +222,26 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
     m_audio_device->start_recording(string_value(car(sc->args)));
     s_return(sc,sc->F);
   } break;
+  case OP_AUDIO_EQ: {
+    m_audio_device->m_left_eq.set_low(rvalue(car(sc->args)));
+    m_audio_device->m_right_eq.set_low(rvalue(car(sc->args)));
+    m_audio_device->m_left_eq.set_mid(rvalue(cadr(sc->args)));
+    m_audio_device->m_right_eq.set_mid(rvalue(cadr(sc->args)));
+    m_audio_device->m_left_eq.set_high(rvalue(caddr(sc->args)));
+    m_audio_device->m_right_eq.set_high(rvalue(caddr(sc->args)));
+    s_return(sc,sc->F);
+  } break;
+  case OP_AUDIO_COMP: {
+    m_audio_device->m_left_comp.set_attack(rvalue(car(sc->args)));
+    m_audio_device->m_right_comp.set_attack(rvalue(car(sc->args)));
+    m_audio_device->m_left_comp.set_release(rvalue(cadr(sc->args)));
+    m_audio_device->m_right_comp.set_release(rvalue(cadr(sc->args)));
+    m_audio_device->m_left_comp.set_threshold(rvalue(caddr(sc->args)));
+    m_audio_device->m_right_comp.set_threshold(rvalue(caddr(sc->args)));
+    m_audio_device->m_left_comp.set_slope(rvalue(cadddr(sc->args)));
+    m_audio_device->m_right_comp.set_slope(rvalue(cadddr(sc->args)));
+    s_return(sc,sc->F);
+  } break;
   case OP_SYNTH_CRT: {
     m_audio_graph
       ->create(ivalue(car(sc->args)),
