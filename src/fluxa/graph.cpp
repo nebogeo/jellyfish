@@ -24,6 +24,7 @@ using namespace std;
 #include "modules.h"
 
 #define MAX_PLAYING_ROOTS 5
+#define OUTPUT_GAIN 0.2 // (1/MAX_PLAYING_ROOTS)
 
 graph::graph(unsigned int num_nodes, unsigned int sample_rate) :
   m_num_nodes(num_nodes),
@@ -218,8 +219,8 @@ void graph::process(unsigned int bufsize, sample &left, sample &right) {
 	if (pan<0) leftpan=1-pan;
 	else rightpan=1+pan;
 	
-	left.mul_mix(m_node_map[i->first]->get_output(),0,0.1*leftpan);
-	right.mul_mix(m_node_map[i->first]->get_output(),0,0.1*rightpan);
+	left.mul_mix(m_node_map[i->first]->get_output(),0,OUTPUT_GAIN*leftpan);
+	right.mul_mix(m_node_map[i->first]->get_output(),0,OUTPUT_GAIN*rightpan);
       }
     }
 
