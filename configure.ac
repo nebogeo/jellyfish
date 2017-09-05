@@ -1,7 +1,5 @@
 AC_INIT(jellyfish, version-0.1)
 AC_PROG_CC
-CFLAGS="$CFLAGS -I/opt/vc/include/"
-LDFLAGS="$LDFLAGS -L/opt/vc/lib"
 dnl FIXME: EGL of RPi depends on GLESv1 or GLESv2
 dnl FIXME: GLESv2 of RPi depends on EGL... WTF!
 AC_CHECK_LIB([bcm_host], [bcm_host_init], [

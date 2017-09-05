@@ -142,13 +142,13 @@ static int is_zero_double(double x);
 static num num_zero;
 static num num_one;
 
-INTERFACE int is_vector(pointer p)    { return (type(p)==T_VECTOR); }
-INTERFACE int is_number(pointer p)    { return (type(p)==T_NUMBER); }
+INTERFACE int is_vector(pointer p)    { return (celltype(p)==T_VECTOR); }
+INTERFACE int is_number(pointer p)    { return (celltype(p)==T_NUMBER); }
 INTERFACE int is_integer(pointer p) {
   return is_number(p) && ((p)->_object._number.is_fixnum);
 }
 
-INTERFACE INLINE int is_string(pointer p)     { return (type(p)==T_STRING); }
+INTERFACE INLINE int is_string(pointer p)     { return (celltype(p)==T_STRING); }
 #define strvalue(p)      ((p)->_object._string._svalue)
 #define strlength(p)        ((p)->_object._string._length)
 
@@ -157,7 +157,7 @@ INTERFACE INLINE int is_real(pointer p) {
   return is_number(p) && (!(p)->_object._number.is_fixnum);
 }
 
-INTERFACE INLINE int is_character(pointer p) { return (type(p)==T_CHARACTER); }
+INTERFACE INLINE int is_character(pointer p) { return (celltype(p)==T_CHARACTER); }
 INTERFACE INLINE char *string_value(pointer p) { return strvalue(p); }
 INLINE num nvalue(pointer p)       { return ((p)->_object._number); }
 INTERFACE long ivalue(pointer p)      { return (num_is_integer(p)?(p)->_object._number.value.ivalue:(long)(p)->_object._number.value.rvalue); }
@@ -168,55 +168,55 @@ INTERFACE double rvalue(pointer p)    { return (!num_is_integer(p)?(p)->_object.
 #define set_num_real(p)      (p)->_object._number.is_fixnum=0;
 INTERFACE  long charvalue(pointer p)  { return ivalue_unchecked(p); }
 
-INTERFACE INLINE int is_port(pointer p)     { return (type(p)==T_PORT); }
+INTERFACE INLINE int is_port(pointer p)     { return (celltype(p)==T_PORT); }
 INTERFACE INLINE int is_inport(pointer p)  { return is_port(p) && p->_object._port->kind & port_input; }
 INTERFACE INLINE int is_outport(pointer p) { return is_port(p) && p->_object._port->kind & port_output; }
 
-INTERFACE INLINE int is_pair(pointer p)     { return (type(p)==T_PAIR); }
+INTERFACE INLINE int is_pair(pointer p)     { return (celltype(p)==T_PAIR); }
 INTERFACE pointer pair_car(pointer p)   { return car(p); }
 INTERFACE pointer pair_cdr(pointer p)   { return cdr(p); }
 INTERFACE pointer set_car(pointer p, pointer q) { return car(p)=q; }
 INTERFACE pointer set_cdr(pointer p, pointer q) { return cdr(p)=q; }
 
-INTERFACE INLINE int is_symbol(pointer p)   { return (type(p)==T_SYMBOL); }
+INTERFACE INLINE int is_symbol(pointer p)   { return (celltype(p)==T_SYMBOL); }
 INTERFACE INLINE char *symname(pointer p)   { return strvalue(car(p)); }
 #if USE_PLIST
-SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (typeflag(p)&T_SYMBOL); }
+SCHEME_EXPORT INLINE int hasprop(pointer p)     { return (celltypeflag(p)&T_SYMBOL); }
 #define symprop(p)       cdr(p)
 #endif
 
-INTERFACE INLINE int is_syntax(pointer p)   { return (typeflag(p)&T_SYNTAX); }
-INTERFACE INLINE int is_proc(pointer p)     { return (type(p)==T_PROC); }
-INTERFACE INLINE int is_foreign(pointer p)  { return (type(p)==T_FOREIGN); }
+INTERFACE INLINE int is_syntax(pointer p)   { return (celltypeflag(p)&T_SYNTAX); }
+INTERFACE INLINE int is_proc(pointer p)     { return (celltype(p)==T_PROC); }
+INTERFACE INLINE int is_foreign(pointer p)  { return (celltype(p)==T_FOREIGN); }
 INTERFACE INLINE char *syntaxname(pointer p) { return strvalue(car(p)); }
 #define procnum(p)       ivalue(p)
 static const char *procname(pointer x);
 
-INTERFACE INLINE int is_closure(pointer p)  { return (type(p)==T_CLOSURE); }
-INTERFACE INLINE int is_macro(pointer p)    { return (type(p)==T_MACRO); }
+INTERFACE INLINE int is_closure(pointer p)  { return (celltype(p)==T_CLOSURE); }
+INTERFACE INLINE int is_macro(pointer p)    { return (celltype(p)==T_MACRO); }
 INTERFACE INLINE pointer closure_code(pointer p)   { return car(p); }
 INTERFACE INLINE pointer closure_env(pointer p)    { return cdr(p); }
 
-INTERFACE INLINE int is_continuation(pointer p)    { return (type(p)==T_CONTINUATION); }
+INTERFACE INLINE int is_continuation(pointer p)    { return (celltype(p)==T_CONTINUATION); }
 #define cont_dump(p)     cdr(p)
 
 /* To do: promise should be forced ONCE only */
-INTERFACE INLINE int is_promise(pointer p)  { return (type(p)==T_PROMISE); }
+INTERFACE INLINE int is_promise(pointer p)  { return (celltype(p)==T_PROMISE); }
 
-INTERFACE INLINE int is_environment(pointer p) { return (type(p)==T_ENVIRONMENT); }
-#define setenvironment(p)    typeflag(p) = T_ENVIRONMENT
+INTERFACE INLINE int is_environment(pointer p) { return (celltype(p)==T_ENVIRONMENT); }
+#define setenvironment(p)    celltypeflag(p) = T_ENVIRONMENT
 
-#define is_atom(p)       (typeflag(p)&T_ATOM)
-#define setatom(p)       typeflag(p) |= T_ATOM
-#define clratom(p)       typeflag(p) &= CLRATOM
+#define is_atom(p)       (celltypeflag(p)&T_ATOM)
+#define setatom(p)       celltypeflag(p) |= T_ATOM
+#define clratom(p)       celltypeflag(p) &= CLRATOM
 
-#define is_mark(p)       (typeflag(p)&MARK)
-#define setmark(p)       typeflag(p) |= MARK
-#define clrmark(p)       typeflag(p) &= UNMARK
+#define is_mark(p)       (celltypeflag(p)&MARK)
+#define setmark(p)       celltypeflag(p) |= MARK
+#define clrmark(p)       celltypeflag(p) &= UNMARK
 
-INTERFACE INLINE int is_immutable(pointer p) { return (typeflag(p)&T_IMMUTABLE); }
-/*#define setimmutable(p)  typeflag(p) |= T_IMMUTABLE*/
-INTERFACE INLINE void setimmutable(pointer p) { typeflag(p) |= T_IMMUTABLE; }
+INTERFACE INLINE int is_immutable(pointer p) { return (celltypeflag(p)&T_IMMUTABLE); }
+/*#define setimmutable(p)  celltypeflag(p) |= T_IMMUTABLE*/
+INTERFACE INLINE void setimmutable(pointer p) { celltypeflag(p) |= T_IMMUTABLE; }
 
 
 #if USE_CHAR_CLASSIFIERS
@@ -551,7 +551,7 @@ static int alloc_cellseg(scheme *sc, int n) {
           sc->fcells += CELL_SEGSIZE;
         last = newp + CELL_SEGSIZE - 1;
           for (p = newp; p <= last; p++) {
-               typeflag(p) = 0;
+               celltypeflag(p) = 0;
                cdr(p) = p + 1;
                car(p) = sc->NIL;
           }
@@ -696,7 +696,7 @@ static pointer find_consecutive_cells(scheme *sc, int n) {
 static void push_recent_alloc(scheme *sc, pointer recent, pointer extra)
 {
   pointer holder = get_cell_x(sc, recent, extra);
-  typeflag(holder) = T_PAIR | T_IMMUTABLE;
+  celltypeflag(holder) = T_PAIR | T_IMMUTABLE;
   car(holder) = recent;
   cdr(holder) = car(sc->sink);
   car(sc->sink) = holder;
@@ -709,7 +709,7 @@ static pointer get_cell(scheme *sc, pointer a, pointer b)
   /* For right now, include "a" and "b" in "cell" so that gc doesn't
      think they are garbage. */
   /* Tentatively record it as a pair so gc understands it. */
-  typeflag(cell) = T_PAIR;
+  celltypeflag(cell) = T_PAIR;
   car(cell) = a;
   cdr(cell) = b;
   push_recent_alloc(sc, cell, sc->NIL);
@@ -721,7 +721,7 @@ static pointer get_vector_object(scheme *sc, int len, pointer init)
   pointer cells = get_consecutive_cells(sc,len/2+len%2+1);
   if(sc->no_memory) { return sc->sink; }
   /* Record it as a vector so that gc understands it. */
-  typeflag(cells) = (T_VECTOR | T_ATOM);
+  celltypeflag(cells) = (T_VECTOR | T_ATOM);
   ivalue_unchecked(cells)=len;
   set_num_integer(cells);
   fill_vector(cells,init);
@@ -740,11 +740,11 @@ static void check_cell_alloced(pointer p, int expect_alloced)
 {
   /* Can't use putstr(sc,str) because callers have no access to
      sc.  */
-  if(typeflag(p) & !expect_alloced)
+  if(celltypeflag(p) & !expect_alloced)
     {
       fprintf(stderr,"Cell is already allocated!\n");
     }
-  if(!(typeflag(p)) & expect_alloced)
+  if(!(celltypeflag(p)) & expect_alloced)
     {
       fprintf(stderr,"Cell is not allocated!\n");
     }
@@ -765,7 +765,7 @@ static void check_range_alloced(pointer p, int n, int expect_alloced)
 pointer _cons(scheme *sc, pointer a, pointer b, int immutable) {
   pointer x = get_cell(sc,a, b);
 
-  typeflag(x) = T_PAIR;
+  celltypeflag(x) = T_PAIR;
   if(immutable) {
     setimmutable(x);
   }
@@ -792,7 +792,7 @@ static pointer oblist_add_by_name(scheme *sc, const char *name)
   int location;
 
   x = immutable_cons(sc, mk_string(sc, name), sc->NIL);
-  typeflag(x) = T_SYMBOL;
+  celltypeflag(x) = T_SYMBOL;
   setimmutable(car(x));
 
   location = hash_fn(name, ivalue_unchecked(sc->oblist));
@@ -860,7 +860,7 @@ static pointer oblist_add_by_name(scheme *sc, const char *name)
   pointer x;
 
   x = immutable_cons(sc, mk_string(sc, name), sc->NIL);
-  typeflag(x) = T_SYMBOL;
+  celltypeflag(x) = T_SYMBOL;
   setimmutable(car(x));
   sc->oblist = immutable_cons(sc, x, sc->oblist);
   return x;
@@ -875,7 +875,7 @@ static pointer oblist_all_symbols(scheme *sc)
 static pointer mk_port(scheme *sc, port *p) {
   pointer x = get_cell(sc, sc->NIL, sc->NIL);
 
-  typeflag(x) = T_PORT|T_ATOM;
+  celltypeflag(x) = T_PORT|T_ATOM;
   x->_object._port=p;
   return (x);
 }
@@ -883,7 +883,7 @@ static pointer mk_port(scheme *sc, port *p) {
 pointer mk_foreign_func(scheme *sc, foreign_func f) {
   pointer x = get_cell(sc, sc->NIL, sc->NIL);
 
-  typeflag(x) = (T_FOREIGN | T_ATOM);
+  celltypeflag(x) = (T_FOREIGN | T_ATOM);
   x->_object._ff=f;
   return (x);
 }
@@ -891,7 +891,7 @@ pointer mk_foreign_func(scheme *sc, foreign_func f) {
 INTERFACE pointer mk_character(scheme *sc, int c) {
   pointer x = get_cell(sc,sc->NIL, sc->NIL);
 
-  typeflag(x) = (T_CHARACTER | T_ATOM);
+  celltypeflag(x) = (T_CHARACTER | T_ATOM);
   ivalue_unchecked(x)= c;
   set_num_integer(x);
   return (x);
@@ -901,7 +901,7 @@ INTERFACE pointer mk_character(scheme *sc, int c) {
 INTERFACE pointer mk_integer(scheme *sc, long num) {
   pointer x = get_cell(sc,sc->NIL, sc->NIL);
 
-  typeflag(x) = (T_NUMBER | T_ATOM);
+  celltypeflag(x) = (T_NUMBER | T_ATOM);
   ivalue_unchecked(x)= num;
   set_num_integer(x);
   return (x);
@@ -910,7 +910,7 @@ INTERFACE pointer mk_integer(scheme *sc, long num) {
 INTERFACE pointer mk_real(scheme *sc, double n) {
   pointer x = get_cell(sc,sc->NIL, sc->NIL);
 
-  typeflag(x) = (T_NUMBER | T_ATOM);
+  celltypeflag(x) = (T_NUMBER | T_ATOM);
   rvalue_unchecked(x)= n;
   set_num_real(x);
   return (x);
@@ -949,7 +949,7 @@ INTERFACE pointer mk_string(scheme *sc, const char *str) {
 
 INTERFACE pointer mk_counted_string(scheme *sc, const char *str, int len) {
      pointer x = get_cell(sc, sc->NIL, sc->NIL);
-     typeflag(x) = (T_STRING | T_ATOM);
+     celltypeflag(x) = (T_STRING | T_ATOM);
      strvalue(x) = store_string(sc,len,str,0);
      strlength(x) = len;
      return (x);
@@ -957,7 +957,7 @@ INTERFACE pointer mk_counted_string(scheme *sc, const char *str, int len) {
 
 INTERFACE pointer mk_empty_string(scheme *sc, int len, char fill) {
      pointer x = get_cell(sc, sc->NIL, sc->NIL);
-     typeflag(x) = (T_STRING | T_ATOM);
+     celltypeflag(x) = (T_STRING | T_ATOM);
      strvalue(x) = store_string(sc,len,0,fill);
      strlength(x) = len;
      return (x);
@@ -970,7 +970,7 @@ INTERFACE static void fill_vector(pointer vec, pointer obj) {
      int i;
      int num=ivalue(vec)/2+ivalue(vec)%2;
      for(i=0; i<num; i++) {
-          typeflag(vec+1+i) = T_PAIR;
+          celltypeflag(vec+1+i) = T_PAIR;
           setimmutable(vec+1+i);
           car(vec+1+i)=obj;
           cdr(vec+1+i)=obj;
@@ -1258,9 +1258,9 @@ static void gc(scheme *sc, pointer a, pointer b) {
     clrmark(p);
       } else {
     /* reclaim cell */
-        if (typeflag(p) != 0) {
+        if (celltypeflag(p) != 0) {
           finalize_cell(sc, p);
-          typeflag(p) = 0;
+          celltypeflag(p) = 0;
           car(p) = sc->NIL;
         }
         ++sc->fcells;
@@ -1968,7 +1968,7 @@ static void atom2str(scheme *sc, pointer l, int f, char **pp, int *plen) {
 static pointer mk_closure(scheme *sc, pointer c, pointer e) {
      pointer x = get_cell(sc, c, e);
 
-     typeflag(x) = T_CLOSURE;
+     celltypeflag(x) = T_CLOSURE;
      car(x) = c;
      cdr(x) = e;
      return (x);
@@ -1978,7 +1978,7 @@ static pointer mk_closure(scheme *sc, pointer c, pointer e) {
 static pointer mk_continuation(scheme *sc, pointer d) {
      pointer x = get_cell(sc, sc->NIL, d);
 
-     typeflag(x) = T_CONTINUATION;
+     celltypeflag(x) = T_CONTINUATION;
      cont_dump(x) = d;
      return (x);
 }
@@ -2835,7 +2835,7 @@ static pointer opexe_1(scheme *sc, enum scheme_opcodes op) {
 
      case OP_DELAY:      /* delay */
           x = mk_closure(sc, cons(sc, sc->NIL, sc->code), sc->envir);
-          typeflag(x)=T_PROMISE;
+          celltypeflag(x)=T_PROMISE;
           s_return(sc,x);
 
      case OP_AND0:       /* and */
@@ -2884,7 +2884,7 @@ static pointer opexe_1(scheme *sc, enum scheme_opcodes op) {
      case OP_C1STREAM:   /* cons-stream */
           sc->args = sc->value;  /* save sc->value to register sc->args for gc */
           x = mk_closure(sc, cons(sc, sc->NIL, sc->code), sc->envir);
-          typeflag(x)=T_PROMISE;
+          celltypeflag(x)=T_PROMISE;
           s_return(sc,cons(sc, sc->args, x));
 
      case OP_MACRO0:     /* macro */
@@ -2902,7 +2902,7 @@ static pointer opexe_1(scheme *sc, enum scheme_opcodes op) {
           s_goto(sc,OP_EVAL);
 
      case OP_MACRO1:     /* macro */
-          typeflag(sc->value) = T_MACRO;
+          celltypeflag(sc->value) = T_MACRO;
           x = find_slot_in_env(sc, sc->envir, sc->code, 0);
           if (x != sc->NIL) {
                set_slot_in_env(sc, x, sc->value);
@@ -4487,7 +4487,7 @@ static void assign_syntax(scheme *sc, char *name) {
      pointer x;
 
      x = oblist_add_by_name(sc, name);
-     typeflag(x) |= T_SYNTAX;
+     celltypeflag(x) |= T_SYNTAX;
 }
 
 static void assign_proc(scheme *sc, enum scheme_opcodes op, char *name) {
@@ -4502,7 +4502,7 @@ static pointer mk_proc(scheme *sc, enum scheme_opcodes op) {
      pointer y;
 
      y = get_cell(sc, sc->NIL, sc->NIL);
-     typeflag(y) = (T_PROC | T_ATOM);
+     celltypeflag(y) = (T_PROC | T_ATOM);
      ivalue_unchecked(y) = (long) op;
      set_num_integer(y);
      return y;
@@ -4682,16 +4682,16 @@ int scheme_init_custom_alloc(scheme *sc, func_alloc malloc, func_dealloc free) {
   sc->tracing=0;
 
   /* init sc->NIL */
-  typeflag(sc->NIL) = (T_ATOM | MARK);
+  celltypeflag(sc->NIL) = (T_ATOM | MARK);
   car(sc->NIL) = cdr(sc->NIL) = sc->NIL;
   /* init T */
-  typeflag(sc->T) = (T_ATOM | MARK);
+  celltypeflag(sc->T) = (T_ATOM | MARK);
   car(sc->T) = cdr(sc->T) = sc->T;
   /* init F */
-  typeflag(sc->F) = (T_ATOM | MARK);
+  celltypeflag(sc->F) = (T_ATOM | MARK);
   car(sc->F) = cdr(sc->F) = sc->F;
   /* init sink */
-  typeflag(sc->sink) = (T_PAIR | MARK);
+  celltypeflag(sc->sink) = (T_PAIR | MARK);
   car(sc->sink) = sc->NIL;
   /* init c_nest */
   sc->c_nest = sc->NIL;
@@ -4777,16 +4777,16 @@ void scheme_deinit(scheme *sc) {
   sc->args=sc->NIL;
   sc->value=sc->NIL;
   if(is_port(sc->inport)) {
-    typeflag(sc->inport) = T_ATOM;
+    celltypeflag(sc->inport) = T_ATOM;
   }
   sc->inport=sc->NIL;
   sc->outport=sc->NIL;
   if(is_port(sc->save_inport)) {
-    typeflag(sc->save_inport) = T_ATOM;
+    celltypeflag(sc->save_inport) = T_ATOM;
   }
   sc->save_inport=sc->NIL;
   if(is_port(sc->loadport)) {
-    typeflag(sc->loadport) = T_ATOM;
+    celltypeflag(sc->loadport) = T_ATOM;
   }
   sc->loadport=sc->NIL;
   sc->gc_verbose=0;
@@ -4829,7 +4829,7 @@ void scheme_load_named_file(scheme *sc, FILE *fin, const char *filename) {
   sc->inport=sc->loadport;
   sc->args = mk_integer(sc,sc->file_i);
   Eval_Cycle(sc, OP_T0LVL);
-  typeflag(sc->loadport)=T_ATOM;
+  celltypeflag(sc->loadport)=T_ATOM;
   if(sc->retcode==0) {
     sc->retcode=sc->nesting!=0;
   }
@@ -4852,7 +4852,7 @@ void scheme_load_string(scheme *sc, const char *cmd) {
   sc->inport=sc->loadport;
   sc->args = mk_integer(sc,sc->file_i);
   Eval_Cycle(sc, OP_T0LVL);
-  typeflag(sc->loadport)=T_ATOM;
+  celltypeflag(sc->loadport)=T_ATOM;
   if(sc->retcode==0) {
     sc->retcode=sc->nesting!=0;
   }

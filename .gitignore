@@ -1,0 +1,12 @@
+configure
+autom4te.cache/
+src/ac_config.h
+src/**/*.dep
+src/**/*.o
+Makefile
+config.log
+autoscan.log
+configure.scan
+config.status
+jellyfish
+libjellyfish.*
