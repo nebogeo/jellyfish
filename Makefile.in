@@ -27,6 +27,7 @@ SRCS :=    src/graphics.cpp\
 	   src/fluxa/command_ring_buffer.cpp\
 	   src/fluxa/OSC_server.cpp \
 	   src/audio/portaudio_client.cpp \
+	   src/audio/JackClient.cpp \
            src/engine/obj_reader.cpp\
            src/engine/engine.cpp\
            src/engine/primitive.cpp\

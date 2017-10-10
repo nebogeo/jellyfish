@@ -22,6 +22,7 @@
 class network_osc {
 public:
     static void start_osc_repl(pthread_mutex_t *render_mutex);
+    static void send(const char *url, const char *name, const char *types, char *data, size_t size);
 
 private:
     static void osc_error_handler(int num, const char *msg, const char *path);

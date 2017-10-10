@@ -17,7 +17,14 @@
 #include "core/types.h"
 #include "fluxa/graph.h"
 #include "fluxa/sample.h"
+
+#define USE_JACK
+
+#ifdef USE_JACK
+#include "audio/JackClient.h"
+#else
 #include "audio/portaudio_client.h"
+#endif
 
 #include <string>
 
@@ -45,7 +52,9 @@ public:
   sample right_in;
   graph *m_graph;
 
+#ifndef USE_JACK
   portaudio_client *m_client;
+#endif
 
   static void save_sample(const std::string &filename, const sample s);
 
@@ -63,7 +72,10 @@ public:
   u32 m_watchdog_counter;
   string m_client_name;
 
+#ifndef USE_JACK
   portaudio_client::device_options m_opt;
+#endif
+
 };
 
 }

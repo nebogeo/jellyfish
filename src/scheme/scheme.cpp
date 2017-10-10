@@ -3443,6 +3443,7 @@ int list_length(scheme *sc, pointer a) {
 pointer list_ref(scheme *sc, pointer l, int i) {
      while (i>0 && l!=sc->NIL) {
           l=cdr(l);
+	  i--;
      }
      return car(l);
 }

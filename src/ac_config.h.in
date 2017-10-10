@@ -27,6 +27,9 @@
 /* Define to 1 if you have the `glut' library (-lglut). */
 #undef HAVE_LIBGLUT
 
+/* Define to 1 if you have the `jack' library (-ljack). */
+#undef HAVE_LIBJACK
+
 /* Define to 1 if you have the `jpeg' library (-ljpeg). */
 #undef HAVE_LIBJPEG
 

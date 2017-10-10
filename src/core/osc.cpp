@@ -28,13 +28,38 @@ using namespace std;
 pthread_mutex_t *network_osc::m_render_mutex=NULL;
 float network_osc::m_sync_delay=0;
 
+void network_osc::send(const char *url, const char *name, const char *types, char *data, size_t size) {
+  lo_message oscmsg=lo_message_new();
+  u32 pos=0;
+  for (u32 i=0; i<strlen(types); ++i) {
+    if (pos<size) {
+      switch(types[i]) {
+	// dirty dirty cast-athon
+      case 'f': lo_message_add_float(oscmsg,*(float*)(data+pos)); pos+=sizeof(float); break;
+      case 'i': lo_message_add_int32(oscmsg,*(int*)(data+pos)); pos+=sizeof(int); break;
+      case 'l': lo_message_add_int64(oscmsg,*(long long*)(data+pos)); pos+=sizeof(long long); break;
+      case 's': lo_message_add_string(oscmsg,(const char*)(data+pos)); pos+=strlen((const char *)(data+pos))+1; break;
+      }
+    } else {
+      cerr<<"network_osc::send data doesn't match types..."<<endl;
+    }
+  }
+  
+  // send the message...
+  lo_address addr=lo_address_new_from_url(url); 
+  lo_send_message(addr, name, oscmsg);
+  lo_message_free(oscmsg);
+  lo_address_free(addr); 
+}
+
+
 void network_osc::osc_error_handler(int num, const char *msg, const char *path) {
-    printf("liblo server error %d in path %s\n",num,path);
+  printf("liblo server error %d in path %s\n",num,path);
 }
 
 int network_osc::osc_default_handler(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
-    //printf("osc server no handler for: %s %s\n",path,types);
-	return 1;
+  //printf("osc server no handler for: %s %s\n",path,types);
+  return 1;
 }
 
 int network_osc::osc_eval_handler(const char *path, const char *types, lo_arg **argv,
@@ -85,7 +110,7 @@ int network_osc::osc_delay_handler(const char *path, const char *types, lo_arg *
 void network_osc::start_osc_repl(pthread_mutex_t* render_mutex) {
     m_render_mutex = render_mutex;
     printf("starting osc, listening to port 8000\n");
-	lo_server_thread server = lo_server_thread_new("8000", osc_error_handler);
+    lo_server_thread server = lo_server_thread_new("8000", osc_error_handler);
     lo_server_thread_add_method(server, NULL, NULL, osc_default_handler, NULL);
     lo_server_thread_add_method(server, "/eval", "s", osc_eval_handler, NULL);
     lo_server_thread_add_method(server, "/sync", "if", osc_sync_handler, NULL);

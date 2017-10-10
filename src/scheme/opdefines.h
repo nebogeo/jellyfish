@@ -218,6 +218,7 @@
     _OP_DEF(opexe_6, "audio-comp",                     4,  4,       0,                               OP_AUDIO_COMP       )
     _OP_DEF(opexe_6, "sleep",                          1,  1,       0,                               OP_SLEEP            )
     _OP_DEF(opexe_6, "fmod",                           2,  2,       0,                               OP_FMOD             )
+    _OP_DEF(opexe_6, "osc-send",                       4,  4,       0,                               OP_OSC_SEND         )
 
 
     _OP_DEF(opexe_6, "push",                           0,  0,       0,                               OP_PUSH             )

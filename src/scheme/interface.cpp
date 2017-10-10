@@ -30,6 +30,7 @@
 #include "engine/engine.h"
 #include "engine/shader.h"
 #include "core/geometry.h"
+#include "core/osc.h"
 #include "fluxa/graph.h"
 #include "fluxa/time.h"
 #include "audio.h"
@@ -270,6 +271,61 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
   } break;
   case OP_FMOD: {
     s_return(sc,mk_real(sc,fmod(rvalue(car(sc->args)),rvalue(cadr(sc->args)))));
+  } break;
+
+  case OP_OSC_SEND: {
+    const char *url=string_value(car(sc->args));
+    const char *name=string_value(cadr(sc->args));
+    const char *types=string_value(caddr(sc->args));
+
+    pointer data=cadddr(sc->args);
+
+    // figure out size of the data packet
+    u32 data_size=0;
+    for (u32 i=0; i<strlen(types); ++i) {
+      switch(types[i]) {
+      case 'f': data_size+=sizeof(float); break;
+      case 'i': data_size+=sizeof(int); break;
+      case 'l': data_size+=sizeof(long long); break;
+      case 's': data_size+=strlen(string_value(list_ref(sc,data,i)))+1; break;
+      }
+    }
+
+    // build data packet
+    char *packet = new char[data_size];
+    u32 data_pos=0;
+    for (u32 i=0; i<strlen(types); ++i) {
+      switch(types[i]) {
+      case 'f': {
+	float v=rvalue(list_ref(sc,data,i));
+	memcpy(packet+data_pos,&v,sizeof(float));
+	data_pos+=sizeof(float);
+      } break;
+      case 'i': { 
+	int v=ivalue(list_ref(sc,data,i));
+	memcpy(packet+data_pos,&v,sizeof(int));
+	data_pos+=sizeof(int); 
+      } break;
+      case 'l': 
+	/*float v=ivalue(list_ref(sc,data,i));
+	memcpy(packet+data_pos,&v,sizeof(float));
+	data_pos+=sizeof(long long); */
+	break;
+      case 's': {
+	char *str=string_value(list_ref(sc,data,i));
+	memcpy(packet+data_pos,str,strlen(str));
+	data_pos+=strlen(string_value(list_ref(sc,data,i)));
+	packet[data_pos]=0; // null terminator
+	data_pos++;
+      } break;
+      }
+    }
+    
+    network_osc::send(url,name,types,packet,data_size);
+
+    delete[] packet;
+
+    s_return(sc,sc->F);
   } break;
 
     //////////////////// fluxus /////////////////////////////////////////

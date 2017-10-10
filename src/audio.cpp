@@ -30,20 +30,24 @@ audio_device::audio_device(const string &clientname, u32 device, u32 samplerate,
   m_right_eq(samplerate),
   m_left_comp(samplerate),
   m_right_comp(samplerate),
+#ifndef USE_JACK
   m_client(NULL),
+#endif
   m_graph(NULL),
   m_recording(false),
   m_record_filename(""),
   m_watchdog_counter(0),
   m_client_name(clientname)
 {
-    m_opt.device_num = device;
-    m_opt.buffer_size = buffer_size;
-    m_opt.num_buffers = 2;
-    m_opt.samplerate = samplerate;
-    m_opt.in_channels = 2;
-    m_opt.out_channels = 2;
-    start_audio();
+#ifndef USE_JACK
+  m_opt.device_num = device;
+  m_opt.buffer_size = buffer_size;
+  m_opt.num_buffers = 2;
+  m_opt.samplerate = samplerate;
+  m_opt.in_channels = 2;
+  m_opt.out_channels = 2;
+#endif
+  start_audio();
 }
 
 void audio_device::save_sample(const string &filename, const sample s) {
@@ -87,35 +91,43 @@ void audio_device::maybe_record() {
     }
 }
 
-#ifndef DONT_USE_FLUXA_GRAPH
 void run_graph(void *c, unsigned int size) {
 #ifndef DONT_USE_FLUXA_GRAPH
   audio_device *a=(audio_device *)c;
+
+  if (a->m_graph!=NULL) {
   a->reset_watchdog_counter();
   a->left_out.zero();
   a->right_out.zero();
   a->m_graph->process(size, a->left_out, a->right_out);
-
+  
   a->m_left_eq.process(size,a->left_out);
   a->m_right_eq.process(size,a->right_out);
-
+  
   // slow and can't get it to work properly
   //  a->m_left_comp.process(size,a->left_out);
   // a->m_right_comp.process(size,a->right_out);
-
+  
   a->maybe_record();
-#endif
 }
 #endif
+}
+
 
 void audio_device::start_graph(graph *graph) {
 #ifndef DONT_USE_FLUXA_GRAPH
   m_graph = graph;
+#ifndef USE_JACK
   m_client->set_callback(run_graph,this);
+#else
+  JackClient::Get()->SetCallback(run_graph,this);
+#endif
+
 #endif
 }
 
 void audio_device::start_audio() {
+#ifndef USE_JACK
   if (m_client!=NULL) delete m_client;
   m_client = new portaudio_client();
   m_client->attach(m_client_name,m_opt);
@@ -124,9 +136,26 @@ void audio_device::start_audio() {
   if (m_graph!=NULL) {
     m_client->set_callback(run_graph,this);
   }
+#else
+  JackClient *Jack = JackClient::Get();
+  Jack->SetCallback(run_graph,this);
+  Jack->Attach(m_client_name);
+  if (Jack->IsAttached()) {	
+    int left_id=Jack->AddOutputPort();
+    int right_id=Jack->AddOutputPort();
+    Jack->SetOutputBuf(left_id,left_out.get_non_const_buffer());
+    Jack->SetOutputBuf(right_id,left_in.get_non_const_buffer());
+    Jack->ConnectOutput(left_id, "system:playback_1");
+    Jack->ConnectOutput(right_id, "system:playback_2");
+    cerr<<"Attached to jack"<<endl;
+  } else {
+    cerr<<"Could not attach to jack"<<endl;
+  }
+#endif
 }
 
 void audio_device::check_audio() {
+#ifndef USE_JACK
   ++m_watchdog_counter;
   if (m_watchdog_counter>=200) {
     m_watchdog_counter=0;
@@ -135,4 +164,5 @@ void audio_device::check_audio() {
     start_audio(); 
     pthread_mutex_unlock(m_graph->m_mutex);
   }
+#endif
 }
