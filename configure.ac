@@ -6,7 +6,9 @@ dnl FIXME: EGL of RPi depends on GLESv1 or GLESv2
 dnl FIXME: GLESv2 of RPi depends on EGL... WTF!
 AC_CHECK_LIB([bcm_host], [bcm_host_init], [
 
-CFLAGS="$CFLAGS -DFLX_RPI -I/opt/vc/include/interface/vcos/pthreads/ -I/opt/vc/include/interface/vmcs_host/linux/"
+AC_MSG_NOTICE([Adding Raspberry Pi stuff to CFLAGS])
+ 
+CFLAGS="$CFLAGS -I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads/ -I/opt/vc/include/interface/vmcs_host/linux/"
 
 AC_CHECK_LIB(bcm_host, main, [], [AC_MSG_ERROR([could not find bcm_host])])
 AC_CHECK_LIB(X11, main)
@@ -25,7 +27,7 @@ AC_CHECK_LIB(dl, main, [], [AC_MSG_ERROR([libdl was not found])])
 AC_CHECK_LIB(lo, main, [], [AC_MSG_ERROR([liblo was not found])])
 AC_CHECK_LIB(sndfile, main, [], [AC_MSG_ERROR([sndfile was not found])])
 AC_CHECK_LIB(jpeg, main)
-AC_CHECK_LIB(portaudio, main, [], [AC_MSG_ERROR([libportaudio not found])])
+#AC_CHECK_LIB(portaudio, main, [], [AC_MSG_ERROR([libportaudio not found])])
 AC_CHECK_LIB(jack, main, [], [AC_MSG_ERROR([jack not found])])
 #AC_CHECK_LIB(freetype, main, [], [AC_MSG_ERROR([freetype not found])])
 #AC_CHECK_LIB(GLU, main, [], [AC_MSG_ERROR([glu not found])])

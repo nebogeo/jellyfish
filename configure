@@ -2885,7 +2885,10 @@ $as_echo "$ac_cv_lib_bcm_host_bcm_host_init" >&6; }
 if test "x$ac_cv_lib_bcm_host_bcm_host_init" = xyes; then :
 
 
-CFLAGS="$CFLAGS -DFLX_RPI -I/opt/vc/include/interface/vcos/pthreads/ -I/opt/vc/include/interface/vmcs_host/linux/"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Adding Raspberry Pi stuff to CFLAGS" >&5
+$as_echo "$as_me: Adding Raspberry Pi stuff to CFLAGS" >&6;}
+
+CFLAGS="$CFLAGS -I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads/ -I/opt/vc/include/interface/vmcs_host/linux/"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lbcm_host" >&5
 $as_echo_n "checking for main in -lbcm_host... " >&6; }
@@ -3465,47 +3468,7 @@ _ACEOF
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lportaudio" >&5
-$as_echo_n "checking for main in -lportaudio... " >&6; }
-if ${ac_cv_lib_portaudio_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lportaudio  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_portaudio_main=yes
-else
-  ac_cv_lib_portaudio_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_portaudio_main" >&5
-$as_echo "$ac_cv_lib_portaudio_main" >&6; }
-if test "x$ac_cv_lib_portaudio_main" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPORTAUDIO 1
-_ACEOF
-
-  LIBS="-lportaudio $LIBS"
-
-else
-  as_fn_error $? "libportaudio not found" "$LINENO" 5
-fi
-
+#AC_CHECK_LIB(portaudio, main, [], [AC_MSG_ERROR([libportaudio not found])])
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -ljack" >&5
 $as_echo_n "checking for main in -ljack... " >&6; }
 if ${ac_cv_lib_jack_main+:} false; then :
