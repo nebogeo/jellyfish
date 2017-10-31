@@ -65,9 +65,9 @@ int network_osc::osc_default_handler(const char *path, const char *types, lo_arg
 int network_osc::osc_eval_handler(const char *path, const char *types, lo_arg **argv,
 		    int argc, void *data, void *user_data) {
     if (types[0]=='s') {
-        pthread_mutex_lock(m_render_mutex);
-        interpreter::eval((char*)argv[0]);
-        pthread_mutex_unlock(m_render_mutex);
+      pthread_mutex_lock(m_render_mutex);
+      interpreter::eval((char*)argv[0]);
+      pthread_mutex_unlock(m_render_mutex);
     }
     return 1;
 }

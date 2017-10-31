@@ -99,15 +99,14 @@ int main(int argc, char *argv[])
     //          graphics::keyboard_callback,
     //          graphics::keyboard_up_callback);
     
-    //usleep(5*1000);
     if (window) graphics::display_callback();
     else {
       if (!pthread_mutex_trylock(graphics::m_render_mutex)) {
 	interpreter::eval("(frame-hook)");
 	pthread_mutex_unlock(graphics::m_render_mutex);
       }
-      usleep(10000);
     }
+    usleep(10000); // - sleeping the gfx too so the osc thread is not starved
   }
 #else
   if (window) {
