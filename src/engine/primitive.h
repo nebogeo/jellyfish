@@ -59,6 +59,7 @@ public:
     // p is in object space
     bool intersect_bb(const vec3 &p, flx_real threshold);
 
+    vec3 m_colour;
 
 protected:
 

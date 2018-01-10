@@ -509,6 +509,8 @@ pointer scheme_interface(scheme *sc, enum scheme_opcodes op) {
 							string_value(car(sc->args)))));
   case OP_BUILD_JELLYFISH:
     s_return(sc,mk_integer(sc,engine::get()->build_jellyfish(ivalue(car(sc->args)))));
+  case OP_BUILD_INSTANCE:
+    s_return(sc,mk_integer(sc,engine::get()->build_instance(ivalue(car(sc->args)))));
   case OP_BUILD_POLYGONS:
     s_return(sc,mk_integer(sc,engine::get()->build_polygons(
 							    ivalue(car(sc->args)),

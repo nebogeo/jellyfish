@@ -75,6 +75,7 @@ public:
     int build_text(char *str);
     int build_polygons(unsigned int size, int type);
     int build_jellyfish(u32 size);
+    int build_instance(u32 id);
     void parent(int p);
     void clear_colour(float r, float g, float b, float a)
     {
