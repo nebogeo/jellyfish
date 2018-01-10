@@ -103,6 +103,7 @@ void jellyfish_primitive::render(u32 hints)
     u32 size=m_size;
     m_size=m_machine->peekix(REG_GRAPHICS);
     hints=m_machine->peekiz(REG_GRAPHICS);
-    primitive::render(hints);
+    // vertcols passed to maintain legacy behaviour - fixme
+    primitive::render(hints|HINT_VERTCOLS);
     m_size=size;
 }
