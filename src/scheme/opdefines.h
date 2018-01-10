@@ -247,6 +247,7 @@
     _OP_DEF(opexe_6, "build-polygons",                 2,  2,       0,                               OP_BUILD_POLYGONS   )
     _OP_DEF(opexe_6, "build-text",                     1,  1,       0,                               OP_BUILD_TEXT       )
     _OP_DEF(opexe_6, "build-jellyfish",                1,  1,       0,                               OP_BUILD_JELLYFISH  )
+    _OP_DEF(opexe_6, "build-instance",                 1,  1,       0,                               OP_BUILD_INSTANCE  )
     _OP_DEF(opexe_6, "get-transform",                  0,  0,       0,                               OP_GET_TRANSFORM    )
     _OP_DEF(opexe_6, "get-global-transform",           0,  0,       0,                               OP_GET_GLOBAL_TRANSFORM )
     _OP_DEF(opexe_6, "get-camera-transform",           0,  0,       0,                               OP_GET_CAMERA_TRANSFORM )

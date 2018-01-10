@@ -17,6 +17,7 @@
 #include "engine.h"
 #include "text_primitive.h"
 #include "jellyfish_primitive.h"
+#include "instance_primitive.h"
 #include "obj_reader.h"
 #include "shader.h"
 
@@ -359,6 +360,18 @@ int engine::build_jellyfish(u32 size) {
   setup_state(n);
   return m_sg->add(state_top()->m_parent,n);
 }
+
+int engine::build_instance(u32 id) {
+  scenenode *srcn=m_sg->find(id);
+  if (srcn==NULL) {
+    printf("cannot find instance source");
+    return -1;
+  }
+  scenenode *n=new scenenode(new instance_primitive(srcn->m_primitive));
+  setup_state(n);
+  return m_sg->add(state_top()->m_parent,n);
+}
+
 
 int engine::build_polygons(unsigned int size, int type) {
   scenenode *n=new scenenode(new primitive(size,static_cast<primitive::type>(type)));

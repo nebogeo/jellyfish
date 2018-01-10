@@ -141,11 +141,17 @@ vec3 *primitive::pdata_get(const char* name, int i) {
 
 void primitive::set_colour(flx_real r, flx_real g,
                            flx_real b, flx_real a) {
+  // reinstating colour material, will it work on gles??
+  m_colour.x=r;
+  m_colour.y=g;
+  m_colour.z=b;
+  /*
   for (int i=0; i<m_size; i++) {
     m_colours[i].x = r;
     m_colours[i].y = g;
     m_colours[i].z = b;
   }
+  */
 }
 
 void primitive::apply(const mat44 &m) {
@@ -275,10 +281,8 @@ void primitive::render(u32 hints) {
   glColorPointer(3, GL_FLOAT, 0, &m_colours[0]);
   glTexCoordPointer(3, GL_FLOAT, 0, &m_tex[0]);
   glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  //  glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-  glColor3f(1,1,1);
 
   if (hints&HINT_SOLID) {
     glDrawArrays(m_type, 0, m_size);

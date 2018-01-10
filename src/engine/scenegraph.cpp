@@ -195,7 +195,13 @@ void scenegraph::render_node_walk(scenenode *node, int depth) {
   else glEnable(GL_DEPTH_TEST);
   
   glEnable(GL_NORMALIZE);
-  
+  if (node->m_primitive!=NULL) {
+    // todo: why can't we set colour in the prim?
+    glEnable(GL_COLOR_MATERIAL);
+    glColor3f(node->m_primitive->m_colour.x,
+	      node->m_primitive->m_colour.y,
+	      node->m_primitive->m_colour.z);
+    }
 #endif
   if (node->m_texture!=0) {
     glEnable(GL_TEXTURE_2D);
