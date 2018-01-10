@@ -304,8 +304,11 @@ void primitive::render(u32 hints) {
 
   glVertexPointer(3, GL_FLOAT, 0, &m_positions[0]);
 
-  if (m_colours!=NULL) {
-    for (int i=0; i<m_size; i++) {
+  // for the moment, rely on (colour) to set glColor4f globally
+  // this is legacy from 8bit colour conv IIRC
+  
+  //  if (m_colours!=NULL) {
+    /*for (int i=0; i<m_size; i++) {
       m_colours_[i*4]=(float)m_colours[i].x*255.0f;
       m_colours_[i*4+1]=(float)m_colours[i].y*255.0f;
       m_colours_[i*4+2]=(float)m_colours[i].z*255.0f;
@@ -314,9 +317,9 @@ void primitive::render(u32 hints) {
 
     glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colours_);
     glEnableClientState(GL_COLOR_ARRAY);
-  } else {
+    } else {*/
     glDisableClientState(GL_COLOR_ARRAY);
-  }
+    //  }
 
   if (m_normals!=NULL) {
     glNormalPointer(GL_FLOAT, 0, &m_normals[0]);

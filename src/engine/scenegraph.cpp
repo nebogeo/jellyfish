@@ -16,6 +16,10 @@
 
 #include "scenegraph.h"
 
+#include <iostream>
+
+using namespace std;
+
 #ifdef _EE
 #include "ee/ps2-renderer.h"
 #endif
@@ -198,9 +202,10 @@ void scenegraph::render_node_walk(scenenode *node, int depth) {
   if (node->m_primitive!=NULL) {
     // todo: why can't we set colour in the prim?
     glEnable(GL_COLOR_MATERIAL);
-    glColor3f(node->m_primitive->m_colour.x,
+    
+    glColor4f(node->m_primitive->m_colour.x,
 	      node->m_primitive->m_colour.y,
-	      node->m_primitive->m_colour.z);
+	      node->m_primitive->m_colour.z,1.0);
     }
 #endif
   if (node->m_texture!=0) {
