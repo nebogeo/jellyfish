@@ -284,7 +284,7 @@ void primitive::render(u32 hints) {
   glColorPointer(3, GL_FLOAT, 0, &m_colours[0]);
   glTexCoordPointer(3, GL_FLOAT, 0, &m_tex[0]);
   glEnableClientState(GL_NORMAL_ARRAY);
-  //glEnableClientState(GL_COLOR_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
   if (hints&HINT_SOLID) {

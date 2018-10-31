@@ -18,7 +18,8 @@
 #include "fluxa/graph.h"
 #include "fluxa/sample.h"
 
-#define USE_JACK
+// turning off for pattern matrix app
+//#define USE_JACK
 
 #ifdef USE_JACK
 #include "audio/JackClient.h"

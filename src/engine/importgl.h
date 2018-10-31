@@ -45,8 +45,9 @@
 
 
 extern "C" {
-  #include "GL/glew.h"
-
+  // if using shaders we need glew, glew causes problems with qt
+  //#include "GL/glew.h"
+  #define NO_SHADERS
 
 #ifndef __APPLE__
 #include "GL/glut.h"
